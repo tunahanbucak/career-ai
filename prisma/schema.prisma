@@ -47,19 +47,50 @@ model Session {
 }
 
 model CV {
-  id         String   @id @default(cuid())
+  id         String       @id @default(cuid())
   title      String
-  uploadDate DateTime @default(now())
+  filename   String
+  mime       String?
+  size       Int?
+  rawText    String?      @db.Text
+  uploadDate DateTime     @default(now())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
+  user       User         @relation(fields: [userId], references: [id])
+  analyses   CVAnalysis[]
+}
+
+model CVAnalysis {
+  id         String   @id @default(cuid())
+  cvId       String
+  title      String?
+  summary    String   @db.Text
+  keywords   String[]
+  suggestion String   @db.Text
+  createdAt  DateTime @default(now())
+  cv         CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
 }
 
 model Interview {
-  id       String   @id @default(cuid())
+  id       String             @id @default(cuid())
   position String
-  date     DateTime @default(now())
+  date     DateTime           @default(now())
   userId   String
-  user     User     @relation(fields: [userId], references: [id])
+  user     User               @relation(fields: [userId], references: [id])
+  messages InterviewMessage[]
+}
+
+enum InterviewRole {
+  ASSISTANT
+  USER
+}
+
+model InterviewMessage {
+  id          String        @id @default(cuid())
+  interviewId String
+  role        InterviewRole
+  content     String        @db.Text
+  createdAt   DateTime      @default(now())
+  interview   Interview     @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {

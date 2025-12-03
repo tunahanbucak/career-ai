@@ -1,12 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import ai from "@/app/utils/gemini";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
+import { prisma } from "@/app/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
-    const { rawText, title } = await request.json();
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !session.user.email) {
+      return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
+    }
+
+    const { rawText, title, cvId } = await request.json();
 
     if (!rawText) {
       return NextResponse.json({ error: "CV metni boş." }, { status: 400 });
+    }
+    if (!cvId || typeof cvId !== "string") {
+      return NextResponse.json({ error: "cvId gerekli." }, { status: 400 });
     }
 
     const prompt = `
@@ -45,11 +56,25 @@ export async function POST(request: NextRequest) {
       .replace(/```json|```/g, "")
       .trim();
     const analysisResult = JSON.parse(jsonString);
+
+    // DB'ye kaydet
+    await prisma.cVAnalysis.create({
+      data: {
+        cvId,
+        title: title ?? null,
+        summary: String(analysisResult.summary || ""),
+        keywords: Array.isArray(analysisResult.keywords)
+          ? analysisResult.keywords.map(String)
+          : [],
+        suggestion: String(analysisResult.suggestion || ""),
+      },
+    });
     return NextResponse.json(
       {
         success: true,
         title: title,
         analysis: analysisResult,
+        cvId,
       },
       { status: 200 }
     );
