@@ -3,17 +3,15 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { 
-  Users, 
-  FileText, 
-  Activity, 
-  MessageSquare, 
   Search, 
   Download, 
   ShieldAlert, 
-  ChevronLeft, 
-  ChevronRight,
-  LayoutGrid
+  FileText
 } from "lucide-react";
+// ... imports
+import AdminStats from "./components/AdminStats";
+import { DataCard } from "./components/AdminTables";
+import GlobalActivityChart from "./components/GlobalActivityChart";
 
 export const dynamic = "force-dynamic";
 
@@ -40,13 +38,55 @@ export default async function AdminPage({ searchParams }: { searchParams?: { q?:
     prisma.interviewMessage.count(),
   ]);
 
+  // Chart için son 30 günlük veriyi çek (Basitleştirilmiş: Son 100 kaydı alıp JS'de işle)
+  const [chartCvs, chartInterviews] = await Promise.all([
+    prisma.cV.findMany({
+       select: { uploadDate: true },
+       orderBy: { uploadDate: 'desc' },
+       take: 100
+    }),
+    prisma.interview.findMany({
+       select: { date: true },
+       orderBy: { date: 'desc' },
+       take: 100
+    })
+  ]);
+
+  // Veriyi Gün Bazında Grupla
+  const activityMap = new Map<string, { date: string; cvs: number; interviews: number }>();
+  
+  // Son 30 günü doldur
+  for (let i = 29; i >= 0; i--) {
+     const d = new Date();
+     d.setDate(d.getDate() - i);
+     const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+     activityMap.set(key, { date: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }), cvs: 0, interviews: 0 });
+  }
+
+  chartCvs.forEach(c => {
+     const key = new Date(c.uploadDate).toISOString().slice(0, 10);
+     if (activityMap.has(key)) {
+        activityMap.get(key)!.cvs += 1;
+     }
+  });
+
+  chartInterviews.forEach(i => {
+     const key = new Date(i.date).toISOString().slice(0, 10);
+     if (activityMap.has(key)) {
+        activityMap.get(key)!.interviews += 1;
+     }
+  });
+
+  const activityData = Array.from(activityMap.values());
+
+
   // 3. Filtreleme Parametreleri
   const q = (searchParams?.q || "").trim();
   const pageIndex = Math.max(1, Number(searchParams?.page || 1));
   const pageSize = 10;
   const skip = (pageIndex - 1) * pageSize;
 
-  // Filtre Sorguları
+  // ... (filtre sorguları aynı kalacak) ...
   const cvWhere = q
     ? {
         OR: [
@@ -106,276 +146,239 @@ export default async function AdminPage({ searchParams }: { searchParams?: { q?:
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30 pb-20">
-      {/* Arka Plan Efekti */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-         <div className="absolute top-0 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 blur-[120px]" />
-         <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-900/10 blur-[120px]" />
+      
+      {/* ... (background effects) ... */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-20">
+         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black via-transparent to-black"></div>
       </div>
+      
+      <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-900/10 blur-[120px]" />
+       </div>
 
       <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col gap-8 px-6 py-10">
         
         {/* HEADER */}
-        <header className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b border-slate-800 pb-6">
+        <header className="flex flex-col justify-between gap-6 md:flex-row md:items-end border-b border-slate-800 pb-6">
           <div>
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-                <ShieldAlert className="h-6 w-6 text-indigo-400" />
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2.5 bg-indigo-600 rounded-lg shadow-[0_0_15px_rgba(79,70,229,0.5)]">
+                <ShieldAlert className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-3xl font-bold tracking-tight text-white">Yönetim Paneli</h1>
+              <h1 className="text-4xl font-black tracking-tighter text-white uppercase italic">Yönetim Paneli</h1>
             </div>
-            <p className="mt-2 text-sm text-slate-400">
-              Hoş geldin, <span className="text-slate-200 font-medium">{session.user.email}</span>. Platform istatistiklerini izle ve yönet.
+            <p className="text-sm font-mono text-slate-400">
+              <span className="text-indigo-400">root@career-ai</span>:~$ Hoş geldin, {session.user.email}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-             <div className="hidden md:flex flex-col items-end">
-                <span className="text-xs text-slate-500 uppercase tracking-wider font-bold">Sistem Durumu</span>
-                <span className="text-sm text-emerald-400 flex items-center gap-1">● Aktif ve Çalışıyor</span>
+          
+          <div className="flex items-center gap-4">
+             <div className="flex flex-col items-end border-r border-slate-800 pr-4">
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Server</span>
+                <span className="text-sm text-emerald-400 font-mono flex items-center gap-2">
+                   <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                   ONLINE
+                </span>
+             </div>
+             <div className="flex flex-col items-end">
+                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Version</span>
+                 <span className="text-sm text-slate-300 font-mono">v3.0.0-alpha</span>
              </div>
           </div>
         </header>
 
-        {/* METRİKLER */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <MetricCard title="Kullanıcılar" value={usersCount} icon={<Users size={20} />} color="text-sky-400" bg="bg-sky-500/10" border="border-sky-500/20" />
-          <MetricCard title="CV Sayısı" value={cvsCount} icon={<FileText size={20} />} color="text-emerald-400" bg="bg-emerald-500/10" border="border-emerald-500/20" />
-          <MetricCard title="Analizler" value={analysesCount} icon={<Activity size={20} />} color="text-purple-400" bg="bg-purple-500/10" border="border-purple-500/20" />
-          <MetricCard title="Mülakatlar" value={interviewsCount} icon={<LayoutGrid size={20} />} color="text-amber-400" bg="bg-amber-500/10" border="border-amber-500/20" />
-          <MetricCard title="Mesajlar" value={messagesCount} icon={<MessageSquare size={20} />} color="text-rose-400" bg="bg-rose-500/10" border="border-rose-500/20" />
-        </section>
+        {/* CHART SECTION */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+           {/* METRICS (2/3 width) */}
+           <div className="lg:col-span-3">
+              <AdminStats counts={{
+                  users: usersCount,
+                  cvs: cvsCount,
+                  analyses: analysesCount,
+                  interviews: interviewsCount,
+                  messages: messagesCount
+              }} />
+           </div>
+        </div>
+        
+        {/* ACTIVITY CHART */}
+        <GlobalActivityChart data={activityData} />
 
-        {/* FİLTRE VE AKSİYON ALANI */}
-        <section className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm p-5 shadow-xl">
-          <div className="flex flex-col lg:flex-row gap-6 justify-between items-end lg:items-center">
+
+
+        {/* FILTERS & SEARCH */}
+        <section className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm p-1">
+          <div className="flex flex-col lg:flex-row justify-between items-center bg-slate-950/50 rounded-xl p-4 gap-4">
             
-            {/* Arama Formu */}
-            <form action="/admin" method="get" className="flex-1 w-full lg:w-auto flex flex-col md:flex-row gap-3 items-end">
-               <div className="relative w-full md:max-w-md">
-                  <label className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1 block ml-1">Hızlı Arama</label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+            <form action="/admin" method="get" className="flex-1 w-full flex flex-col md:flex-row gap-3">
+               <div className="relative flex-1 group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
                     <input
                       name="q"
                       defaultValue={q}
-                      placeholder="E-posta, başlık veya pozisyon ara..."
-                      className="w-full rounded-xl border border-slate-700 bg-slate-950 pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all"
+                      placeholder="Veritabanında ara (Email, ID, Başlık)..."
+                      className="w-full h-11 rounded-lg border border-slate-700 bg-slate-900 pl-11 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-mono"
                     />
-                  </div>
                </div>
-               <input type="hidden" name="page" value="1" /> {/* Yeni aramada sayfa 1'e dön */}
-               <button type="submit" className="w-full md:w-auto rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 transition-all">
-                 Filtrele
+               <input type="hidden" name="page" value="1" />
+               <button type="submit" className="h-11 px-6 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20">
+                 ARA
                </button>
                {q && (
-                 <a href="/admin" className="text-xs text-slate-500 hover:text-slate-300 underline underline-offset-4 pb-2">Temizle</a>
+                  <a href="/admin" className="flex items-center justify-center px-4 h-11 text-xs text-slate-400 hover:text-white border border-slate-700 rounded-lg hover:bg-slate-800 transition-colors">
+                    Reset
+                  </a>
                )}
             </form>
 
-            {/* Export Formu */}
-            <form action="/api/admin/export" method="get" className="w-full lg:w-auto flex flex-col md:flex-row gap-3 items-end bg-slate-950/50 p-3 rounded-xl border border-slate-800/50">
-               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 w-full">
-                  <div>
-                    <label className="text-[10px] text-slate-500 block mb-1">Veri Tipi</label>
-                    <select name="type" className="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-300 focus:border-indigo-500 outline-none">
-                      <option value="analyses">Analizler</option>
-                      <option value="cvs">CV&apos;ler</option>
-                      <option value="interviews">Mülakatlar</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-slate-500 block mb-1">Başlangıç</label>
-                    <input type="date" name="from" className="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-300 focus:border-indigo-500 outline-none" />
-                  </div>
-                  <div className="col-span-2 md:col-span-1">
-                    <label className="text-[10px] text-slate-500 block mb-1">Bitiş</label>
-                    <input type="date" name="to" className="w-full rounded-lg border border-slate-700 bg-slate-900 px-2 py-1.5 text-xs text-slate-300 focus:border-indigo-500 outline-none" />
-                  </div>
-               </div>
-               <button type="submit" className="w-full md:w-auto flex items-center justify-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700 border border-slate-700">
-                 <Download size={14} /> CSV İndir
-               </button>
-            </form>
+            <div className="w-full lg:w-auto flex items-center gap-3 border-t lg:border-t-0 lg:border-l border-slate-800 pt-4 lg:pt-0 lg:pl-4">
+               <form action="/api/admin/export" method="get" className="flex items-center gap-2">
+                 <select name="type" className="h-9 rounded-lg border border-slate-700 bg-slate-900 px-3 text-xs text-slate-300 outline-none focus:border-indigo-500">
+                    <option value="analyses">Analizler</option>
+                    <option value="cvs">CV&apos;ler</option>
+                 </select>
+                 <button type="submit" className="h-9 px-3 flex items-center gap-2 rounded-lg bg-slate-800 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 transition-colors">
+                   <Download size={14} /> CSV
+                 </button>
+               </form>
+            </div>
 
           </div>
         </section>
 
-        {/* TABLOLAR ALANI */}
+        {/* DATA TABLES GRID */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           
-          {/* 1. TABLO: SON CV'LER */}
-          <DataCard title="Son Yüklenen CV'ler" total={cvTotal} page={pageIndex} pageSize={pageSize} query={q}>
+          {/* CV TABLE */}
+          <DataCard title="Son Yüklenen CV'ler" total={cvTotal} page={pageIndex} pageSize={pageSize} query={q} accentColor="emerald">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-500 uppercase bg-slate-950/50 border-b border-slate-800">
+              <thead className="text-[10px] text-slate-500 uppercase bg-slate-950/80 border-b border-slate-800 tracking-wider">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Başlık</th>
-                  <th className="px-4 py-3 font-medium">Kullanıcı</th>
-                  <th className="px-4 py-3 font-medium text-right">Tarih</th>
+                  <th className="px-6 py-3 font-semibold">Başlık</th>
+                  <th className="px-6 py-3 font-semibold">Kullanıcı</th>
+                  <th className="px-6 py-3 font-semibold text-right">Zaman</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-slate-800/50">
                 {recentCVs.map((cv) => (
-                  <tr key={cv.id} className="hover:bg-slate-800/30 transition-colors group">
-                    <td className="px-4 py-3 font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">
-                      {cv.title || "Başlıksız Belge"}
+                  <tr key={cv.id} className="hover:bg-emerald-500/5 transition-colors group">
+                    <td className="px-6 py-3.5">
+                      <div className="font-medium text-slate-200 group-hover:text-emerald-300 transition-colors flex items-center gap-2">
+                         <FileText size={14} className="text-slate-600 group-hover:text-emerald-500" />
+                         {cv.title || "İsimsiz Belge"}
+                      </div>
                     </td>
-                    <td className="px-4 py-3">
-                       <span className="inline-flex items-center rounded-full bg-slate-900 border border-slate-800 px-2 py-0.5 text-xs text-slate-400">
-                          {cv.user?.email || "Anonim"}
+                    <td className="px-6 py-3.5">
+                       <span className="font-mono text-xs text-slate-400 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
+                          {cv.user?.email?.split('@')[0]}
                        </span>
                     </td>
-                    <td className="px-4 py-3 text-right text-xs text-slate-500 tabular-nums">
-                      {new Date(cv.uploadDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    <td className="px-6 py-3.5 text-right text-xs text-slate-500 tabular-nums font-mono">
+                      {new Date(cv.uploadDate).toLocaleDateString('tr-TR')}
                     </td>
                   </tr>
                 ))}
                 {recentCVs.length === 0 && (
-                   <tr><td colSpan={3} className="px-4 py-8 text-center text-slate-500">Kayıt bulunamadı.</td></tr>
+                   <tr><td colSpan={3} className="px-6 py-12 text-center text-slate-500 italic">Veri bulunamadı.</td></tr>
                 )}
               </tbody>
             </table>
           </DataCard>
 
-          {/* 2. TABLO: SON ANALİZLER */}
-          <DataCard title="Son Yapılan Analizler" total={analysisTotal} page={pageIndex} pageSize={pageSize} query={q}>
+          {/* ANALYSIS TABLE */}
+          <DataCard title="Son Analizler" total={analysisTotal} page={pageIndex} pageSize={pageSize} query={q} accentColor="purple">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-500 uppercase bg-slate-950/50 border-b border-slate-800">
+              <thead className="text-[10px] text-slate-500 uppercase bg-slate-950/80 border-b border-slate-800 tracking-wider">
                 <tr>
-                  <th className="px-4 py-3 font-medium">CV Başlığı</th>
-                  <th className="px-4 py-3 font-medium">Kullanıcı</th>
-                  <th className="px-4 py-3 font-medium text-right">Tarih</th>
+                  <th className="px-6 py-3 font-semibold">İçerik</th>
+                  <th className="px-6 py-3 font-semibold">User</th>
+                  <th className="px-6 py-3 font-semibold text-right">Zaman</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-slate-800/50">
                 {recentAnalyses.map((a) => (
-                  <tr key={a.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3">
-                       <div className="font-medium text-slate-200">{a.cv?.title || "-"}</div>
-                       <div className="text-[10px] text-slate-500 truncate max-w-[150px] mt-0.5">
-                          {Array.isArray(a.keywords) ? a.keywords.slice(0, 3).join(", ") : ""}
+                  <tr key={a.id} className="hover:bg-purple-500/5 transition-colors group">
+                    <td className="px-6 py-3.5">
+                       <div className="font-medium text-slate-200 group-hover:text-purple-300 transition-colors">{a.cv?.title || "Bilinmiyor"}</div>
+                       <div className="flex gap-1 mt-1">
+                          {Array.isArray(a.keywords) && a.keywords.slice(0, 2).map((k: string, i: number) => (
+                             <span key={i} className="text-[9px] uppercase px-1 rounded bg-slate-900 text-slate-500 border border-slate-800">{k}</span>
+                          ))}
                        </div>
                     </td>
-                    <td className="px-4 py-3">
-                       <span className="inline-flex items-center rounded-full bg-slate-900 border border-slate-800 px-2 py-0.5 text-xs text-slate-400">
-                          {a.cv?.user?.email || "Anonim"}
+                    <td className="px-6 py-3.5">
+                       <span className="font-mono text-xs text-slate-400 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-800">
+                          {a.cv?.user?.email?.split('@')[0]}
                        </span>
                     </td>
-                    <td className="px-4 py-3 text-right text-xs text-slate-500 tabular-nums">
-                      {new Date(a.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    <td className="px-6 py-3.5 text-right text-xs text-slate-500 tabular-nums font-mono">
+                      {new Date(a.createdAt).toLocaleDateString('tr-TR')}
                     </td>
                   </tr>
                 ))}
                  {recentAnalyses.length === 0 && (
-                   <tr><td colSpan={3} className="px-4 py-8 text-center text-slate-500">Kayıt bulunamadı.</td></tr>
+                   <tr><td colSpan={3} className="px-6 py-12 text-center text-slate-500 italic">Veri bulunamadı.</td></tr>
                 )}
               </tbody>
             </table>
           </DataCard>
         </div>
 
-        {/* 3. BÖLÜM: MÜLAKATLAR (GENİŞ TABLO) */}
+        {/* INTERVIEWS TABLE (FULL WIDTH) */}
         <section>
-          <DataCard title="Son Mülakat Oturumları" total={interviewTotal} page={pageIndex} pageSize={pageSize} query={q}>
+          <DataCard title="Mülakat Oturumları" total={interviewTotal} page={pageIndex} pageSize={pageSize} query={q} accentColor="amber">
             <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-500 uppercase bg-slate-950/50 border-b border-slate-800">
+              <thead className="text-[10px] text-slate-500 uppercase bg-slate-950/80 border-b border-slate-800 tracking-wider">
                 <tr>
-                  <th className="px-4 py-3 font-medium">Pozisyon</th>
-                  <th className="px-4 py-3 font-medium">Kullanıcı</th>
-                  <th className="px-4 py-3 font-medium text-center">Mesaj Sayısı</th>
-                  <th className="px-4 py-3 font-medium text-right">Oluşturulma</th>
+                  <th className="px-6 py-3 font-semibold">Pozisyon</th>
+                  <th className="px-6 py-3 font-semibold">Kullanıcı</th>
+                  <th className="px-6 py-3 font-semibold text-center">Etkileşim</th>
+                  <th className="px-6 py-3 font-semibold text-center">Durum</th>
+                  <th className="px-6 py-3 font-semibold text-right">Tarih</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-slate-800/50">
                 {recentInterviews.map((i) => (
-                  <tr key={i.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3 font-medium text-indigo-300">
-                      {i.position}
+                  <tr key={i.id} className="hover:bg-amber-500/5 transition-colors group">
+                    <td className="px-6 py-3.5">
+                      <div className="flex items-center gap-3">
+                         <div className="h-8 w-8 rounded bg-slate-900 border border-slate-800 flex items-center justify-center text-amber-500 font-bold text-xs uppercase">
+                            {i.position.substring(0,2)}
+                         </div>
+                         <span className="font-medium text-slate-200 group-hover:text-amber-300 transition-colors">{i.position}</span>
+                      </div>
                     </td>
-                    <td className="px-4 py-3">
-                       <span className="inline-flex items-center rounded-full bg-slate-900 border border-slate-800 px-2 py-0.5 text-xs text-slate-400">
-                         {i.user?.email || "-"}
+                    <td className="px-6 py-3.5">
+                       <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full bg-slate-700" />
+                          <span className="text-sm text-slate-400">{i.user?.email}</span>
+                       </div>
+                    </td>
+                    <td className="px-6 py-3.5 text-center">
+                       <span className="font-mono text-xs font-bold text-slate-300">
+                          {i.messages?.length ?? 0} msgs
                        </span>
                     </td>
-                    <td className="px-4 py-3 text-center">
-                       <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-md bg-slate-800 text-xs font-medium text-slate-300">
-                          {i.messages?.length ?? 0}
+                     <td className="px-6 py-3.5 text-center">
+                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-500/20">
+                          COMPLETED
                        </span>
                     </td>
-                    <td className="px-4 py-3 text-right text-xs text-slate-500 tabular-nums">
-                      {new Date(i.date).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
+                    <td className="px-6 py-3.5 text-right text-xs text-slate-500 tabular-nums font-mono">
+                      {new Date(i.date).toLocaleString('tr-TR')}
                     </td>
                   </tr>
                 ))}
                  {recentInterviews.length === 0 && (
-                   <tr><td colSpan={4} className="px-4 py-8 text-center text-slate-500">Kayıt bulunamadı.</td></tr>
+                   <tr><td colSpan={5} className="px-6 py-12 text-center text-slate-500 italic">Veri bulunamadı.</td></tr>
                 )}
               </tbody>
             </table>
           </DataCard>
         </section>
 
-      </div>
-    </div>
-  );
-}
-
-// --- BİLEŞENLER ---
-
-function MetricCard({ title, value, icon, color, bg, border }: { title: string; value: number; icon: React.ReactNode, color: string, bg: string, border: string }) {
-  return (
-    <div className={`group relative overflow-hidden rounded-2xl border ${border} ${bg} backdrop-blur-sm p-5 transition-all hover:scale-[1.02]`}>
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{title}</p>
-          <h3 className="mt-2 text-3xl font-bold text-white tabular-nums tracking-tight">{value}</h3>
-        </div>
-        <div className={`rounded-xl bg-slate-950/40 p-2 ${color}`}>
-          {icon}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DataCard({ title, children, total, page, pageSize, query }: { title: string; children: React.ReactNode; total: number; page: number; pageSize: number, query: string }) {
-  const totalPages = Math.ceil(total / pageSize);
-  
-  return (
-    <div className="flex flex-col rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm shadow-sm overflow-hidden">
-      <div className="flex items-center justify-between border-b border-slate-800 px-5 py-4 bg-slate-900/50">
-        <h3 className="font-semibold text-slate-200 flex items-center gap-2">
-            <LayoutGrid size={16} className="text-slate-500" />
-            {title}
-        </h3>
-        <span className="text-xs text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800">Toplam: {total}</span>
-      </div>
-      
-      <div className="overflow-x-auto">
-        {children}
-      </div>
-
-      {/* Pagination Footer */}
-      <div className="flex items-center justify-between border-t border-slate-800 bg-slate-950/30 px-4 py-3">
-         <div className="text-xs text-slate-500">
-            Sayfa {page} / {totalPages || 1}
-         </div>
-         <div className="flex gap-2">
-            {page > 1 && (
-               <a
-               href={`/admin?q=${query}&page=${page - 1}`}
-               className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors"
-               >
-               <ChevronLeft size={14} />
-               </a>
-            )}
-            {page < totalPages && (
-               <a
-               href={`/admin?q=${query}&page=${page + 1}`}
-               className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-colors"
-               >
-               <ChevronRight size={14} />
-               </a>
-            )}
-         </div>
       </div>
     </div>
   );
