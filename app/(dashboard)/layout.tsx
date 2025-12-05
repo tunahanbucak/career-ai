@@ -2,7 +2,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { redirect } from "next/navigation";
 import Sidebar from "@/app/components/Sidebar";
-import Navbar from "@/app/components/Navbar";
+import DashboardNavbar from "@/app/components/DashboardNavbar";
+import { LayoutProvider } from "@/app/context/LayoutContext";
+import DashboardLayoutShell from "@/app/components/DashboardLayoutShell";
 
 export default async function DashboardLayout({
   children,
@@ -21,14 +23,15 @@ export default async function DashboardLayout({
         <div className="absolute top-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-indigo-900/20 blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-blue-900/10 blur-[120px]" />
       </div>
-      <Navbar />
-      <Sidebar user={session.user} />
+      
+      <LayoutProvider>
+          <Sidebar user={session.user} />
+          <DashboardNavbar user={session.user} />
 
-      <main className="pt-20 lg:pl-72 min-h-screen relative z-10">
-        <div className="container mx-auto max-w-[1600px] p-4 lg:p-8">
-          {children}
-        </div>
-      </main>
+          <DashboardLayoutShell>
+            {children}
+          </DashboardLayoutShell>
+      </LayoutProvider>
     </div>
   );
 }

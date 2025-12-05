@@ -7,12 +7,13 @@ import {
   FileText,
   MessageSquare,
   Zap,
-  Sparkles,
   Menu,
   X,
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Target,
+  Sparkles,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useLayout } from "@/app/context/LayoutContext";
 
 export default function Sidebar({
   user,
@@ -31,9 +33,8 @@ export default function Sidebar({
 }) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false); // Sidebar kapalı mı durumu
+  const { isSidebarCollapsed, toggleSidebar } = useLayout();
 
-  // Sayfa değişince mobil menüyü kapat
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
@@ -43,81 +44,75 @@ export default function Sidebar({
 
   return (
     <>
-      {/* MOBİL MENÜ BUTONU (Sadece mobilde görünür) */}
       <div className="fixed top-4 left-4 z-50 lg:hidden">
         <Button
           variant="outline"
           size="icon"
-          className="bg-slate-950 border-slate-800 text-slate-200"
+          className="bg-sidebar/80 backdrop-blur-md border-sidebar-border text-sidebar-foreground"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X /> : <Menu />}
         </Button>
       </div>
 
-      {/* MOBİL MENÜ OVERLAY */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-slate-950/95 p-6 lg:hidden animate-in slide-in-from-left-10 flex flex-col h-full">
-          <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <Zap className="h-6 w-6 text-white" fill="currentColor" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white">
-              CareerAI
-            </span>
+        <div className="fixed inset-0 z-40 bg-sidebar/95 p-6 lg:hidden animate-in slide-in-from-left-10 flex flex-col h-full backdrop-blur-xl">
+          <div className="flex items-center gap-3 mb-10 px-2 pt-4">
+             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+               <Zap className="h-6 w-6 text-white" fill="currentColor" />
+             </div>
+             <span className="text-xl font-bold tracking-tight text-sidebar-foreground">
+               CareerAI
+             </span>
           </div>
           <NavContent isActive={isActive} isCollapsed={false} />
-          {/* Mobil Alt Kısım (User) */}
-          <div className="mt-auto pt-6 border-t border-slate-800">
+          <div className="mt-auto pt-6 border-t border-sidebar-border/50">
             <UserProfile user={user} isCollapsed={false} />
           </div>
         </div>
       )}
 
-      {/* DESKTOP SIDEBAR */}
       <aside
-        className={`hidden lg:flex fixed top-0 left-0 z-40 h-screen flex-col justify-between border-r border-slate-800 bg-slate-950 transition-all duration-300 ease-in-out shadow-2xl ${
-          isCollapsed ? "w-[80px]" : "w-72"
+        className={`hidden lg:flex fixed top-0 left-0 z-40 h-screen flex-col justify-between border-r border-sidebar-border/50 bg-sidebar/60 backdrop-blur-2xl transition-all duration-300 ease-out shadow-2xl ${
+          isSidebarCollapsed ? "w-[80px]" : "w-72"
         }`}
       >
-        {/* Toggle Button (Sidebar'ı Aç/Kapa) */}
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-10 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-slate-400 hover:bg-indigo-600 hover:text-white transition-all shadow-md"
+          onClick={toggleSidebar}
+          className="absolute -right-3 top-10 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-sidebar-border bg-sidebar text-sidebar-foreground hover:bg-primary hover:text-primary-foreground transition-all shadow-md group"
         >
-          {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          {isSidebarCollapsed ? <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" /> : <ChevronLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />}
         </button>
 
         <div className="flex flex-col h-full p-4">
-          {/* Logo Alanı */}
           <div
             className={`flex items-center ${
-              isCollapsed ? "justify-center" : "gap-3 px-2"
-            } mb-8 h-12 transition-all`}
+              isSidebarCollapsed ? "justify-center" : "gap-3 px-2"
+            } mb-10 mt-2 h-12 transition-all`}
           >
-            <div className="h-10 w-10 min-w-[40px] rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-              <Zap className="h-5 w-5 text-white" fill="currentColor" />
-            </div>
-            {!isCollapsed && (
-              <div className="flex flex-col leading-tight animate-in fade-in duration-300">
-                <span className="text-lg font-bold tracking-tight text-white">
-                  CareerAI
-                </span>
-                <span className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
-                  Dashboard
-                </span>
-              </div>
-            )}
+            <Link href="/dashboard" className="flex items-center gap-3">
+                <div className="h-10 w-10 min-w-[40px] rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+                <Zap className="h-5 w-5 text-white" fill="currentColor" />
+                </div>
+                {!isSidebarCollapsed && (
+                <div className="flex flex-col leading-tight animate-in fade-in duration-300">
+                    <span className="text-lg font-bold tracking-tight text-sidebar-foreground">
+                    CareerAI
+                    </span>
+                    <span className="text-[10px] text-primary/80 uppercase tracking-widest font-bold">
+                    Pro Suite
+                    </span>
+                </div>
+                )}
+            </Link>
           </div>
 
-          {/* Navigasyon */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-800">
-            <NavContent isActive={isActive} isCollapsed={isCollapsed} />
+          <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-sidebar-border/50 scrollbar-track-transparent">
+            <NavContent isActive={isActive} isCollapsed={isSidebarCollapsed} />
           </div>
 
-          {/* User Profile Footer */}
-          <div className="mt-4 pt-4 border-t border-slate-800/50">
-            <UserProfile user={user} isCollapsed={isCollapsed} />
+          <div className="mt-4 pt-4 border-t border-sidebar-border/50">
+            <UserProfile user={user} isCollapsed={isSidebarCollapsed} />
           </div>
         </div>
       </aside>
@@ -125,7 +120,6 @@ export default function Sidebar({
   );
 }
 
-// Navigasyon İçeriği
 function NavContent({
   isActive,
   isCollapsed,
@@ -135,12 +129,6 @@ function NavContent({
 }) {
   return (
     <nav className="space-y-2">
-      {!isCollapsed && (
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 px-4 mb-2 mt-2 animate-in fade-in">
-          Menü
-        </div>
-      )}
-
       <TooltipProvider delayDuration={0}>
         <div className="space-y-1">
           <NavItem
@@ -164,9 +152,17 @@ function NavContent({
             active={isActive("/interview")}
             isCollapsed={isCollapsed}
           />
+          
+          {!isCollapsed && (
+            <div className="pt-6 pb-2 px-4 text-[10px] font-bold uppercase tracking-widest text-muted-foreground animate-in fade-in">
+              Arşiv
+            </div>
+          )}
+           {isCollapsed && <div className="h-4" />}
+
           <NavItem
             href="/me/cvs"
-            icon={<FileText size={20} />}
+            icon={<Target size={20} />}
             label="Geçmiş CV'ler"
             active={isActive("/me/cvs")}
             isCollapsed={isCollapsed}
@@ -184,7 +180,6 @@ function NavContent({
   );
 }
 
-// Tekil Navigasyon Öğesi
 const NavItem = ({
   href,
   icon,
@@ -205,30 +200,29 @@ const NavItem = ({
       href={href}
       onClick={onClick}
       className={`group flex items-center rounded-xl transition-all duration-200 relative overflow-hidden
-      ${isCollapsed ? "justify-center p-3" : "gap-3 px-4 py-3"}
+      ${isCollapsed ? "justify-center p-3 w-12 h-12 mx-auto" : "gap-3 px-4 py-3"}
       ${
         active
-          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/20"
-          : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-100"
+          ? "bg-sidebar-accent text-sidebar-accent-foreground border border-sidebar-border shadow-[0_0_20px_rgba(99,102,241,0.1)]"
+          : "text-sidebar-foreground/60 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground border border-transparent"
       }`}
     >
-      {/* Aktif İndikatörü (Sadece Açıkken) */}
       {!isCollapsed && active && (
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-indigo-300 rounded-r-full opacity-50" />
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-[0_0_10px_#6366f1]" />
       )}
 
       <span
         className={`${
           active
-            ? "text-indigo-100"
-            : "text-slate-500 group-hover:text-indigo-400"
-        } transition-colors`}
+            ? "text-primary"
+            : "text-sidebar-foreground group-hover:text-primary"
+        } transition-colors duration-200`}
       >
         {icon}
       </span>
 
       {!isCollapsed && (
-        <span className="font-medium truncate animate-in fade-in slide-in-from-left-2 duration-300">
+        <span className="font-medium text-sm truncate animate-in fade-in slide-in-from-left-2 duration-300">
           {label}
         </span>
       )}
@@ -241,7 +235,7 @@ const NavItem = ({
         <TooltipTrigger asChild>{content}</TooltipTrigger>
         <TooltipContent
           side="right"
-          className="bg-slate-800 text-slate-200 border-slate-700 ml-2 font-medium"
+          className="bg-sidebar text-sidebar-foreground border-sidebar-border ml-2 font-medium px-4 py-2 shadow-xl"
         >
           {label}
         </TooltipContent>
@@ -252,7 +246,6 @@ const NavItem = ({
   return content;
 };
 
-// Kullanıcı Profili Bileşeni
 function UserProfile({
   user,
   isCollapsed,
@@ -266,35 +259,37 @@ function UserProfile({
     <div
       className={`flex items-center ${
         isCollapsed ? "justify-center" : "gap-3"
-      } p-2 rounded-xl bg-slate-900/50 border border-slate-800/50 hover:border-indigo-500/30 transition-all group`}
+      } p-3 rounded-2xl bg-gradient-to-b from-sidebar to-sidebar/95 border border-sidebar-border hover:border-sidebar-accent transition-all group shadow-lg`}
     >
-      <div className="relative">
-        <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 p-[2px]">
-          <div className="h-full w-full rounded-full bg-slate-950 flex items-center justify-center text-xs font-bold text-white">
+      <div className="relative flex-shrink-0">
+        <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 p-[2px] shadow-lg shadow-indigo-500/20">
+          <div className="h-full w-full rounded-full bg-sidebar flex items-center justify-center text-xs font-bold text-sidebar-foreground group-hover:bg-sidebar-accent/50 transition-colors">
             {user.name?.charAt(0) || "U"}
           </div>
         </div>
-        <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-slate-950"></div>
+        <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-sidebar shadow-[0_0_8px_#10b981]"></div>
       </div>
 
       {!isCollapsed && (
         <div className="flex-1 overflow-hidden animate-in fade-in duration-300">
           <div className="flex items-center justify-between">
-            <div className="truncate text-sm font-semibold text-slate-200">
+            <div className="truncate text-sm font-semibold text-sidebar-foreground group-hover:text-foreground transition-colors">
               {user.name?.split(" ")[0] || "Kullanıcı"}
             </div>
-            <Button
+          </div>
+          <div className="flex items-center justify-between mt-0.5">
+            <div className="truncate text-[10px] text-muted-foreground group-hover:text-sidebar-foreground/80 transition-colors">
+                 {user.email || "Free Plan"}
+            </div>
+             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-slate-500 hover:text-red-400 hover:bg-red-500/10 -mr-1"
+              className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10 -mr-2"
               onClick={() => signOut({ callbackUrl: "/" })}
               title="Çıkış Yap"
             >
-              <LogOut size={14} />
+              <LogOut size={13} />
             </Button>
-          </div>
-          <div className="truncate text-[10px] text-slate-500">
-            {user.email}
           </div>
         </div>
       )}
