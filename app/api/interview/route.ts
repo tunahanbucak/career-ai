@@ -6,6 +6,19 @@ import { prisma } from "@/app/lib/prisma";
 
 export const runtime = "nodejs";
 
+type InterviewHistoryMessage = {
+  role: "assistant" | "user";
+  content: string;
+};
+
+interface InterviewRequestBody {
+  position?: string;
+  message?: string;
+  history?: InterviewHistoryMessage[];
+  start?: boolean;
+  interviewId?: string;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -13,13 +26,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
     }
 
-    const { position, history, message, start, interviewId }: {
-      position?: string;
-      message?: string;
-      history?: Array<{ role: "assistant" | "user"; content: string }>;
-      start?: boolean;
-      interviewId?: string;
-    } = await req.json();
+    const { position, history, message, start, interviewId } = (await req.json()) as InterviewRequestBody;
 
     const hasUserMessage = typeof message === "string" && message.trim().length > 0;
     const isStart = Boolean(start);

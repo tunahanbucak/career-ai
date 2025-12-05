@@ -11,7 +11,7 @@ import { prisma } from "@/app/lib/prisma";
 
 // 💡 ÇÖZÜM: Kütüphanenin kendisini import ediyoruz ve içindeki fonksiyonu kullanacağız.
 // Bu, require ile import edilen objenin içindeki fonksiyonu bulmanın en güvenilir yoludur.
-const pdfParse = require('pdf-parse'); 
+const pdfParse = require("pdf-parse");
 
 export const runtime = "nodejs";
 
@@ -19,17 +19,21 @@ export const runtime = "nodejs";
 const isRecord = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object";
 
 // pdf-parse fonksiyonunu basit ve stabil şekilde çöz
-async function resolvePdfParse(): Promise<((b: Buffer) => Promise<{ text?: string }>)> {
+type PdfParseFn = (b: Buffer) => Promise<{ text?: string }>;
+
+async function resolvePdfParse(): Promise<PdfParseFn> {
   const m: unknown = pdfParse;
-  if (typeof m === 'function') return m as (b: Buffer) => Promise<{ text?: string }>;
-  if (isRecord(m) && typeof m.default === 'function') return m.default as (b: Buffer) => Promise<{ text?: string }>;
-  if (isRecord(m) && typeof (m as Record<string, unknown>).pdf === 'function') return (m as { pdf: (b: Buffer) => Promise<{ text?: string }> }).pdf;
+  if (typeof m === "function") return m as PdfParseFn;
+  if (isRecord(m) && typeof m.default === "function") return m.default as PdfParseFn;
+  if (isRecord(m) && typeof (m as Record<string, unknown>).pdf === "function") {
+    return (m as { pdf: PdfParseFn }).pdf;
+  }
 
   // Dinamik import fallback
-  const mod: unknown = await import('pdf-parse');
-  if (typeof mod === 'function') return mod as (b: Buffer) => Promise<{ text?: string }>;
-  if (isRecord(mod) && typeof mod.default === 'function') return mod.default as (b: Buffer) => Promise<{ text?: string }>;
-  throw new TypeError('pdf-parse modülü çözümlenemedi (uyumlu fonksiyon bulunamadı)');
+  const mod: unknown = await import("pdf-parse");
+  if (typeof mod === "function") return mod as PdfParseFn;
+  if (isRecord(mod) && typeof mod.default === "function") return mod.default as PdfParseFn;
+  throw new TypeError("pdf-parse modülü çözümlenemedi (uyumlu fonksiyon bulunamadı)");
 }
 
 export async function POST(request: NextRequest) {

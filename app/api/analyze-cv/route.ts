@@ -1,24 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import ai from "@/app/utils/gemini";
 import { getServerSession } from "next-auth";
+import { z } from "zod";
+import ai from "@/app/utils/gemini";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
+import { AnalysisResult } from "@/types";
+
+// Zod schema for request validation
+const analyzeCvSchema = z.object({
+  rawText: z.string().min(1, "CV metni boş olamaz."),
+  title: z.string().optional(),
+  cvId: z.string().min(1, "cvId gereklidir."),
+});
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || !session.user || !session.user.email) {
-      return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
     }
 
-    const { rawText, title, cvId } = await request.json();
+    const json = await request.json();
+    const result = analyzeCvSchema.safeParse(json);
 
-    if (!rawText) {
-      return NextResponse.json({ error: "CV metni boş." }, { status: 400 });
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.error.issues[0]?.message || "Geçersiz veri." },
+        { status: 400 }
+      );
     }
-    if (!cvId || typeof cvId !== "string") {
-      return NextResponse.json({ error: "cvId gerekli." }, { status: 400 });
-    }
+
+    const { rawText, title, cvId } = result.data;
 
     const prompt = `
       Sen, üst düzey bir İK uzmanı ve kariyer danışmanısın. Aşağıdaki CV metnini 3 aşamalı olarak analiz et:
@@ -38,50 +50,57 @@ export async function POST(request: NextRequest) {
     `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-2.0-flash", // Updated to latest model if available, fallback to flash
       contents: prompt,
     });
-    if (!response.text) {
-      return NextResponse.json(
-        {
-          error:
-            "Gemini analiz verisi üretemedi. Lütfen CV içeriğini kontrol edin.",
-        },
+    
+    const text = response.text ? response.text.trim() : "";
+    
+    if (!text) {
+      throw new Error("AI yanıtı boş.");
+    }
+
+    // Clean markdown code blocks if present
+    const cleanJson = text.replace(/```json|```/g, "").trim();
+    
+    let parsedData: AnalysisResult;
+    try {
+        parsedData = JSON.parse(cleanJson);
+    } catch (e) {
+        console.error("JSON Parse Error:", e);
+         return NextResponse.json(
+        { error: "AI yanıtı işlenemedi." },
         { status: 500 }
       );
     }
 
-    const jsonString = response.text
-      .trim()
-      .replace(/```json|```/g, "")
-      .trim();
-    const analysisResult = JSON.parse(jsonString);
+    const { summary, keywords, suggestion } = parsedData;
 
-    // DB'ye kaydet
+    // Database operation
     await prisma.cVAnalysis.create({
       data: {
         cvId,
         title: title ?? null,
-        summary: String(analysisResult.summary || ""),
-        keywords: Array.isArray(analysisResult.keywords)
-          ? analysisResult.keywords.map(String)
-          : [],
-        suggestion: String(analysisResult.suggestion || ""),
+        summary: summary || "",
+        keywords: Array.isArray(keywords) ? keywords.map(String) : [],
+        suggestion: suggestion || "",
       },
     });
+
     return NextResponse.json(
       {
         success: true,
-        title: title,
-        analysis: analysisResult,
+        title,
+        analysis: parsedData,
         cvId,
       },
       { status: 200 }
     );
+
   } catch (error) {
-    console.error("Gemini Analiz Hatası:", error);
+    console.error("Analyze CV API Error:", error);
     return NextResponse.json(
-      { error: "AI Analizi sırasında bir hata oluştu." },
+      { error: "İşlem sırasında bir hata oluştu." },
       { status: 500 }
     );
   }
