@@ -3,9 +3,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { MessageSquare, ChevronRight, Plus, UserCircle2 } from "lucide-react";
+import { MessageSquare, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import InterviewAnalytics from "./InterviewAnalytics";
+import InterviewHistoryList from "./components/InterviewHistoryList";
 
 export const dynamic = "force-dynamic";
 
@@ -50,14 +51,14 @@ export default async function MyInterviewsPage() {
       </div>
 
       {interviews.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-800 bg-slate-950/50 py-20 text-center">
-          <div className="rounded-full bg-slate-900 p-4">
-            <MessageSquare className="h-8 w-8 text-slate-500" />
+        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-800 bg-slate-950/50 py-20 text-center">
+          <div className="rounded-full bg-slate-900 p-6 mb-4 shadow-lg shadow-emerald-500/10">
+            <MessageSquare className="h-10 w-10 text-slate-500" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-slate-300">
+          <h3 className="text-xl font-bold text-slate-300">
             Henüz mülakat yapmadınız
           </h3>
-          <p className="mt-1 text-sm text-slate-500 max-w-xs mx-auto">
+          <p className="mt-2 text-sm text-slate-500 max-w-xs mx-auto">
             İlk simülasyonunuzu başlatın ve deneyim kazanın.
           </p>
         </div>
@@ -65,40 +66,17 @@ export default async function MyInterviewsPage() {
         <>
           <InterviewAnalytics interviews={interviews} />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {interviews.map((it) => (
-              <Link
-                key={it.id}
-                href={`/me/interviews/${it.id}`}
-                className="group relative flex flex-col justify-between rounded-2xl border border-slate-800 bg-slate-900/40 p-5 backdrop-blur-sm transition-all hover:-translate-y-1 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/10"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
-                      <UserCircle2 size={20} />
-                    </div>
-                    <span className="text-[10px] text-slate-500 font-medium px-2 py-1 rounded-full bg-slate-950 border border-slate-800">
-                      {new Date(it.date).toLocaleDateString("tr-TR")}
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-100 group-hover:text-indigo-300 transition-colors line-clamp-1">
-                    {it.position}
-                  </h3>
-                  <p className="text-sm text-slate-500 mt-1">
-                    Simülasyon Kaydı
-                  </p>
-                </div>
-
-                <div className="mt-6 flex items-center justify-between border-t border-slate-800 pt-4">
-                  <div className="text-xs text-slate-400 flex items-center gap-1">
-                    <MessageSquare size={12} /> {it._count.messages} Mesaj
-                  </div>
-                  <div className="text-xs font-medium text-indigo-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    İncele <ChevronRight size={12} />
-                  </div>
-                </div>
-              </Link>
-            ))}
+          <div className="pt-4">
+             <div className="flex items-center gap-2 mb-6">
+                <div className="h-8 w-1 bg-emerald-500 rounded-full" />
+                <h2 className="text-xl font-bold text-white">Geçmiş Mülakatlar</h2>
+             </div>
+             <InterviewHistoryList interviews={interviews.map(it => ({
+                id: it.id,
+                position: it.position,
+                date: it.date instanceof Date ? it.date.toISOString() : it.date,
+                _count: it._count
+             }))} />
           </div>
         </>
       )}

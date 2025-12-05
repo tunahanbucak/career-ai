@@ -1,27 +1,6 @@
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-
-export type RecentAnalysis = {
-  id: string;
-  title: string | null;
-  createdAt: string;
-  cvId: string;
-  keywords: string[];
-};
+import { RecentAnalysis } from "@/types";
+import { FileText, ArrowRight } from "lucide-react";
 
 type Props = {
   analyses: RecentAnalysis[];
@@ -29,63 +8,53 @@ type Props = {
 
 export default function RecentUploadsCard({ analyses }: Props) {
   return (
-    <Card className="border-slate-800 bg-slate-900/60 backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-lg">Son Yüklemeler</CardTitle>
-        <Button
-          variant="ghost"
-          size="sm"
-          asChild
-          className="text-xs text-slate-400 hover:text-white"
-        >
-          <Link href="/me/cvs">Tümünü Gör</Link>
-        </Button>
-      </CardHeader>
-      <CardContent className="p-0">
-        <Table>
-          <TableHeader className="bg-slate-950/30">
-            <TableRow className="border-slate-800 hover:bg-transparent">
-              <TableHead className="text-slate-400">Dosya</TableHead>
-              <TableHead className="text-slate-400">Tarih</TableHead>
-              <TableHead className="text-right text-slate-400">İşlem</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {analyses.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={3}
-                  className="text-center py-8 text-slate-500"
-                >
-                  Kayıt yok.
-                </TableCell>
-              </TableRow>
-            ) : (
-              analyses.slice(0, 5).map((a) => (
-                <TableRow
-                  key={a.id}
-                  className="border-slate-800 hover:bg-slate-800/30"
-                >
-                  <TableCell className="font-medium text-slate-200">
-                    {a.title || "İsimsiz"}
-                  </TableCell>
-                  <TableCell className="text-slate-400 text-xs">
-                    {new Date(a.createdAt).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Link
-                      href={`/me/cvs/${a.cvId}`}
-                      className="text-indigo-400 hover:underline text-xs"
-                    >
-                      Detay
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+    <div className="rounded-2xl border border-white/5 bg-slate-900/40 p-6 backdrop-blur-xl">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+           <h3 className="text-lg font-semibold text-white tracking-tight">Son Yüklemeler</h3>
+           <p className="text-xs text-slate-400 mt-1">Sisteme yüklediğin son CV&apos;ler.</p>
+        </div>
+       
+        <Link href="/me/cvs" className="text-xs font-medium text-indigo-400 flex items-center gap-1 hover:text-indigo-300 transition-colors">
+            Tümünü Gör <ArrowRight size={14} />
+        </Link>
+      </div>
+      
+      <div className="space-y-3">
+        {analyses.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-10 text-slate-500 border border-dashed border-slate-800 rounded-xl">
+             <FileText size={40} className="mb-3 opacity-20" />
+             <p className="text-sm">Henüz kayıt bulunmuyor.</p>
+          </div>
+        ) : (
+          analyses.slice(0, 5).map((a) => (
+            <div
+              key={a.id}
+              className="group flex items-center justify-between rounded-xl border border-transparent bg-white/5 p-3 hover:border-indigo-500/20 hover:bg-white/10 transition-all duration-300"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 group-hover:scale-110 transition-transform">
+                  <FileText size={18} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-slate-200 group-hover:text-white transition-colors">
+                    {a.title || "İsimsiz CV Analizi"}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    {new Date(a.createdAt).toLocaleDateString("tr-TR", { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </span>
+                </div>
+              </div>
+              <Link
+                href={`/me/cvs/${a.cvId}`}
+                className="rounded-lg bg-slate-950/50 px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-indigo-500 hover:text-white transition-all"
+              >
+                İncele
+              </Link>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 }
