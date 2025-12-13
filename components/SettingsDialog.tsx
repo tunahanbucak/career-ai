@@ -46,7 +46,7 @@ export default function SettingsDialog({
         toast.success("Profil başarıyla güncellendi");
         router.refresh();
       } else {
-        toast.error("Profil güncellenirken bir hata oluştu");
+        toast.error(result.error || "Profil güncellenirken bir hata oluştu");
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
