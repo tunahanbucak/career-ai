@@ -4,13 +4,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
 
+// Node.js runtime kullanılacağını belirtiyoruz (AI işlemleri için gerekli olabilir)
 export const runtime = "nodejs";
 
+// Mülakat geçmişi için mesaj tipi
 type InterviewHistoryMessage = {
   role: "assistant" | "user";
   content: string;
 };
 
+// API İstek gövdesi tipi
 interface InterviewRequestBody {
   position?: string;
   message?: string;
@@ -19,30 +22,36 @@ interface InterviewRequestBody {
   interviewId?: string;
 }
 
+// POST: Mülakat simülasyonu için AI yanıtı oluşturur
 export async function POST(req: NextRequest) {
   try {
+    // 1. Oturum Kontrolü
     const session = await getServerSession(authOptions);
     if (!session || !session.user || !session.user.email) {
       return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
     }
 
+    // 2. İstek Verilerini Okuma
     const { position, history, message, start, interviewId } = (await req.json()) as InterviewRequestBody;
 
     const hasUserMessage = typeof message === "string" && message.trim().length > 0;
     const isStart = Boolean(start);
+    
+    // Mesaj yoksa ve başlangıç değilse hata ver
     if (!hasUserMessage && !isStart) {
       return NextResponse.json({ error: "Mesaj gerekli." }, { status: 400 });
     }
 
     const role = typeof position === "string" && position.trim().length > 0 ? position.trim() : "Genel Yazılım Geliştirici";
 
+    // 3. AI Sistem Talimatı (Prompt) Hazırlama
     const systemPrompt = `Sen profesyonel bir teknik mülakat simülatörüsün. Rol: ${role}.
 - Kısa ve net sorular sor.
 - Adayın yanıtına göre derinleş.
 - Gerektiğinde geri bildirim ver.
 Yanıtlarını Türkçe ver.`;
 
-    // Basit geçmiş formatını tek bir metne çeviriyoruz.
+    // 4. Geçmişi Metne Çevirme (Context Window için)
     const historyText = Array.isArray(history)
       ? history
           .map((m) => {
@@ -53,10 +62,12 @@ Yanıtlarını Türkçe ver.`;
           .join("\n")
       : "";
 
+    // 5. Tam Prompt Oluşturma
     const fullPrompt = isStart
       ? `${systemPrompt}\n\nGeçmiş:\n${historyText}\n\nLütfen ${role} pozisyonu için ilk teknik mülakat sorunu sor. Kısa ve net olsun.\n\nMülakatçı:`
       : `${systemPrompt}\n\nGeçmiş:\n${historyText}\n\nAday: ${message}\n\nMülakatçı:`;
 
+    // 6. Gemini AI İsteği
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: fullPrompt,
@@ -68,11 +79,13 @@ Yanıtlarını Türkçe ver.`;
 
     const reply = response.text.trim();
 
-    // DB Kalıcılık
+    // 7. Veritabanına Kayıt
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (!user) return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
 
     let createdInterviewId = interviewId;
+    
+    // Eğer yeni bir mülakatsa DB kaydı oluştur
     if (isStart) {
       const created = await prisma.interview.create({
         data: { position: role, userId: user.id },
@@ -84,14 +97,17 @@ Yanıtlarını Türkçe ver.`;
       return NextResponse.json({ error: "interviewId gerekli." }, { status: 400 });
     }
 
-    // Geçmişi DB'ye eklemiyoruz (tekrar gönderilebilir), sadece yeni mesajları ekleyelim
+    // Kullanıcı mesajını kaydet
     if (hasUserMessage) {
       await prisma.interviewMessage.create({
         data: { interviewId: createdInterviewId, role: "USER", content: message!.trim() },
+        select: { id: true }
       });
     }
+    // AI yanıtını kaydet
     await prisma.interviewMessage.create({
       data: { interviewId: createdInterviewId, role: "ASSISTANT", content: reply },
+      select: { id: true }
     });
 
     return NextResponse.json(

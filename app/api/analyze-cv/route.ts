@@ -6,23 +6,28 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
 import { AnalysisResult } from "@/types";
 
-// Zod schema for request validation
+// Zod şeması: Gelen istek verilerinin doğrulanması için kullanılır.
 const analyzeCvSchema = z.object({
-  rawText: z.string().min(1, "CV metni boş olamaz."),
-  title: z.string().optional(),
-  cvId: z.string().min(1, "cvId gereklidir."),
+  rawText: z.string().min(1, "CV metni boş olamaz."), // CV içeriği zorunludur.
+  title: z.string().optional(), // Başlık opsiyoneldir.
+  cvId: z.string().min(1, "cvId gereklidir."), // Hangi CV'nin analiz edildiği bilinmelidir.
 });
 
+// POST Metodu: CV analizi işlemini gerçekleştirir.
 export async function POST(request: NextRequest) {
   try {
+    // 1. Kullanıcı oturum kontrolü
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
+      // Oturum açmamış kullanıcıya yetkisiz hatası dön.
       return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
     }
 
+    // 2. İstek verisini al ve doğrula
     const json = await request.json();
     const result = analyzeCvSchema.safeParse(json);
 
+    // Eğer veri doğrulama hatası varsa 400 hatası dön.
     if (!result.success) {
       return NextResponse.json(
         { error: result.error.issues[0]?.message || "Geçersiz veri." },
@@ -32,6 +37,7 @@ export async function POST(request: NextRequest) {
 
     const { rawText, title, cvId } = result.data;
 
+    // 3. Yapay Zeka (Gemini) için prompt hazırlığı
     const prompt = `
       Sen, üst düzey bir İK uzmanı ve kariyer danışmanısın. Aşağıdaki CV metnini 3 aşamalı olarak analiz et:
 
@@ -49,26 +55,28 @@ export async function POST(request: NextRequest) {
       }
     `;
 
+    // 4. Gemini AI servisine isteği gönder
     const response = await ai.models.generateContent({
-      model: "gemini-2.0-flash", // Updated to latest model if available, fallback to flash
+      model: "gemini-2.5-flash", // En hızlı ve güncel modeli kullanır.
       contents: prompt,
     });
-    
+
     const text = response.text ? response.text.trim() : "";
-    
+
+    // AI yanıtı boşsa hata fırlat.
     if (!text) {
       throw new Error("AI yanıtı boş.");
     }
 
-    // Clean markdown code blocks if present
+    // 5. JSON yanıtını temizle ve parse et (Markdown bloklarını kaldır)
     const cleanJson = text.replace(/```json|```/g, "").trim();
-    
+
     let parsedData: AnalysisResult;
     try {
-        parsedData = JSON.parse(cleanJson);
+      parsedData = JSON.parse(cleanJson);
     } catch (e) {
-        console.error("JSON Parse Error:", e);
-         return NextResponse.json(
+      console.error("JSON Parse Error:", e);
+      return NextResponse.json(
         { error: "AI yanıtı işlenemedi." },
         { status: 500 }
       );
@@ -76,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const { summary, keywords, suggestion } = parsedData;
 
-    // Database operation
+    // 6. Sonuçları Veritabanına Kaydet
     await prisma.cVAnalysis.create({
       data: {
         cvId,
@@ -87,6 +95,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // 7. Başarılı yanıtı döndür
     return NextResponse.json(
       {
         success: true,
@@ -96,8 +105,8 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
-
   } catch (error) {
+    // Beklenmedik hataları yakala ve logla
     console.error("Analyze CV API Error:", error);
     return NextResponse.json(
       { error: "İşlem sırasında bir hata oluştu." },

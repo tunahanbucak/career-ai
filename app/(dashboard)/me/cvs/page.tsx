@@ -21,7 +21,20 @@ export default async function MyCVsPage() {
   const cvs = await prisma.cV.findMany({
     where: { userId: user.id },
     orderBy: { uploadDate: "desc" },
-    select: { id: true, title: true, uploadDate: true },
+    select: { 
+        id: true, 
+        title: true, 
+        uploadDate: true,
+        analyses: {
+            take: 1,
+            orderBy: { createdAt: 'desc' },
+            select: {
+                summary: true,
+                keywords: true,
+                createdAt: true
+            }
+        }
+    },
   });
 
   return (
@@ -69,7 +82,8 @@ export default async function MyCVsPage() {
              <CvHistoryList cvs={cvs.map(c => ({
                 id: c.id, 
                 title: c.title, 
-                uploadDate: c.uploadDate instanceof Date ? c.uploadDate.toISOString() : c.uploadDate
+                uploadDate: c.uploadDate instanceof Date ? c.uploadDate.toISOString() : c.uploadDate,
+                analysis: c.analyses[0] || null
              }))} />
           </div>
         </>

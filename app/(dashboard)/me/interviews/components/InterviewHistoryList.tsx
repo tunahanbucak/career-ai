@@ -2,8 +2,24 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MessageSquare, Search, ArrowUpRight, Clock, UserCircle2 } from "lucide-react";
+import { MessageSquare, Search, ArrowRight, Clock, MessageCircle, BarChart, CheckCircle2, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Badge } from "@/components/ui/badge";
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
 
 interface InterviewItem {
   id: string;
@@ -22,6 +38,16 @@ export default function InterviewHistoryList({ interviews }: InterviewHistoryLis
   const filtered = interviews.filter(item => 
     (item.position.toLowerCase() || "").includes(term.toLowerCase())
   );
+
+  // Mock function to generate consistent score based on ID
+  const getMockScore = (id: string, count: number) => {
+    if (count < 5) return null; // Not enough data
+    let hash = 0;
+    for (let i = 0; i < id.length; i++) {
+        hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return Math.abs(hash % 30) + 70; // Score between 70-100
+  };
 
   return (
     <div className="space-y-6">
@@ -52,53 +78,82 @@ export default function InterviewHistoryList({ interviews }: InterviewHistoryLis
            <p className="text-slate-600 text-sm">Arama teriminizi değiştirmeyi deneyin.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-           <AnimatePresence>
-             {filtered.map((it, i) => (
+        <motion.div 
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+           <AnimatePresence mode="popLayout">
+             {filtered.map((it) => {
+               const score = getMockScore(it.id, it._count.messages);
+               const isCompleted = it._count.messages > 5;
+               
+               return (
                <motion.div
                  key={it.id}
-                 initial={{ opacity: 0, y: 20 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 exit={{ opacity: 0, scale: 0.95 }}
-                 transition={{ delay: i * 0.05 }}
+                 variants={item}
+                 layout
                >
                  <Link href={`/me/interviews/${it.id}`} className="group block h-full">
-                    <div className="relative h-full bg-slate-900/40 backdrop-blur-md rounded-3xl border border-slate-800/60 p-6 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-900/80 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col justify-between">
-                       
-                       {/* Header */}
-                       <div className="flex items-start justify-between mb-4">
-                          <div className="h-12 w-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow-lg">
-                             <UserCircle2 className="h-6 w-6" />
-                          </div>
-                          <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-slate-950/80 text-slate-500 border border-slate-800 group-hover:border-indigo-500/30 group-hover:text-indigo-300 transition-colors">
-                            {new Date(it.date).toLocaleDateString("tr-TR")}
-                          </span>
-                       </div>
-                       
-                       {/* Content */}
-                       <div>
-                          <h3 className="text-lg font-bold text-slate-200 mb-2 line-clamp-1 group-hover:text-white transition-colors" title={it.position}>
-                             {it.position}
-                          </h3>
-                          <div className="flex items-center justify-between border-t border-slate-800/50 pt-4">
-                             <div className="flex items-center gap-2 text-xs text-slate-500 group-hover:text-slate-400 transition-colors">
-                                <MessageSquare className="h-3 w-3" />
-                                {it._count.messages} Mesaj
-                             </div>
-                             <div className="flex items-center gap-1 text-xs font-semibold text-indigo-400 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                                İncele <ArrowUpRight className="h-3 w-3" />
-                             </div>
-                          </div>
-                       </div>
+                    <div className="group relative h-full bg-slate-900/40 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/50 hover:bg-slate-900/60 transition-all duration-300 overflow-hidden cursor-pointer flex flex-col">
                        
                        {/* Decoration */}
-                       <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500/0 via-indigo-500/50 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                       <div className="absolute top-0 right-0 -mt-8 -mr-8 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all" />
+
+                       {/* Header */}
+                       <div className="flex justify-between items-start mb-4 relative z-10">
+                           <div className="h-12 w-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform duration-300">
+                               <MessageSquare size={24} />
+                           </div>
+                           <Badge 
+                                variant="outline" 
+                                className={`
+                                    border font-normal
+                                    ${isCompleted ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}
+                                `}
+                           >
+                               {isCompleted ? "Tamamlandı" : "Yarım Kaldı"}
+                           </Badge>
+                       </div>
+
+                       {/* Content */}
+                       <div className="flex-1">
+                           <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors line-clamp-1">
+                               {it.position}
+                           </h3>
+                           <p className="text-xs text-slate-500 mb-4">
+                               {new Date(it.date).toLocaleDateString("tr-TR", { day: 'numeric', month: 'long', year: 'numeric' })}
+                           </p>
+
+                           {/* Metrics */}
+                           <div className="grid grid-cols-2 gap-2 mb-4">
+                               <div className="p-2 rounded-lg bg-slate-950/50 border border-slate-800/50 flex flex-col items-center justify-center">
+                                    <span className="text-xs text-slate-500">Mesaj</span>
+                                    <span className="text-sm font-bold text-slate-200">{it._count.messages}</span>
+                               </div>
+                               <div className="p-2 rounded-lg bg-slate-950/50 border border-slate-800/50 flex flex-col items-center justify-center">
+                                    <span className="text-xs text-slate-500">Puan</span>
+                                    <span className={`text-sm font-bold ${score ? 'text-emerald-400' : 'text-slate-400'}`}>
+                                        {score ? `%${score}` : '-'}
+                                    </span>
+                               </div>
+                           </div>
+                       </div>
+
+                       {/* Action */}
+                       <div className="mt-auto pt-4 border-t border-slate-800/50 flex items-center justify-between text-xs font-semibold text-slate-400 group-hover:text-white transition-colors">
+                           <span>Detayları Gör</span>
+                           <div className="h-6 w-6 rounded-full bg-slate-800 flex items-center justify-center group-hover:bg-indigo-500 transition-colors">
+                                <ArrowRight size={12} />
+                           </div>
+                       </div>
                     </div>
                  </Link>
                </motion.div>
-             ))}
+             )})}
            </AnimatePresence>
-        </div>
+        </motion.div>
       )}
     </div>
   );

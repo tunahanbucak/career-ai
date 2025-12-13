@@ -48,7 +48,9 @@ export default function CvAnalytics({ cvs }: Props) {
 
     cvs.forEach((cv) => {
       const d = new Date(cv.uploadDate);
-      const key = !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : "unknown";
+      const key = !Number.isNaN(d.getTime())
+        ? d.toISOString().slice(0, 10)
+        : "unknown";
       byDateMap.set(key, (byDateMap.get(key) ?? 0) + 1);
 
       if (!minDate || key < minDate) minDate = key;
@@ -97,21 +99,13 @@ export default function CvAnalytics({ cvs }: Props) {
         />
         <StatCard
           label="İlk Yükleme"
-          value={
-            stats.firstUpload
-              ? formatDateLabel(stats.firstUpload)
-              : "-"
-          }
+          value={stats.firstUpload ? formatDateLabel(stats.firstUpload) : "-"}
           description="Bu platformdaki ilk CV yükleme tarihin."
           accent="from-emerald-500/40 via-emerald-500/10 to-transparent"
         />
         <StatCard
           label="Son Yükleme"
-          value={
-            stats.lastUpload
-              ? formatDateLabel(stats.lastUpload)
-              : "-"
-          }
+          value={stats.lastUpload ? formatDateLabel(stats.lastUpload) : "-"}
           description="En güncel CV yükleme tarihin."
           accent="from-fuchsia-500/40 via-fuchsia-500/10 to-transparent"
         />
@@ -121,13 +115,20 @@ export default function CvAnalytics({ cvs }: Props) {
         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-950/80 to-slate-950 p-4 md:p-5 shadow-lg shadow-indigo-500/10">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-sm font-semibold text-slate-100">Zaman İçinde Yüklemeler</h3>
-              <p className="text-xs text-slate-500">Hangi dönemlerde daha aktif CV yüklediğini gösterir.</p>
+              <h3 className="text-sm font-semibold text-slate-100">
+                Zaman İçinde Yüklemeler
+              </h3>
+              <p className="text-xs text-slate-500">
+                Hangi dönemlerde daha aktif CV yüklediğini gösterir.
+              </p>
             </div>
           </div>
           <div className="h-52 md:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats.byDate} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
+              <AreaChart
+                data={stats.byDate}
+                margin={{ left: -20, right: 0, top: 10, bottom: 0 }}
+              >
                 <defs>
                   <linearGradient id="cvUploads" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#6366f1" stopOpacity={0.35} />
@@ -156,8 +157,13 @@ export default function CvAnalytics({ cvs }: Props) {
                     border: "1px solid #1f2937",
                     padding: "8px 10px",
                   }}
-                  labelFormatter={(v: string | number) => formatDateLabel(String(v))}
-                  formatter={(value: number | string) => [value, "Yükleme Sayısı"]}
+                  labelFormatter={(v: string | number) =>
+                    formatDateLabel(String(v))
+                  }
+                  formatter={(value: number | string) => [
+                    value,
+                    "Yükleme Sayısı",
+                  ]}
                 />
                 <Area
                   type="monotone"
@@ -175,8 +181,12 @@ export default function CvAnalytics({ cvs }: Props) {
         <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 md:p-5 shadow-lg shadow-sky-500/10 flex flex-col">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-slate-100">Son Yüklenen CV’ler</h3>
-              <p className="text-xs text-slate-500">En güncel belgelerini tarih sırasına göre gör.</p>
+              <h3 className="text-sm font-semibold text-slate-100">
+                Son Yüklenen CV’ler
+              </h3>
+              <p className="text-xs text-slate-500">
+                En güncel belgelerini tarih sırasına göre gör.
+              </p>
             </div>
           </div>
 
@@ -199,7 +209,10 @@ export default function CvAnalytics({ cvs }: Props) {
                       })}
                     </span>
                   </div>
-                  <div className="text-sm font-medium text-slate-100 truncate" title={cv.title}>
+                  <div
+                    className="text-sm font-medium text-slate-100 truncate"
+                    title={cv.title}
+                  >
                     {cv.title}
                   </div>
                 </div>
@@ -213,7 +226,9 @@ export default function CvAnalytics({ cvs }: Props) {
             ))}
 
             {stats.latestCvs.length === 0 && (
-              <div className="text-xs text-slate-600">Görüntülenecek CV bulunamadı.</div>
+              <div className="text-xs text-slate-600">
+                Görüntülenecek CV bulunamadı.
+              </div>
             )}
           </div>
         </div>
@@ -239,9 +254,13 @@ function StatCard({ label, value, description, accent }: StatCardProps) {
         )}
       />
       <div className="relative space-y-1">
-        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{label}</div>
+        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+          {label}
+        </div>
         <div className="text-2xl font-semibold text-slate-50">{value}</div>
-        {description && <p className="text-[11px] text-slate-400 max-w-xs">{description}</p>}
+        {description && (
+          <p className="text-[11px] text-slate-400 max-w-xs">{description}</p>
+        )}
       </div>
     </div>
   );
