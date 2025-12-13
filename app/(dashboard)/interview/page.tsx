@@ -7,32 +7,40 @@ import type { ChatItem } from "./components/InterviewChat";
 import InterviewHeader from "./components/InterviewHeader";
 import InterviewChat from "./components/InterviewChat";
 
+// Mülakat Simülasyonu Sayfası
+// Kullanıcı seçtiği pozisyon için yapay zeka ile mülakat yapabilir.
 export default function InterviewPage() {
   const { data: session, status } = useSession();
   
-  const [position, setPosition] = useState<string>("Frontend Developer");
-  const [message, setMessage] = useState<string>("");
-  const [history, setHistory] = useState<ChatItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [interviewId, setInterviewId] = useState<string | null>(null);
+  // State Tanımları
+  const [position, setPosition] = useState<string>("Frontend Developer"); // Hedef pozisyon
+  const [message, setMessage] = useState<string>(""); // Kullanıcının yazdığı anlık mesaj
+  const [history, setHistory] = useState<ChatItem[]>([]); // Chat geçmişi
+  const [loading, setLoading] = useState(false); // AI yanıtı bekleniyor mu?
+  const [error, setError] = useState<string | null>(null); // Hata durumları
+  const [interviewId, setInterviewId] = useState<string | null>(null); // Veritabanındaki mülakat ID'si
 
+  // Oturum yükleniyorsa bekleme ekranı göster
   if (status === "loading") {
     return (
       <div className="flex h-full items-center justify-center text-indigo-500">
-        {/* loading spinner */}
+        {/* Yükleniyor spinner'ı eklenebilir */}
       </div>
     );
   }
   
+  // Oturum yoksa ana sayfaya yönlendir
   if (!session || !session.user) {
     redirect("/");
   }
 
+  // Mülakatı Başlatma Fonksiyonu
+  // İlk mesajı AI'dan almak için tetiklenir ("start: true")
   const startInterview = async () => {
     try {
       setError(null);
       setLoading(true);
+      // API isteği gönder
       const res = await fetch("/api/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,9 +50,12 @@ export default function InterviewPage() {
       if (!res.ok) {
         throw new Error(data?.error || "İstek hatası");
       }
+      
+      // AI'dan gelen ilk soruyu geçmişe ekle
       if (data?.reply) {
         setHistory((h) => [...h, { role: "assistant", content: String(data.reply) }]);
       }
+      // ID'yi kaydet (devamlılık için)
       if (data?.interviewId && typeof data.interviewId === "string") {
         setInterviewId(data.interviewId);
       }
