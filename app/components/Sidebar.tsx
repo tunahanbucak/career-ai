@@ -25,7 +25,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useLayout } from "@/app/context/LayoutContext";
+import Logo from "./Logo";
 
+// Sidebar Bileşeni: Uygulamanın sol tarafındaki ana navigasyon menüsü.
+// Kullanıcı durumuna göre menü öğelerini gösterir ve daraltılabilir (collapsed) özelliğe sahiptir.
 export default function Sidebar({
   user,
 }: {
@@ -58,12 +61,7 @@ export default function Sidebar({
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 bg-sidebar/95 p-6 lg:hidden animate-in slide-in-from-left-10 flex flex-col h-full backdrop-blur-xl">
           <div className="flex items-center gap-3 mb-10 px-2 pt-4">
-             <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-               <Zap className="h-6 w-6 text-white" fill="currentColor" />
-             </div>
-             <span className="text-xl font-bold tracking-tight text-sidebar-foreground">
-               CareerAI
-             </span>
+             <Logo textSize="xl" lightMode={false} />
           </div>
           <NavContent isActive={isActive} isCollapsed={false} />
           <div className="mt-auto pt-6 border-t border-sidebar-border/50">
@@ -91,18 +89,12 @@ export default function Sidebar({
             } mb-10 mt-2 h-12 transition-all`}
           >
             <Link href="/dashboard" className="flex items-center gap-3">
-                <div className="h-10 w-10 min-w-[40px] rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.3)]">
-                <Zap className="h-5 w-5 text-white" fill="currentColor" />
-                </div>
-                {!isSidebarCollapsed && (
-                <div className="flex flex-col leading-tight animate-in fade-in duration-300">
-                    <span className="text-lg font-bold tracking-tight text-sidebar-foreground">
-                    CareerAI
-                    </span>
-                    <span className="text-[10px] text-primary/80 uppercase tracking-widest font-bold">
-                    Pro Suite
-                    </span>
-                </div>
+                {isSidebarCollapsed ? (
+                    <div className="h-10 w-10 min-w-[40px] rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+                        <Zap className="h-5 w-5 text-white" fill="currentColor" />
+                    </div>
+                ) : (
+                    <Logo textSize="lg" />
                 )}
             </Link>
           </div>
@@ -256,10 +248,11 @@ function UserProfile({
   if (!user) return null;
 
   return (
+    <Link href="/me/account">
     <div
       className={`flex items-center ${
         isCollapsed ? "justify-center" : "gap-3"
-      } p-3 rounded-2xl bg-gradient-to-b from-sidebar to-sidebar/95 border border-sidebar-border hover:border-sidebar-accent transition-all group shadow-lg`}
+      } p-3 rounded-2xl bg-gradient-to-b from-sidebar to-sidebar/95 border border-sidebar-border hover:border-sidebar-accent transition-all group shadow-lg cursor-pointer`}
     >
       <div className="relative flex-shrink-0">
         <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 p-[2px] shadow-lg shadow-indigo-500/20">
@@ -279,13 +272,16 @@ function UserProfile({
           </div>
           <div className="flex items-center justify-between mt-0.5">
             <div className="truncate text-[10px] text-muted-foreground group-hover:text-sidebar-foreground/80 transition-colors">
-                 {user.email || "Free Plan"}
+                 {user.email}
             </div>
              <Button
               variant="ghost"
               size="icon"
               className="h-6 w-6 text-muted-foreground hover:text-destructive hover:bg-destructive/10 -mr-2"
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onClick={(e) => {
+                e.preventDefault();
+                signOut({ callbackUrl: "/" });
+              }}
               title="Çıkış Yap"
             >
               <LogOut size={13} />
@@ -294,5 +290,6 @@ function UserProfile({
         </div>
       )}
     </div>
+    </Link>
   );
 }

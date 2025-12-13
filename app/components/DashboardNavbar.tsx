@@ -24,6 +24,8 @@ import { useLayout } from "@/app/context/LayoutContext";
 import { cn } from "@/lib/utils";
 import SettingsDialog from "@/components/SettingsDialog";
 
+// DashboardNavbar: Üst tarafta bulunan navigasyon çubuğu.
+// Breadcrumbs (sayfa yolu), arama çubuğu ve kullanıcı profil menüsünü içerir.
 export default function DashboardNavbar({
     user
 }: {
@@ -128,13 +130,17 @@ export default function DashboardNavbar({
                              </div>
                         </div>
                          <div className="hidden md:block text-left mr-2">
-                             <div className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">{user?.name?.split(" ")[0]}</div>
-                             <div className="text-[10px] text-muted-foreground">Pro Plan</div>
+                             <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{user?.name?.split(" ")[0]}</div>
                          </div>
                          <ChevronDown size={14} className="text-muted-foreground group-hover:text-foreground hidden md:block" />
                     </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-background/95 backdrop-blur-xl border-border text-foreground mt-2 px-1 py-1.5 shadow-2xl">
+                    <DropdownMenuItem 
+                        className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5"
+                    >
+                        <Link href="/me/account" className="flex w-full font-medium">Hesabım</Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem 
                         className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5"
                         onSelect={(e) => {

@@ -45,10 +45,10 @@ export default function QuickActionsCard() {
       )}
       <div className="space-y-4">
         <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
-                <Zap size={16} className="text-indigo-400" />
+            <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20">
+                <Zap size={16} className="text-white" />
             </div>
-            <h3 className="text-sm font-semibold text-slate-200">Hızlı İşlemler</h3>
+            <h3 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400">Hızlı İşlemler</h3>
         </div>
         
         <motion.div 
@@ -60,28 +60,32 @@ export default function QuickActionsCard() {
             <motion.button
                 variants={item}
                 onClick={handleFeedback}
-                className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:bg-slate-800/60 hover:border-indigo-500/30 transition-all group"
+                className="flex flex-col items-center justify-center p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-indigo-500/30 transition-all group backdrop-blur-sm shadow-sm hover:shadow-indigo-500/10"
             >
-                <ThumbsUp size={20} className="mb-2 text-emerald-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-medium text-slate-300">Geri Bildirim</span>
+                <div className="p-2 mb-2 rounded-full bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
+                    <ThumbsUp size={18} className="text-emerald-400 group-hover:scale-110 transition-transform" />
+                </div>
+                <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors">Geri Bildirim</span>
             </motion.button>
 
             <motion.button
                 variants={item}
                 onClick={handleSupport}
-                className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-800 bg-slate-900/40 hover:bg-slate-800/60 hover:border-indigo-500/30 transition-all group"
+                className="flex flex-col items-center justify-center p-4 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-indigo-500/30 transition-all group backdrop-blur-sm shadow-sm hover:shadow-indigo-500/10"
             >
-                <Mail size={20} className="mb-2 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span className="text-xs font-medium text-slate-300">Destek</span>
+                 <div className="p-2 mb-2 rounded-full bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors">
+                    <Mail size={18} className="text-blue-400 group-hover:scale-110 transition-transform" />
+                 </div>
+                <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors">Destek</span>
             </motion.button>
             
             <motion.button
                 variants={item}
                 onClick={handleLogout}
-                className="col-span-2 flex items-center justify-center gap-3 p-3 rounded-xl border border-red-900/20 bg-red-950/10 hover:bg-red-950/30 hover:border-red-800/30 transition-all group"
+                className="col-span-2 flex items-center justify-center gap-3 p-3 rounded-xl border border-red-500/10 bg-red-500/5 hover:bg-red-500/10 hover:border-red-500/20 transition-all group"
             >
-                <LogOut size={16} className="text-red-400" />
-                <span className="text-xs font-medium text-red-300">Güvenli Çıkış</span>
+                <LogOut size={16} className="text-red-400 group-hover:translate-x-1 transition-transform" />
+                <span className="text-xs font-medium text-red-300 group-hover:text-red-200">Güvenli Çıkış</span>
             </motion.button>
         </motion.div>
       </div>
