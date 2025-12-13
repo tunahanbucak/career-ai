@@ -4,11 +4,13 @@ import { signIn, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Github, Mail, Command, CheckCircle2, Star, Quote } from "lucide-react";
+import { ArrowRight, Github, Mail, CheckCircle2, Star, Quote } from "lucide-react";
 import { motion } from "framer-motion";
+import Logo from "@/app/components/Logo";
+import LoadingScreen from "@/app/components/LoadingScreen";
 
 export default function SignInPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   const [email, setEmail] = useState("");
@@ -20,6 +22,10 @@ export default function SignInPage() {
       router.push("/dashboard");
     }
   }, [session, router]);
+  
+  if (status === "loading" || status === "authenticated") {
+      return <LoadingScreen text={status === "authenticated" ? "Yönlendiriliyor..." : "Oturum açılıyor..."} />;
+  }
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,12 +69,7 @@ export default function SignInPage() {
           </div>
 
           <div className="relative z-10">
-             <div className="flex items-center gap-2 font-bold text-xl text-white">
-                 <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center">
-                    <Command className="w-5 h-5 text-white" />
-                 </div>
-                 CareerAI
-             </div>
+             <Logo textSize="2xl" />
           </div>
 
           <div className="relative z-10 max-w-lg">
@@ -112,8 +113,8 @@ export default function SignInPage() {
             className="w-full max-w-md"
         >
             <div className="mb-8 text-center lg:text-left">
-                <Link href="/" className="lg:hidden inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-500 mb-6">
-                    <Command className="w-6 h-6 text-white" />
+                <Link href="/" className="lg:hidden inline-flex mb-6">
+                    <Logo textSize="2xl" />
                 </Link>
                 <h2 className="text-3xl font-bold text-white mb-2">Hoş Geldin</h2>
                 <p className="text-slate-400">Kariyer yolculuğuna devam etmek için giriş yap.</p>

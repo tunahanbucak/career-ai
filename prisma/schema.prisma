@@ -1,102 +1,116 @@
+// Veritabanı kaynağını belirler (PostgreSQL)
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// Prisma İstemcisini oluşturur (JS/TS için)
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
 }
 
+// Kullanıcı Modeli: Sistemdeki kullanıcıların temel bilgilerini tutar.
 model User {
-  id            String      @id @default(cuid())
-  name          String?
-  email         String?     @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  cvs           CV[]
-  interviews    Interview[]
+  id            String      @id @default(cuid()) // Eşsiz Kimlik
+  name          String? // Kullanıcı Adı
+  title         String? // Unvan (Settings sayfası için)
+  phone         String? // Telefon (Settings sayfası için)
+  about         String? // Hakkımda (My Account sayfası için)
+  email         String?     @unique // E-posta (Eşsiz olmalı)
+  emailVerified DateTime? // E-posta doğrulama tarihi
+  image         String? // Profil resmi URL'i
+  accounts      Account[] // Bağlı sosyal hesaplar
+  sessions      Session[] // Aktif oturumlar
+  cvs           CV[] // Yüklenen CV'ler
+  interviews    Interview[] // Yapılan mülakatlar
 }
 
+// Hesap Modeli: OAuth sağlayıcıları (Google, GitHub vb.) için hesap bilgileri.
 model Account {
   id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  userId            String // Kullanıcı ID'si
+  type              String // Hesap tipi (oauth, email vb.)
+  provider          String // Sağlayıcı (google, github)
+  providerAccountId String // Sağlayıcıdaki ID
+  refresh_token     String? @db.Text // Yenileme tokenı
+  access_token      String? @db.Text // Erişim tokenı
+  expires_at        Int? // Token bitiş süresi
+  token_type        String? // Token tipi
+  scope             String? // Erişim kapsamı
+  id_token          String? @db.Text // Kimlik tokenı
+  session_state     String? // Oturum durumu
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId]) // Bir sağlayıcıda bir hesap ID'si eşsiz olmalı
 }
 
+// Oturum Modeli: Kullanıcının giriş oturumlarını yönetir.
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
+  sessionToken String   @unique // Oturum tokenı
+  userId       String // Kullanıcı ID
+  expires      DateTime // Oturum bitiş zamanı
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+// CV Modeli: Kullanıcıların yüklediği özgeçmiş dosyaları.
 model CV {
   id         String       @id @default(cuid())
-  title      String
-  filename   String
-  mime       String?
-  size       Int?
-  rawText    String?      @db.Text
-  uploadDate DateTime     @default(now())
-  userId     String
+  title      String // Dosya başlığı
+  filename   String // Dosya adı
+  mime       String? // Dosya tipi (pdf, docx vb.)
+  size       Int? // Dosya boyutu
+  rawText    String?      @db.Text // Çıkarılan ham metin
+  uploadDate DateTime     @default(now()) // Yükleme tarihi
+  userId     String // Yükleyen kullanıcı
   user       User         @relation(fields: [userId], references: [id])
-  analyses   CVAnalysis[]
+  analyses   CVAnalysis[] // Yapılan analizler
 }
 
+// CV Analiz Modeli: AI tarafından üretilen analiz sonuçları.
 model CVAnalysis {
   id         String   @id @default(cuid())
-  cvId       String
-  title      String?
-  summary    String   @db.Text
-  keywords   String[]
-  suggestion String   @db.Text
-  createdAt  DateTime @default(now())
+  cvId       String // Analiz edilen CV ID'si
+  title      String? // Analiz başlığı
+  summary    String   @db.Text // Özet
+  keywords   String[] // Anahtar kelimeler
+  suggestion String   @db.Text // Gelişim önerileri
+  createdAt  DateTime @default(now()) // Oluşturulma tarihi
   cv         CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
 }
 
+// Mülakat Modeli: AI ile yapılan mülakat oturumları.
 model Interview {
   id       String             @id @default(cuid())
-  position String
-  date     DateTime           @default(now())
-  userId   String
+  position String // Mülakat yapılan pozisyon
+  date     DateTime           @default(now()) // Tarih
+  userId   String // Mülakatı yapan kullanıcı
   user     User               @relation(fields: [userId], references: [id])
-  messages InterviewMessage[]
+  messages InterviewMessage[] // Mesajlaşma geçmişi
 }
 
+// Mülakat Rolleri: Mesajı kimin attığını belirler.
 enum InterviewRole {
-  ASSISTANT
-  USER
+  ASSISTANT // Yapay Zeka
+  USER // Kullanıcı
 }
 
+// Mülakat Mesaj Modeli: Mülakat sırasındaki soru-cevaplar.
 model InterviewMessage {
   id          String        @id @default(cuid())
-  interviewId String
-  role        InterviewRole
-  content     String        @db.Text
-  createdAt   DateTime      @default(now())
+  interviewId String // Ait olduğu mülakat
+  role        InterviewRole // Gönderen (AI veya Kullanıcı)
+  content     String        @db.Text // Mesaj içeriği
+  createdAt   DateTime      @default(now()) // Mesaj zamanı
   interview   Interview     @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 }
 
+// Doğrulama Tokenı: E-posta girişleri için magic link tokenları.
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+  identifier String // E-posta adresi
+  token      String   @unique // Doğrulama kodu
+  expires    DateTime // Kodun geçerlilik süresi
 
   @@unique([identifier, token])
 }

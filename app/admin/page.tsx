@@ -13,32 +13,37 @@ import AdminStats from "./components/AdminStats";
 import { DataCard } from "./components/AdminTables";
 import GlobalActivityChart from "./components/GlobalActivityChart";
 
+// Hata ayıklama ve dinamik render için gerekli ayar
 export const dynamic = "force-dynamic";
 
+// Admin sayfası bileşeni (Asenkron Server Component)
 export default async function AdminPage({ searchParams }: { searchParams?: { q?: string; page?: string } }) {
+  // 1. Oturum Kontrolü: Kullanıcının giriş yapıp yapmadığını kontrol et.
   const session = await getServerSession(authOptions);
   
-  // 1. Yetki Kontrolü
   if (!session || !session.user?.email) {
-    redirect("/");
+    redirect("/"); // Giriş yapmamışsa anasayfaya yönlendir.
   }
+
+  // 1.1 Yetki Kontrolü: Kullanıcının admin listesinde olup olmadığını kontrol et.
   const admins = (process.env.ADMIN_EMAILS || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
   const isAdmin = admins.length === 0 ? false : admins.includes(session.user.email.toLowerCase());
   
+  // Eğer admin değilse anasayfaya at.
   if (!isAdmin) {
     redirect("/");
   }
 
-  // 2. İstatistikleri Çek
+  // 2. İstatistikleri Veritabanından Çek (Paralel Sorgu ile Performans Artışı)
   const [usersCount, cvsCount, analysesCount, interviewsCount, messagesCount] = await Promise.all([
-    prisma.user.count(),
-    prisma.cV.count(),
-    prisma.cVAnalysis.count(),
-    prisma.interview.count(),
-    prisma.interviewMessage.count(),
+    prisma.user.count(),              // Toplam Kullanıcı
+    prisma.cV.count(),                // Toplam CV
+    prisma.cVAnalysis.count(),        // Yapılan Analizler
+    prisma.interview.count(),         // Mülakat Sayısı
+    prisma.interviewMessage.count(),  // Toplam Mesaj
   ]);
 
-  // Chart için son 30 günlük veriyi çek (Basitleştirilmiş: Son 100 kaydı alıp JS'de işle)
+  // Grafik Verisi Hazırlığı: Son 100 kaydı çekip istemci tarafında işlemek üzere hazırla.
   const [chartCvs, chartInterviews] = await Promise.all([
     prisma.cV.findMany({
        select: { uploadDate: true },
@@ -52,17 +57,18 @@ export default async function AdminPage({ searchParams }: { searchParams?: { q?:
     })
   ]);
 
-  // Veriyi Gün Bazında Grupla
+  // Veriyi Gün Bazında Grupla: Tarih bazlı istatistik haritası oluştur.
   const activityMap = new Map<string, { date: string; cvs: number; interviews: number }>();
   
-  // Son 30 günü doldur
+  // Son 30 günü sıfır değerleriyle doldur (Boş günler grafikde görünsün diye)
   for (let i = 29; i >= 0; i--) {
      const d = new Date();
      d.setDate(d.getDate() - i);
-     const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+     const key = d.toISOString().slice(0, 10); // Format: YYYY-MM-DD
      activityMap.set(key, { date: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }), cvs: 0, interviews: 0 });
   }
 
+  // CV yüklemelerini tarihe göre eşle
   chartCvs.forEach(c => {
      const key = new Date(c.uploadDate).toISOString().slice(0, 10);
      if (activityMap.has(key)) {
@@ -70,6 +76,7 @@ export default async function AdminPage({ searchParams }: { searchParams?: { q?:
      }
   });
 
+  // Mülakatları tarihe göre eşle
   chartInterviews.forEach(i => {
      const key = new Date(i.date).toISOString().slice(0, 10);
      if (activityMap.has(key)) {
@@ -80,13 +87,13 @@ export default async function AdminPage({ searchParams }: { searchParams?: { q?:
   const activityData = Array.from(activityMap.values());
 
 
-  // 3. Filtreleme Parametreleri
-  const q = (searchParams?.q || "").trim();
-  const pageIndex = Math.max(1, Number(searchParams?.page || 1));
-  const pageSize = 10;
-  const skip = (pageIndex - 1) * pageSize;
+  // 3. Filtreleme ve Arama Parametrelerini Hazırla
+  const q = (searchParams?.q || "").trim(); // Arama sorgusu
+  const pageIndex = Math.max(1, Number(searchParams?.page || 1)); // Sayfa numarası
+  const pageSize = 10; // Sayfa başına kayıt
+  const skip = (pageIndex - 1) * pageSize; // Atlanacak kayıt sayısı
 
-  // ... (filtre sorguları aynı kalacak) ...
+  // Dinamik "Where" sorguları oluştur (Eğer arama varsa filtrele, yoksa boş obje)
   const cvWhere = q
     ? {
         OR: [
@@ -113,13 +120,14 @@ export default async function AdminPage({ searchParams }: { searchParams?: { q?:
       }
     : {};
 
-  // 4. Verileri ve Toplam Sayıları Çek
+  // 4. Tablo Verilerini ve Toplam Sayıları Çek
   const [cvTotal, analysisTotal, interviewTotal] = await Promise.all([
     prisma.cV.count({ where: cvWhere }),
     prisma.cVAnalysis.count({ where: analysisWhere }),
     prisma.interview.count({ where: interviewWhere }),
   ]);
 
+  // Sayfalanmış verileri getir
   const [recentCVs, recentAnalyses, recentInterviews] = await Promise.all([
     prisma.cV.findMany({
       where: cvWhere,
