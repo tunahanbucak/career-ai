@@ -3,17 +3,23 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Zap, Menu, X, ArrowRight } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
+import Logo from "./Logo";
 
+// LandingNavbar: Karşılama sayfası için navigasyon barı bileşeni.
 export default function LandingNavbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false); // Sayfa kaydırma durumu state'i
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü açık/kapalı durumu
 
+  // useEffect Hook: Sayfa kaydırıldığında navbar stilini değiştirmek için event listener ekler.
   useEffect(() => {
     const handleScroll = () => {
+      // Eğer sayfa 20px'den fazla aşağı kaydırıldıysa isScrolled true olur.
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
+    
+    // Temizlik fonksiyonu: Component unmount olduğunda listener'ı kaldırır.
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -21,22 +27,17 @@ export default function LandingNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "h-20 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg"
-          : "h-24 bg-transparent"
+          ? "h-20 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg" // Kaydırılınca aktif olan stiller
+          : "h-24 bg-transparent" // İlk yüklemede şeffaf
       }`}
     >
       <div className="container mx-auto px-6 h-full flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform duration-300">
-            <Zap className="h-6 w-6 text-white" fill="currentColor" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-200 transition-colors">
-            CareerAI
-          </span>
+        {/* Logo Alanı */}
+        <Link href="/" className="group">
+          <Logo textSize="xl" />
         </Link>
 
-        {/* Desktop Actions */}
+        {/* Masaüstü Aksiyon Butonları (Giriş / Kayıt) */}
         <div className="hidden md:flex items-center gap-4">
           <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-white/5" asChild>
             <Link href="/auth/signin">Giriş Yap</Link>
@@ -49,7 +50,7 @@ export default function LandingNavbar() {
           </Button>
         </div>
 
-        {/* Mobile Toggle */}
+        {/* Mobil Menü Açma/Kapama Butonu */}
         <div className="md:hidden">
           <Button
             variant="ghost"
@@ -62,7 +63,7 @@ export default function LandingNavbar() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobil Menü İçeriği */}
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 p-6 md:hidden animate-in slide-in-from-top-2">
             <div className="flex flex-col gap-4">
