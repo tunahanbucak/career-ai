@@ -55,7 +55,13 @@ type AnalysisResult = {
     summary: string;
     keywords: string[];
     suggestion: string;
-    score?: number; // API'den gelmezse örnek skor
+    score?: number;
+    details?: {
+      impact: number;
+      brevity: number;
+      ats: number;
+      style: number;
+    };
   };
   error?: string;
 } | null;
@@ -149,12 +155,6 @@ export default function CvUploadPage() {
       const analyzeJson = await analyzeRes.json();
       if (!analyzeRes.ok)
         throw new Error(analyzeJson?.error || "Analiz hatası.");
-
-      // Mock Score generation if not present (just for visual demo)
-      if (analyzeJson.analysis && !analyzeJson.analysis.score) {
-        analyzeJson.analysis.score =
-          Math.floor(Math.random() * (95 - 70 + 1)) + 70;
-      }
 
       setAnalysis(analyzeJson);
       setStep("done");
@@ -511,22 +511,22 @@ export default function CvUploadPage() {
                           {[
                             {
                               label: "Etki Odaklılık",
-                              score: 85,
+                              score: analysis.analysis?.details?.impact || 0,
                               color: "bg-emerald-500",
                             },
                             {
                               label: "Kısalık / Öz",
-                              score: 92,
+                              score: analysis.analysis?.details?.brevity || 0,
                               color: "bg-indigo-500",
                             },
                             {
                               label: "ATS Uyumu",
-                              score: 78,
+                              score: analysis.analysis?.details?.ats || 0,
                               color: "bg-blue-500",
                             },
                             {
-                              label: "Dil Bilgisi",
-                              score: 95,
+                              label: "Dil Bilgisi / Stil",
+                              score: analysis.analysis?.details?.style || 0,
                               color: "bg-purple-500",
                             },
                           ].map((metric) => (

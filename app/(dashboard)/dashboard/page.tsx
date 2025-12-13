@@ -12,6 +12,7 @@ import CareerReadinessWidget from "./components/CareerReadinessWidget";
 import RecommendedActionsWidget from "./components/RecommendedActionsWidget";
 import SkillsRadarWidget from "./components/SkillsRadarWidget";
 import MarketTrendsWidget from "./components/MarketTrendsWidget";
+import RecentUploadsCard from "./components/RecentUploadsCard";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function DashboardPage() {
     where: { email: session.user.email },
     select: {
       id: true,
-      name: true, // Header için gerekli
+      name: true,
     },
   });
 
@@ -36,54 +37,41 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  const { stats } = await getDashboardData(dbUser.id);
+  const { stats, activityData, skillsData, recentAnalyses } = await getDashboardData(dbUser.id);
 
   return (
     <div className="min-h-screen w-full font-sans selection:bg-primary/30 overflow-hidden pb-20">
       <main className="relative z-10 h-full w-full max-w-[1920px] mx-auto p-6 lg:p-10">
         <DashboardHeader userName={dbUser.name} />
-
         <StatsGrid
           totalAnalyses={stats.totalAnalyses}
           totalInterviews={stats.totalInterviews}
+          activityScore={stats.activityScore}
         />
-
-        {/* BENTO GRID LAYOUT */}
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-          {/* Kolon 1: Ana Grafikler ve İstatistikler (3 birim genişlik) */}
           <div className="xl:col-span-3 space-y-6">
-            {/* Üst Kısım: Aktivite ve Radar Yan Yana */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Aktivite Grafiği (2 birim) */}
               <div className="lg:col-span-2 h-[400px]">
-                <ActivityChart />
+                <ActivityChart data={activityData} />
               </div>
-              {/* Yetkinlik Radarı (1 birim) */}
               <div className="h-[400px]">
-                <SkillsRadarWidget />
+                <SkillsRadarWidget data={skillsData} />
               </div>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <IndustryInsightsWidget />
               <CareerReadinessWidget />
             </div>
-
-            {/* Eski RecentUploadsCard Yorum Satırı
+            
             <RecentUploadsCard analyses={recentAnalyses || []} />
-            */}
           </div>
-
-          {/* Kolon 2: Sağ Sidebar (1 birim genişlik) */}
           <div className="space-y-6 flex flex-col h-full">
             <div className="flex-none">
               <RecommendedActionsWidget />
             </div>
-
             <div className="flex-1">
               <MarketTrendsWidget />
             </div>
-
             {/* Eski InterviewPromoCard Yorum Satırı
             <div className="flex-1">
                 <InterviewPromoCard />

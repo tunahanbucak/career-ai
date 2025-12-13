@@ -2,17 +2,13 @@
 
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Zap } from "lucide-react";
+import { SkillData } from "@/types";
 
-const data = [
-  { subject: 'Teknik', A: 85, fullMark: 100 },
-  { subject: 'İletişim', A: 90, fullMark: 100 },
-  { subject: 'Liderlik', A: 65, fullMark: 100 },
-  { subject: 'Problem Çözme', A: 80, fullMark: 100 },
-  { subject: 'Takım Çalışması', A: 95, fullMark: 100 },
-  { subject: 'Dil', A: 70, fullMark: 100 },
-];
+type Props = {
+  data: SkillData[];
+};
 
-export default function SkillsRadarWidget() {
+export default function SkillsRadarWidget({ data }: Props) {
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 h-[400px] flex flex-col relative overflow-hidden">
         {/* Glow Effect */}

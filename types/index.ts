@@ -1,12 +1,20 @@
 export interface DashboardStats {
   totalAnalyses: number;
   totalInterviews: number;
+  activityScore: number;
 }
 
 export interface AnalysisResult {
   summary: string;
   keywords: string[];
   suggestion: string;
+  score?: number;
+  details?: {
+    impact: number;
+    brevity: number;
+    ats: number;
+    style: number;
+  };
 }
 
 export interface RecentAnalysis {
@@ -24,10 +32,24 @@ export interface DashboardInterview {
   count: number;
 }
 
+export interface ActivityData {
+  date: string;
+  cv: number;
+  interview: number;
+}
+
+export interface SkillData {
+  subject: string;
+  A: number;
+  fullMark: number;
+}
+
 export interface DashboardData {
   stats: DashboardStats;
   recentAnalyses: RecentAnalysis[];
   recentInterviews: DashboardInterview[];
+  activityData: ActivityData[];
+  skillsData: SkillData[];
 }
 
 export interface HistoryResponse {

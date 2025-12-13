@@ -39,25 +39,30 @@ export async function POST(request: NextRequest) {
 
     // 3. Yapay Zeka (Gemini) için prompt hazırlığı
     const prompt = `
-      Sen, üst düzey bir İK uzmanı ve kariyer danışmanısın. Aşağıdaki CV metnini 3 aşamalı olarak analiz et:
+      Sen, üst düzey bir İK uzmanı ve kariyer danışmanısın. Aşağıdaki CV metnini analiz et ve aşağıdaki JSON formatında detaylı bir rapor oluştur.
 
-      1. ÖZET: CV'yi 3 cümlede özetle. Adayın ana odak noktası (Frontend, Backend, vs.) ne?
-      2. ANAHTAR KELİMELER: CV'deki en güçlü 5 teknik beceriyi (örnek: React, SQL, Cloud) bir JSON dizisi olarak çıkar.
-      3. GELİŞİM ÖNERİSİ: Adayın kariyer hedefi göz önüne alındığında, eksik olduğu 2 alanı ve bu eksikliği gidermesi için somut 1 öneri yaz.
+      İSTENEN ÇIKTI FORMATI:
+      {
+        "summary": "CV'yi 3 cümlede özetle. Adayın ana odak noktası ne?",
+        "keywords": ["En güçlü 5 teknik yetenek (örnek: React, SQL)"],
+        "suggestion": "Kariyer gelişimi için 1 somut öneri",
+        "score": 0, // 0-100 arası genel CV puanı
+        "details": {
+          "impact": 0, // 0-100: Etki Odaklılık (Başarıların somutluğu)
+          "brevity": 0, // 0-100: Kısalık ve Özgünlük
+          "ats": 0, // 0-100: ATS (Aday Takip Sistemi) Uyumu
+          "style": 0 // 0-100: Dil Bilgisi ve Yazım Tarzı
+        }
+      }
 
       CV METNİ: """${rawText}"""
-
-      Cevabını, başka hiçbir metin eklemeden, sadece bu JSON formatında döndür:
-      {
-        "summary": "...",
-        "keywords": ["...", "..."],
-        "suggestion": "..."
-      }
+      
+      Sadece bu JSON objesini döndür. Başka hiçbir açıklama yapma.
     `;
 
     // 4. Gemini AI servisine isteği gönder
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash", // En hızlı ve güncel modeli kullanır.
+      model: "gemini-2.5-flash", 
       contents: prompt,
     });
 
@@ -82,7 +87,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { summary, keywords, suggestion } = parsedData;
+    // Default değerler ata eğer AI eksik döndürürse
+    const { 
+      summary, 
+      keywords, 
+      suggestion, 
+      score = 0, 
+      details = { impact: 0, brevity: 0, ats: 0, style: 0 } 
+    } = parsedData;
 
     // 6. Sonuçları Veritabanına Kaydet
     await prisma.cVAnalysis.create({
@@ -92,6 +104,11 @@ export async function POST(request: NextRequest) {
         summary: summary || "",
         keywords: Array.isArray(keywords) ? keywords.map(String) : [],
         suggestion: suggestion || "",
+        score,
+        impact: details.impact,
+        brevity: details.brevity,
+        ats: details.ats,
+        style: details.style,
       },
     });
 

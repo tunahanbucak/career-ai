@@ -45,7 +45,7 @@ export default async function MyInterviewsPage() {
           className="bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
         >
           <Link href="/interview">
-            <Plus className="mr-2 h-4 w-4" /> Yeni Mülakat Başlat
+            <Plus className=" h-4 w-4" /> Yeni Mülakat Başlat
           </Link>
         </Button>
       </div>
@@ -67,16 +67,20 @@ export default async function MyInterviewsPage() {
           <InterviewAnalytics interviews={interviews} />
 
           <div className="pt-4">
-             <div className="flex items-center gap-2 mb-6">
-                <div className="h-8 w-1 bg-emerald-500 rounded-full" />
-                <h2 className="text-xl font-bold text-white">Geçmiş Mülakatlar</h2>
-             </div>
-             <InterviewHistoryList interviews={interviews.map(it => ({
+            <div className="flex items-center gap-2 mb-6">
+              <div className="h-8 w-1 bg-emerald-500 rounded-full" />
+              <h2 className="text-xl font-bold text-white">
+                Geçmiş Mülakatlar
+              </h2>
+            </div>
+            <InterviewHistoryList
+              interviews={interviews.map((it) => ({
                 id: it.id,
                 position: it.position,
                 date: it.date instanceof Date ? it.date.toISOString() : it.date,
-                _count: it._count
-             }))} />
+                _count: it._count,
+              }))}
+            />
           </div>
         </>
       )}

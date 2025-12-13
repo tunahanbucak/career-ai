@@ -7,7 +7,10 @@ import { revalidatePath } from "next/cache";
 
 // Kullanıcı profil güncelleme işlemini yapan Server Action.
 // 'use server' direktifi ile bu kodun sacede sunucuda çalışmasını sağlarız.
-type State = { success: false; message: string } | { success: true; message: string } | null;
+type State =
+  | { success: false; message: string }
+  | { success: true; message: string }
+  | null;
 
 export async function updateProfile(prevState: State, formData: FormData) {
   // 1. Oturum Kontrolü: İşlemi yapan kişinin giriş yapmış olduğundan emin ol.
@@ -53,12 +56,13 @@ export async function updateProfile(prevState: State, formData: FormData) {
     // Bu sayede kullanıcı sayfayı yenilediğinde eski veriyi görmez.
     revalidatePath("/settings");
     revalidatePath("/me/account");
-    
+
     return { success: true, message: "Profil başarıyla güncellendi!" };
   } catch (error: unknown) {
     // Hata Yönetimi: Olası veritabanı hatalarını yakala ve logla.
     console.error("Profil güncelleme hatası:", error);
-    const errorMessage = error instanceof Error ? error.message : "Bilinmeyen bir hata oluştu.";
+    const errorMessage =
+      error instanceof Error ? error.message : "Bilinmeyen bir hata oluştu.";
     return { success: false, message: `Hata: ${errorMessage}` };
   }
 }

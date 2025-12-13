@@ -11,7 +11,7 @@ type Props = {
 
 export default function DashboardHeader({ userName }: Props) {
   const { data: session } = useSession();
-  
+
   const displayName = userName || session?.user?.name || "Kullanıcı";
 
   const handleSupport = () => {
@@ -19,20 +19,18 @@ export default function DashboardHeader({ userName }: Props) {
   };
 
   const handleNewAnalysis = () => {
-      window.location.href = "/me/cvs";
+    window.location.href = "/me/cvs";
   };
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6 relative"
     >
-      {/* Background Decor */}
       <div className="absolute -top-10 -left-10 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -z-10 pointer-events-none" />
       <div className="absolute top-10 right-20 w-32 h-32 bg-purple-500/10 rounded-full blur-[80px] -z-10 pointer-events-none" />
-
       <div className="max-w-2xl">
         <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground mb-4">
           Hoş Geldin,{" "}
@@ -42,10 +40,10 @@ export default function DashboardHeader({ userName }: Props) {
           👋
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-          Kariyer yolculuğun burada şekilleniyor. CV analizlerini incele, mülakat yeteneklerini geliştir ve hedefine ulaş.
+          Kariyer yolculuğun burada şekilleniyor. CV analizlerini incele,
+          mülakat yeteneklerini geliştir ve hedefine ulaş.
         </p>
       </div>
-
       <div className="flex items-center gap-4">
         <Button
           variant="outline"

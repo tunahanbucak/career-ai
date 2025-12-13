@@ -76,6 +76,14 @@ model CVAnalysis {
   summary    String   @db.Text // Özet
   keywords   String[] // Anahtar kelimeler
   suggestion String   @db.Text // Gelişim önerileri
+  
+  // Analiz Skorları (Gemini tarafından üretilecek)
+  score      Int?     @default(0) // Genel Skor (0-100)
+  impact     Int?     @default(0) // Etki Odaklılık
+  brevity    Int?     @default(0) // Kısalık / Öz
+  ats        Int?     @default(0) // ATS Uyumu
+  style      Int?     @default(0) // Dil Bilgisi / Stil
+
   createdAt  DateTime @default(now()) // Oluşturulma tarihi
   cv         CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
 }

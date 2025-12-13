@@ -123,7 +123,7 @@ export default async function CVDetailPage({ params }: { params: { id: string } 
                              <CheckCircle2 className="h-8 w-8 text-white" />
                          </div>
                          <h3 className="text-lg font-bold text-white mb-1">Analiz Tamamlandı</h3>
-                         <p className="text-sm text-slate-400 mb-4">CV'niz başarıyla işlendi ve analiz edildi.</p>
+                         <p className="text-sm text-slate-400 mb-4">CV&apos;niz başarıyla işlendi ve analiz edildi.</p>
                          <div className="text-xs text-slate-600 bg-slate-900 rounded-full px-3 py-1 border border-slate-800">
                              {new Date(latestAnalysis.createdAt).toLocaleString()}
                          </div>

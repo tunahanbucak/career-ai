@@ -2,17 +2,13 @@
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
+import { ActivityData } from '@/types';
 
-const data = [
-  { name: 'Oca', cv: 4, interview: 2 },
-  { name: 'Şub', cv: 3, interview: 5 },
-  { name: 'Mar', cv: 2, interview: 3 },
-  { name: 'Nis', cv: 6, interview: 8 },
-  { name: 'May', cv: 8, interview: 7 },
-  { name: 'Haz', cv: 5, interview: 9 },
-];
+type Props = {
+  data: ActivityData[];
+};
 
-export default function ActivityChart() {
+export default function ActivityChart({ data }: Props) {
   return (
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
@@ -48,7 +44,7 @@ export default function ActivityChart() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
             <XAxis 
-                dataKey="name" 
+                dataKey="date" 
                 stroke="#64748b" 
                 fontSize={12} 
                 tickLine={false} 
