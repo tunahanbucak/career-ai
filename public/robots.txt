@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Sitemap: https://careerai.app/sitemap.xml
+
+# Disallow admin and private routes
+User-agent: *
+Disallow: /admin
+Disallow: /api
+Disallow: /me
+Disallow: /settings
