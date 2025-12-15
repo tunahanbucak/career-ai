@@ -3,22 +3,46 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion } from 'framer-motion';
 import { ActivityData } from '@/types';
+import { TrendingUp } from 'lucide-react';
 
 type Props = {
   data: ActivityData[];
 };
 
 export default function ActivityChart({ data }: Props) {
+  const hasData = data.some(d => d.cv > 0 || d.interview > 0);
+
+  if (!hasData) {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur-xl h-full flex flex-col items-center justify-center text-center"
+      >
+        <div className="p-4 bg-slate-800/50 rounded-full mb-4">
+          <TrendingUp className="w-12 h-12 text-slate-600" />
+        </div>
+        <h3 className="text-lg font-semibold text-slate-300 mb-2">
+          Henüz aktivite verisi yok
+        </h3>
+        <p className="text-sm text-slate-500 max-w-sm">
+          CV analizi veya mülakat yaptıkça burada aktivite grafiğini göreceksin
+        </p>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div 
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className="rounded-2xl border border-white/5 bg-slate-900/40 p-6 backdrop-blur-xl h-full flex flex-col justify-between"
+      className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 backdrop-blur-xl h-full flex flex-col justify-between hover:border-indigo-500/20 transition-all duration-300"
     >
       <div className="mb-6">
         <h3 className="text-lg font-semibold text-white tracking-tight">Aktivite Analizi</h3>
-        <p className="text-sm text-slate-400">Son 6 aylık performans grafiğin.</p>
+        <p className="text-sm text-slate-400">Son 7 günlük performans grafiğin.</p>
       </div>
 
       <div className="h-[250px] w-full">

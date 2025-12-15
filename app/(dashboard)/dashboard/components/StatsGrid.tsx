@@ -2,7 +2,7 @@
 
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
-import { Activity, FileText, Award, UserCheck } from "lucide-react";
+import { Activity, FileText, TrendingUp, Zap } from "lucide-react";
 
 type StatCardProps = {
   title: string;
@@ -10,6 +10,7 @@ type StatCardProps = {
   icon: ReactNode;
   suffix?: string;
   gradient: string;
+  borderColor: string;
   delay: number;
 };
 
@@ -19,42 +20,54 @@ function StatCard({
   icon,
   suffix,
   gradient,
+  borderColor,
   delay,
 }: StatCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className={`relative overflow-hidden rounded-2xl border border-border p-5 bg-card text-card-foreground shadow-sm hover:shadow-lg hover:border-primary/20 transition-all duration-300 group`}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.5, delay, type: "spring", stiffness: 100 }}
+      whileHover={{ scale: 1.02, y: -5 }}
+      className={`relative overflow-hidden rounded-2xl border ${borderColor} p-6 bg-gradient-to-br from-slate-900/50 to-slate-950/50 backdrop-blur-xl shadow-xl hover:shadow-2xl transition-all duration-300 group`}
     >
-      <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-500 text-primary">
+      <div
+        className={`absolute inset-0 ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+      />
+      <div className="absolute top-0 right-0 w-32 h-32 opacity-5 group-hover:opacity-10 transition-opacity transform translate-x-8 -translate-y-8">
         {icon}
       </div>
 
-      <div className="relative z-10 flex flex-col h-full justify-between">
-        <div className="mb-4">
-          <div
-            className={`p-2.5 w-fit rounded-xl backdrop-blur-md mb-3 ${gradient}`}
-          >
-            {icon}
-          </div>
-          <p className="text-xs font-medium text-muted-foreground tracking-wide uppercase">
-            {title}
-          </p>
+      <div className="relative z-10">
+        <div
+          className={`inline-flex p-3 rounded-xl backdrop-blur-md mb-4 ${gradient} border ${borderColor} shadow-lg`}
+        >
+          {icon}
         </div>
-
-        <div className="flex items-end gap-1">
-          <h3 className="text-3xl font-bold text-foreground tracking-tight">
+        <p className="text-xs font-semibold text-slate-400 tracking-wider uppercase mb-3">
+          {title}
+        </p>
+        <div className="flex items-end gap-2">
+          <motion.h3
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, delay: delay + 0.2, type: "spring" }}
+            className="text-4xl font-black text-white tracking-tight"
+          >
             {value}
-          </h3>
+          </motion.h3>
           {suffix && (
-            <span className="text-sm text-muted-foreground mb-1.5 font-medium">
+            <span className="text-lg text-slate-400 mb-1 font-semibold">
               {suffix}
             </span>
           )}
         </div>
+        <div className="mt-3 flex items-center gap-1 text-emerald-400 text-xs font-medium">
+          <TrendingUp className="w-3 h-3" />
+          <span>Aktif</span>
+        </div>
       </div>
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
     </motion.div>
   );
 }
@@ -65,51 +78,37 @@ type Props = {
   activityScore: number;
 };
 
-export default function StatsGrid({ totalAnalyses, totalInterviews, activityScore }: Props) {
+export default function StatsGrid({
+  totalAnalyses,
+  totalInterviews,
+  activityScore,
+}: Props) {
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
       <StatCard
         title="Toplam CV Analizi"
         value={totalAnalyses}
-        icon={
-          <FileText size={24} className="text-blue-500 dark:text-blue-400" />
-        }
-        gradient="bg-blue-500/10 text-blue-600 dark:text-blue-400"
+        icon={<FileText size={24} className="text-blue-400" />}
+        gradient="bg-blue-500/10"
+        borderColor="border-blue-500/20"
         delay={0.1}
       />
       <StatCard
         title="Mülakat Pratiği"
         value={totalInterviews}
-        icon={
-          <Activity
-            size={24}
-            className="text-emerald-500 dark:text-emerald-400"
-          />
-        }
-        gradient="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+        icon={<Activity size={24} className="text-emerald-400" />}
+        gradient="bg-emerald-500/10"
+        borderColor="border-emerald-500/20"
         delay={0.2}
       />
       <StatCard
         title="Aktivite Skoru"
         value={activityScore}
         suffix="/100"
-        icon={
-          <Award size={24} className="text-amber-500 dark:text-amber-400" />
-        }
-        gradient="bg-amber-500/10 text-amber-600 dark:text-amber-400"
+        icon={<Zap size={24} className="text-amber-400" />}
+        gradient="bg-amber-500/10"
+        borderColor="border-amber-500/20"
         delay={0.3}
-      />
-      <StatCard
-        title="Üyelik Tipi"
-        value="PRO"
-        icon={
-          <UserCheck
-            size={24}
-            className="text-purple-500 dark:text-purple-400"
-          />
-        }
-        gradient="bg-purple-500/10 text-purple-600 dark:text-purple-400"
-        delay={0.4}
       />
     </div>
   );
