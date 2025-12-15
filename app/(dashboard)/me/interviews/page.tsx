@@ -30,48 +30,52 @@ export default async function MyInterviewsPage() {
   });
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
-            Mülakatlarım
+          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight mb-2">
+            Mülakat Geçmişim
           </h1>
-          <p className="text-slate-400 mt-1 text-sm">
-            AI ile gerçekleştirdiğin mülakat simülasyonları.
+          <p className="text-slate-400">
+            AI ile gerçekleştirdiğin mülakat simülasyonları
           </p>
         </div>
-        <Button
-          asChild
-          className="bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20"
-        >
-          <Link href="/interview">
-            <Plus className=" h-4 w-4" /> Yeni Mülakat Başlat
-          </Link>
-        </Button>
+        <Link href="/interview">
+          <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold px-6 h-11 rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-purple-500/50 transition-all flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Yeni Mülakat Başlat
+          </Button>
+        </Link>
       </div>
 
       {interviews.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-800 bg-slate-950/50 py-20 text-center">
-          <div className="rounded-full bg-slate-900 p-6 mb-4 shadow-lg shadow-emerald-500/10">
-            <MessageSquare className="h-10 w-10 text-slate-500" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-800 bg-slate-950/50 py-24 text-center">
+          <div className="p-6 bg-slate-900/50 rounded-full mb-6">
+            <MessageSquare className="h-14 w-14 text-slate-600" />
           </div>
-          <h3 className="text-xl font-bold text-slate-300">
+          <h3 className="text-2xl font-bold text-white mb-2">
             Henüz mülakat yapmadınız
           </h3>
-          <p className="mt-2 text-sm text-slate-500 max-w-xs mx-auto">
-            İlk simülasyonunuzu başlatın ve deneyim kazanın.
+          <p className="text-slate-500 max-w-md mx-auto mb-6">
+            AI destekli mülakat simülasyonu ile pratik yapın ve kendinizi
+            geliştirin
           </p>
+          <Link href="/interview">
+            <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-semibold px-6 h-11 rounded-xl shadow-lg shadow-purple-500/25">
+              İlk Mülakatını Başlat
+            </Button>
+          </Link>
         </div>
       ) : (
-        <>
+        <div className="space-y-8">
           <InterviewAnalytics interviews={interviews} />
-
-          <div className="pt-4">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="h-8 w-1 bg-emerald-500 rounded-full" />
-              <h2 className="text-xl font-bold text-white">
-                Geçmiş Mülakatlar
-              </h2>
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-8 w-1 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full" />
+              <h2 className="text-2xl font-bold text-white">Tüm Mülakatlar</h2>
+              <span className="px-2.5 py-0.5 bg-slate-800 text-slate-400 text-xs font-semibold rounded-full">
+                {interviews.length}
+              </span>
             </div>
             <InterviewHistoryList
               interviews={interviews.map((it) => ({
@@ -82,7 +86,7 @@ export default async function MyInterviewsPage() {
               }))}
             />
           </div>
-        </>
+        </div>
       )}
     </div>
   );
