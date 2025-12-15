@@ -1,7 +1,6 @@
 // Veritabanı kaynağını belirler (PostgreSQL)
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // Prisma İstemcisini oluşturur (JS/TS için)
