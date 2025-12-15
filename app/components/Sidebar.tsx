@@ -165,7 +165,7 @@ function NavContent({
           <NavItem
             href="/me/cvs"
             icon={<Target size={20} />}
-            label="Geçmiş CV'ler"
+            label="Geçmiş CV&apos;ler"
             active={isActive("/me/cvs")}
             isCollapsed={isCollapsed}
           />
