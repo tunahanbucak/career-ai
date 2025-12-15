@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import SettingsForm from "./components/SettingsForm";
+import { Settings } from "lucide-react";
 
 export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
@@ -21,21 +22,25 @@ export default async function SettingsPage() {
       title: true,
       phone: true,
       about: true,
-    }
+    },
   });
 
   if (!user) redirect("/");
 
   return (
-    <div className="max-w-4xl mx-auto p-6 lg:p-10 space-y-8 pb-20">
-      {/* Başlık */}
-      <div>
-        <h1 className="text-3xl font-bold text-white tracking-tight">
-          Hesap Ayarları
-        </h1>
-        <p className="text-slate-400 mt-2">
-          Kişisel bilgilerinizi ve kariyer profilinizi buradan yönetebilirsiniz.
-        </p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl">
+          <Settings className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">
+            Hesap Ayarları
+          </h1>
+          <p className="text-slate-400 mt-1">
+            Profil bilgilerinizi yönetin ve kişiselleştirin
+          </p>
+        </div>
       </div>
 
       <SettingsForm user={user} />

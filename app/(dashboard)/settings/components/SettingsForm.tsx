@@ -4,7 +4,18 @@ import { useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Save, User, Phone, CheckCircle2, AlertCircle, Briefcase, FileText } from "lucide-react";
+import {
+  Save,
+  User,
+  Phone,
+  CheckCircle2,
+  AlertCircle,
+  Briefcase,
+  FileText,
+  Mail,
+  Sparkles,
+  Award,
+} from "lucide-react";
 import { updateProfile } from "@/app/actions/profile";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -22,9 +33,11 @@ interface SettingsFormProps {
 export default function SettingsForm({ user }: SettingsFormProps) {
   const { update } = useSession();
   const [isPending, startTransition] = useTransition();
-  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
-  // Client-side state for controlled inputs (optional, but good for validation feedback)
   const [phoneVal, setPhoneVal] = useState(user.phone || "");
   const [nameVal, setNameVal] = useState(user.name || "");
   const [titleVal, setTitleVal] = useState(user.title || "");
@@ -34,7 +47,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
     const val = e.target.value.replace(/[^0-9]/g, "");
     // Maksimum 11 hane
     if (val.length <= 11) {
-        setPhoneVal(val);
+      setPhoneVal(val);
     }
   };
 
@@ -51,142 +64,253 @@ export default function SettingsForm({ user }: SettingsFormProps) {
   };
 
   async function handleSubmit(formData: FormData) {
-    if (phoneVal.length !== 11) {
-        setMessage({ type: "error", text: "Telefon numarası 11 haneli olmalıdır (05...)" });
-        return;
+    if (phoneVal && phoneVal.length !== 11) {
+      setMessage({
+        type: "error",
+        text: "Telefon numarası 11 haneli olmalıdır (05...)",
+      });
+      return;
     }
 
     startTransition(async () => {
       const result = await updateProfile(null, formData);
       if (result.success) {
         setMessage({ type: "success", text: result.message });
-        await update(); // Session'ı güncelle (Header vb. için)
+        await update(); // Session'ı güncelle
       } else {
         setMessage({ type: "error", text: result.message });
       }
-      setTimeout(() => setMessage(null), 3000);
+      setTimeout(() => setMessage(null), 4000);
     });
   }
 
+  const completionPercentage =
+    [user.name, user.title, user.phone, user.about].filter(Boolean).length * 25;
+
   return (
     <div className="grid gap-8 lg:grid-cols-3">
-         {/* Sol Taraf: Profil Özeti */}
-         <div className="lg:col-span-1 space-y-6">
-            <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 text-center backdrop-blur-sm">
-                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl font-bold text-white mb-4 shadow-lg shadow-indigo-500/20">
-                    {user.name?.charAt(0).toUpperCase() || "U"}
+      {/* Sol Panel: Profil Kartı */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="lg:col-span-1"
+      >
+        <div className="sticky top-6 space-y-6">
+          {/* Profile Card */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-6 backdrop-blur-xl shadow-2xl">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl" />
+            <div className="relative z-10 text-center">
+              {/* Avatar */}
+              <div className="relative inline-block mb-4">
+                <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-4xl font-black text-white shadow-2xl shadow-indigo-500/30 ring-4 ring-slate-900">
+                  {user.name?.charAt(0).toUpperCase() || "U"}
                 </div>
-                <h3 className="text-lg font-semibold text-white">{user.name || "Kullanıcı"}</h3>
-                <p className="text-indigo-400 text-sm font-medium mb-1">{user.email}</p>
+                <div className="absolute -bottom-1 -right-1 p-1.5 bg-emerald-500 rounded-full border-4 border-slate-900">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+              </div>
+              {/* Name & Email */}
+              <h3 className="text-xl font-bold text-white mb-1">
+                {user.name || "Kullanıcı"}
+              </h3>
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Mail className="w-3 h-3 text-indigo-400" />
+                <p className="text-indigo-400 text-sm font-medium">
+                  {user.email}
+                </p>
+              </div>
+
+              {/* Title Badge */}
+              {user.title && (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                  <Briefcase className="w-3 h-3 text-indigo-400" />
+                  <span className="text-xs font-semibold text-indigo-400">
+                    {user.title}
+                  </span>
+                </div>
+              )}
             </div>
-         </div>
+          </div>
 
-         {/* Sağ Taraf: Form */}
-         <div className="lg:col-span-2">
-            <form action={handleSubmit} className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 space-y-6 backdrop-blur-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
-                
-                {/* 1. Ad Soyad */}
-                <div className="space-y-2 relative z-10">
-                    <label className="text-sm font-medium text-slate-300 ml-1">
-                        Ad Soyad <span className="text-red-400">*</span>
-                    </label>
-                    <div className="relative group">
-                        <User className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
-                        <input 
-                           name="name"
-                           type="text"
-                           value={nameVal}
-                           onChange={handleNameChange}
-                           placeholder="Adınız Soyadınız"
-                           required
-                           className="w-full h-11 bg-slate-950/50 border border-slate-700 rounded-xl pl-10 pr-4 text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                        />
-                    </div>
-                </div>
+          {/* Profile Completion */}
+          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-400" />
+                <span className="text-sm font-semibold text-white">
+                  Profil Tamamlanma
+                </span>
+              </div>
+              <span className="text-sm font-bold text-white">
+                {completionPercentage}%
+              </span>
+            </div>
+            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${completionPercentage}%` }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+              />
+            </div>
+            <p className="text-xs text-slate-500 mt-3">
+              {completionPercentage === 100
+                ? "Profile tamamen dolu! 🎉"
+                : "Tüm bilgileri doldurarak profilini tamamla"}
+            </p>
+          </div>
+        </div>
+      </motion.div>
 
-                {/* 2. Unvan */}
-                 <div className="space-y-2 relative z-10">
-                    <label className="text-sm font-medium text-slate-300 ml-1">Unvan</label>
-                    <div className="relative group">
-                        <Briefcase className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
-                         <input 
-                           name="title"
-                           type="text"
-                           value={titleVal}
-                           onChange={handleTitleChange}
-                           placeholder="Örn: Yazılım Mühendisi"
-                           className="w-full h-11 bg-slate-950/50 border border-slate-700 rounded-xl pl-10 pr-4 text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
-                        />
-                    </div>
-                </div>
+      {/* Sağ Panel: Form */}
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="lg:col-span-2"
+      >
+        <form
+          action={handleSubmit}
+          className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-8 space-y-6 backdrop-blur-xl shadow-2xl relative overflow-hidden"
+        >
+          {/* Background Effects */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
 
-                {/* 3. Telefon */}
-                <div className="space-y-2 relative z-10">
-                    <label className="text-sm font-medium text-slate-300 ml-1">Telefon (11 Hane)</label>
-                    <div className="relative group">
-                         <Phone className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
-                         <input 
-                           name="phone"
-                           type="text"
-                           value={phoneVal}
-                           onChange={handlePhoneChange}
-                           placeholder="05XX XXX XX XX"
-                           className="w-full h-11 bg-slate-950/50 border border-slate-700 rounded-xl pl-10 pr-4 text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
-                        />
-                    </div>
-                </div>
+          {/* Form Header */}
+          <div className="relative z-10 pb-6 border-b border-slate-800">
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Kişisel Bilgiler
+            </h2>
+            <p className="text-sm text-slate-400">
+              Profil bilgilerinizi güncel tutun
+            </p>
+          </div>
 
-                {/* 4. Hakkımda */}
-                <div className="space-y-2 relative z-10">
-                    <label className="text-sm font-medium text-slate-300 ml-1">Hakkımda</label>
-                    <div className="relative group">
-                         <FileText className="absolute left-3 top-3 w-5 h-5 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
-                         <Textarea 
-                           name="about"
-                           defaultValue={user.about || ""}
-                           placeholder="Kendinizden kısaca bahsedin..."
-                           className="min-h-[120px] bg-slate-950/50 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all resize-y"
-                        />
-                    </div>
-                </div>
+          <div className="relative z-10 space-y-6">
+            {/* Ad Soyad */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                <User className="w-4 h-4 text-indigo-400" />
+                Ad Soyad <span className="text-red-400">*</span>
+              </label>
+              <input
+                name="name"
+                type="text"
+                value={nameVal}
+                onChange={handleNameChange}
+                placeholder="Adınız Soyadınız"
+                required
+                className="w-full h-12 bg-slate-950/50 border border-slate-700 rounded-xl px-4 text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+              />
+            </div>
 
-                <div className="pt-4 relative z-10">
-                    <Button 
-                        type="submit" 
-                        disabled={isPending}
-                        className="w-full h-12 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2"
-                    >
-                        {isPending ? (
-                            "Kaydediliyor..."
-                        ) : (
-                            <>
-                                <Save size={18} /> Değişiklikleri Kaydet
-                            </>
-                        )}
-                    </Button>
-                </div>
+            {/* Unvan */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-indigo-400" />
+                Unvan / Pozisyon
+              </label>
+              <input
+                name="title"
+                type="text"
+                value={titleVal}
+                onChange={handleTitleChange}
+                placeholder="Örn: Yazılım Mühendisi"
+                className="w-full h-12 bg-slate-950/50 border border-slate-700 rounded-xl px-4 text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+              />
+            </div>
 
-                <AnimatePresence>
-                    {message && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className={`p-4 rounded-xl flex items-center gap-3 relative z-10 ${
-                                message.type === "success" 
-                                ? "bg-emerald-500/10 border border-emerald-500/20 text-emerald-400" 
-                                : "bg-red-500/10 border border-red-500/20 text-red-400"
-                            }`}
-                        >
-                            {message.type === "success" ? <CheckCircle2 className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
-                            {message.text}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+            {/* Telefon */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                <Phone className="w-4 h-4 text-indigo-400" />
+                Telefon
+              </label>
+              <input
+                name="phone"
+                type="text"
+                value={phoneVal}
+                onChange={handlePhoneChange}
+                placeholder="05XX XXX XX XX"
+                className="w-full h-12 bg-slate-950/50 border border-slate-700 rounded-xl px-4 text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all font-mono"
+              />
+              {phoneVal && phoneVal.length !== 11 && (
+                <p className="text-xs text-amber-400">11 haneli olmalıdır</p>
+              )}
+            </div>
 
-            </form>
-         </div>
-      </div>
+            {/* Hakkımda */}
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-indigo-400" />
+                Hakkımda
+              </label>
+              <Textarea
+                name="about"
+                defaultValue={user.about || ""}
+                placeholder="Kendinizden kısaca bahsedin, yeteneklerinizi ve ilgi alanlarınızı paylaşın..."
+                className="min-h-[140px] bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all resize-y"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="pt-4">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isPending ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Kaydediliyor...
+                  </>
+                ) : (
+                  <>
+                    <Save size={18} />
+                    Değişiklikleri Kaydet
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Success/Error Message */}
+            <AnimatePresence>
+              {message && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className={`p-4 rounded-xl flex items-center gap-3 ${
+                    message.type === "success"
+                      ? "bg-emerald-500/10 border border-emerald-500/20"
+                      : "bg-red-500/10 border border-red-500/20"
+                  }`}
+                >
+                  {message.type === "success" ? (
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                  )}
+                  <span
+                    className={`text-sm font-medium ${
+                      message.type === "success"
+                        ? "text-emerald-400"
+                        : "text-red-400"
+                    }`}
+                  >
+                    {message.text}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </form>
+      </motion.div>
+    </div>
   );
 }
