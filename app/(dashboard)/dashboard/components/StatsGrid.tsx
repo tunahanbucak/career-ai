@@ -37,7 +37,6 @@ function StatCard({
       <div className="absolute top-0 right-0 w-32 h-32 opacity-5 group-hover:opacity-10 transition-opacity transform translate-x-8 -translate-y-8">
         {icon}
       </div>
-
       <div className="relative z-10">
         <div
           className={`inline-flex p-3 rounded-xl backdrop-blur-md mb-4 ${gradient} border ${borderColor} shadow-lg`}

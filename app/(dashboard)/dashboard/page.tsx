@@ -8,7 +8,7 @@ import StatsGrid from "./components/StatsGrid";
 import ActivityChart from "./components/ActivityChart";
 import SkillsRadarWidget from "./components/SkillsRadarWidget";
 import RecommendedActionsWidget from "./components/RecommendedActionsWidget";
-import RecentUploadsCard from "./components/RecentUploadsCard";
+// import RecentUploadsCard from "./components/RecentUploadsCard";
 import WelcomeCard from "./components/WelcomeCard";
 import ActivityTimeline from "./components/ActivityTimeline";
 import ProgressTracker from "./components/ProgressTracker";
@@ -66,7 +66,6 @@ export default async function DashboardPage() {
             />
           </div>
         )}
-
         <StatsGrid
           totalAnalyses={stats.totalAnalyses}
           totalInterviews={stats.totalInterviews}
@@ -82,7 +81,7 @@ export default async function DashboardPage() {
                 <SkillsRadarWidget data={skillsData} />
               </div>
             </div>
-            <RecentUploadsCard analyses={recentAnalyses || []} />
+            {/* <RecentUploadsCard analyses={recentAnalyses || []} /> */}
             <ActivityTimeline activities={timelineActivities} />
           </div>
           <div className="space-y-6">

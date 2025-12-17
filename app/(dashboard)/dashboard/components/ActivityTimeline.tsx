@@ -13,7 +13,9 @@ interface ActivityTimelineProps {
   }>;
 }
 
-export default function ActivityTimeline({ activities }: ActivityTimelineProps) {
+export default function ActivityTimeline({
+  activities,
+}: ActivityTimelineProps) {
   if (activities.length === 0) {
     return (
       <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 text-center">
@@ -41,7 +43,6 @@ export default function ActivityTimeline({ activities }: ActivityTimelineProps) 
           <p className="text-xs text-slate-400">Yakın zamandaki işlemler</p>
         </div>
       </div>
-
       <div className="space-y-4">
         {activities.slice(0, 5).map((activity, index) => (
           <motion.div
@@ -51,11 +52,13 @@ export default function ActivityTimeline({ activities }: ActivityTimelineProps) 
             transition={{ delay: index * 0.1 }}
             className="flex items-start gap-4 pb-4 border-b border-slate-800/50 last:border-0 last:pb-0"
           >
-            <div className={`p-2 rounded-lg ${
-              activity.type === "cv" 
-                ? "bg-emerald-500/10 text-emerald-400" 
-                : "bg-purple-500/10 text-purple-400"
-            }`}>
+            <div
+              className={`p-2 rounded-lg ${
+                activity.type === "cv"
+                  ? "bg-emerald-500/10 text-emerald-400"
+                  : "bg-purple-500/10 text-purple-400"
+              }`}
+            >
               {activity.type === "cv" ? (
                 <Zap className="w-4 h-4" />
               ) : (

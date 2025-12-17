@@ -12,33 +12,29 @@ type Props = {
 export default function RecentUploadsCard({ analyses }: Props) {
   return (
     <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/50 to-slate-950/50 backdrop-blur-xl p-6 shadow-xl relative overflow-hidden">
-      {/* Decorative Glow */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-[80px]" />
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/5 rounded-full blur-[80px]" />
-
       <div className="relative z-10">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl border border-indigo-500/20">
               <FileText className="w-5 h-5 text-indigo-400" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Son CV Analizleri</h3>
+              <h3 className="text-lg font-bold text-white">
+                Son CV Analizleri
+              </h3>
               <p className="text-xs text-slate-400">Yüklediğin son dosyalar</p>
             </div>
           </div>
-          
-          <Link 
-            href="/me/cvs" 
+          <Link
+            href="/me/cvs"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 transition-all"
           >
             Tümü
             <ArrowRight size={14} />
           </Link>
         </div>
-        
-        {/* Content */}
         <div className="space-y-3">
           {analyses.length === 0 ? (
             <motion.div
@@ -55,7 +51,7 @@ export default function RecentUploadsCard({ analyses }: Props) {
               <p className="text-sm text-slate-500 mb-6 max-w-xs">
                 İlk CV&apos;ni yükleyerek yapay zeka destekli analizini başlat
               </p>
-              <Link 
+              <Link
                 href="/cv-analysis"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/50 hover:scale-105"
               >
@@ -83,10 +79,10 @@ export default function RecentUploadsCard({ analyses }: Props) {
                     <div className="flex items-center gap-2 text-xs text-slate-500">
                       <Calendar className="w-3 h-3" />
                       <span>
-                        {new Date(a.createdAt).toLocaleDateString("tr-TR", { 
-                          month: 'long', 
-                          day: 'numeric',
-                          year: 'numeric'
+                        {new Date(a.createdAt).toLocaleDateString("tr-TR", {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
                         })}
                       </span>
                     </div>

@@ -49,10 +49,8 @@ export default function ProgressTracker({
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/90 to-slate-950/90 p-6 shadow-xl relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl" />
-
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-2.5 bg-amber-500/10 rounded-xl">
@@ -67,7 +65,6 @@ export default function ProgressTracker({
             <p className="text-xs text-slate-400">Kariyer yolculuğun</p>
           </div>
         </div>
-
         {isNewUser ? (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -109,7 +106,6 @@ export default function ProgressTracker({
                 </div>
               </div>
             </div>
-
             <Link
               href="/cv-analysis"
               className="block w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-center transition-all shadow-lg shadow-amber-500/25 hover:shadow-amber-500/50 hover:scale-[1.02]"

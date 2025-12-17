@@ -113,7 +113,6 @@ export default function CvUploadCard(props: CvUploadCardProps) {
             onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="hidden"
           />
-
           <div className="flex flex-col items-center justify-center text-center space-y-4">
             <div
               className={`h-16 w-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-2xl ${
@@ -146,7 +145,6 @@ export default function CvUploadCard(props: CvUploadCardProps) {
             </div>
           </div>
         </div>
-
         {error && (
           <Alert
             variant="destructive"
@@ -157,10 +155,13 @@ export default function CvUploadCard(props: CvUploadCardProps) {
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-slate-950/50 p-4 rounded-xl border border-slate-800/50">
           <div className="flex items-center gap-4 text-xs w-full md:w-auto justify-center">
-            <StepIndicator active={step !== "idle"} label="Yükleme" number="1" />
+            <StepIndicator
+              active={step !== "idle"}
+              label="Yükleme"
+              number="1"
+            />
             <div className="h-[1px] w-8 bg-slate-800"></div>
             <StepIndicator
               active={step === "analyzing" || step === "done"}
@@ -168,13 +169,8 @@ export default function CvUploadCard(props: CvUploadCardProps) {
               number="2"
             />
             <div className="h-[1px] w-8 bg-slate-800"></div>
-            <StepIndicator
-              active={step === "done"}
-              label="Sonuç"
-              number="3"
-            />
+            <StepIndicator active={step === "done"} label="Sonuç" number="3" />
           </div>
-
           <Button
             onClick={onUploadAndAnalyze}
             disabled={loading || !file}
@@ -189,14 +185,12 @@ export default function CvUploadCard(props: CvUploadCardProps) {
             )}
           </Button>
         </div>
-
         {step === "analyzing" && (
           <div className="space-y-4 py-8 animate-pulse px-4">
             <Skeleton className="h-4 w-1/3 bg-slate-800" />
             <Skeleton className="h-32 w-full rounded-xl bg-slate-800" />
           </div>
         )}
-
         {analysis && (
           <div className="mt-8 border-t border-slate-800 pt-6 animate-in fade-in slide-in-from-bottom-6">
             <Tabs defaultValue="summary" className="w-full">
@@ -220,7 +214,6 @@ export default function CvUploadCard(props: CvUploadCardProps) {
                   Öneri
                 </TabsTrigger>
               </TabsList>
-
               <div className="mt-6 bg-slate-950/30 rounded-xl p-6 border border-slate-800/50">
                 <TabsContent
                   value="summary"
@@ -248,7 +241,6 @@ export default function CvUploadCard(props: CvUploadCardProps) {
                 </TabsContent>
               </div>
             </Tabs>
-
             {rawPreview && (
               <div className="mt-6">
                 <button

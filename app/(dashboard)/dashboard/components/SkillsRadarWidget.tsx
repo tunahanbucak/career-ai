@@ -21,7 +21,6 @@ export default function SkillsRadarWidget({ data }: Props) {
     return (
       <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 h-[400px] flex flex-col items-center justify-center text-center relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px] -z-10" />
-
         <div className="p-4 bg-slate-800/50 rounded-full mb-4">
           <Target className="w-12 h-12 text-slate-600" />
         </div>
@@ -44,13 +43,11 @@ export default function SkillsRadarWidget({ data }: Props) {
   return (
     <div className="bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 h-[400px] flex flex-col relative overflow-hidden hover:border-purple-500/20 transition-all duration-300">
       <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px] -z-10" />
-
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
           <Zap className="w-5 h-5 text-purple-400" /> Yetkinlik Analizi
         </h3>
       </div>
-
       <div className="flex-1 w-full h-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
@@ -78,7 +75,6 @@ export default function SkillsRadarWidget({ data }: Props) {
           </RadarChart>
         </ResponsiveContainer>
       </div>
-
       <div className="text-center text-xs text-slate-500 mt-2">
         * CV analizlerine göre hesaplanmıştır
       </div>

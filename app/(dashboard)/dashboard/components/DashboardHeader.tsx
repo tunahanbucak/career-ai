@@ -12,10 +12,12 @@ export default function DashboardHeader({ userName }: DashboardHeaderProps) {
   const currentHour = new Date().getHours();
   const greeting =
     currentHour < 12
+      ? "İyi Geceler"
+      : currentHour < 12
       ? "Günaydın"
       : currentHour < 18
-      ? "İyi günler"
-      : "İyi akşamlar";
+      ? "İyi Günler"
+      : "İyi Akşamlar";
 
   const today = new Date();
   const formattedDate = today.toLocaleDateString("tr-TR", {
@@ -74,7 +76,6 @@ export default function DashboardHeader({ userName }: DashboardHeaderProps) {
               Yeni CV Analizi
             </span>
           </Link>
-
           <Link
             href="/interview"
             className="px-6 py-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/50 text-slate-200 hover:text-white font-semibold transition-all backdrop-blur-sm"

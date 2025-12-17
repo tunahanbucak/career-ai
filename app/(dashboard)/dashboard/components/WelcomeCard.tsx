@@ -29,7 +29,6 @@ export default function WelcomeCard({
       <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
       <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-3 bg-white/20 backdrop-blur-sm rounded-2xl">
@@ -39,12 +38,10 @@ export default function WelcomeCard({
             Hoş geldin{userName ? `, ${userName}` : ""}! 👋
           </h2>
         </div>
-
         <p className="text-white/90 mb-6 leading-relaxed">
           CareerAI&apos;ya katıldığın için teşekkürler! Kariyerini bir üst
           seviyeye taşımak için hazır mısın?
         </p>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
             <div className="flex items-center gap-3 mb-2">
@@ -59,7 +56,6 @@ export default function WelcomeCard({
               CV&apos;ni yükle ve AI koçundan detaylı geri bildirim al
             </p>
           </div>
-
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-white/20 rounded-lg">
@@ -74,7 +70,6 @@ export default function WelcomeCard({
             </p>
           </div>
         </div>
-
         <Link
           href="/cv-analysis"
           className="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold hover:bg-slate-100 transition-all hover:scale-105 shadow-lg"

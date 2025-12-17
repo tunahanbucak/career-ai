@@ -1,6 +1,12 @@
 "use client";
 
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  ResponsiveContainer,
+} from "recharts";
 import { motion } from "framer-motion";
 
 const data = [
@@ -26,12 +32,14 @@ export default function SkillsRadar() {
           <p className="text-sm text-slate-400">Analizlere göre profilin</p>
         </div>
       </div>
-
       <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
             <PolarGrid stroke="#334155" />
-            <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 12 }} />
+            <PolarAngleAxis
+              dataKey="subject"
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
+            />
             <Radar
               name="My Skills"
               dataKey="A"
