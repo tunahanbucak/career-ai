@@ -5,7 +5,6 @@ export default function DashboardPreview() {
     <section className="max-w-6xl mx-auto px-6 mb-32 animate-in fade-in zoom-in duration-1000 delay-500">
       <div className="relative rounded-3xl border border-slate-800 bg-slate-900/50 p-2 md:p-4 backdrop-blur-sm shadow-2xl group">
         <div className="absolute -top-24 left-1/2 -z-10 h-96 w-96 -translate-x-1/2 rounded-full bg-indigo-500/20 blur-[80px] opacity-50 group-hover:opacity-75 transition-opacity duration-1000" />
-
         <div className="overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-950 shadow-inner">
           <div className="flex items-center gap-2 border-b border-slate-800 bg-slate-900/80 px-4 py-3">
             <div className="flex gap-1.5">
@@ -17,7 +16,6 @@ export default function DashboardPreview() {
               https://careerai.app/dashboard
             </div>
           </div>
-
           <div className="grid grid-cols-12 min-h-[450px] bg-slate-950/50">
             <div className="col-span-2 hidden md:block border-r border-slate-800 p-4 space-y-4 bg-slate-900/20">
               <div className="h-8 w-8 rounded-lg bg-indigo-500/20 mb-6 flex items-center justify-center">
@@ -33,8 +31,6 @@ export default function DashboardPreview() {
                 <div className="h-12 w-full rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20" />
               </div>
             </div>
-
-            {/* Main Area */}
             <div className="col-span-12 md:col-span-10 p-6 md:p-8 relative overflow-hidden">
               {/* Üst Kısım */}
               <div className="flex justify-between mb-8 items-center">
@@ -76,13 +72,15 @@ export default function DashboardPreview() {
                   Mülakat Performansı
                 </div>
                 {/* Chart Bars */}
-                {[40, 70, 50, 90, 60, 80, 45, 95, 55, 85, 65, 75].map((h, i) => (
-                  <div
-                    key={i}
-                    className="flex-1 rounded-t-sm bg-indigo-500/20 hover:bg-indigo-500/50 transition-all relative group"
-                    style={{ height: `${h}%` }}
-                  ></div>
-                ))}
+                {[40, 70, 50, 90, 60, 80, 45, 95, 55, 85, 65, 75].map(
+                  (h, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 rounded-t-sm bg-indigo-500/20 hover:bg-indigo-500/50 transition-all relative group"
+                      style={{ height: `${h}%` }}
+                    ></div>
+                  )
+                )}
               </div>
             </div>
           </div>

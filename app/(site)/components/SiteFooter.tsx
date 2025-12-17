@@ -7,7 +7,6 @@ export default function SiteFooter() {
   return (
     <footer className="border-t border-slate-800 bg-slate-950/50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-        {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-12">
           <div className="lg:col-span-4">
             <Logo textSize="xl" />

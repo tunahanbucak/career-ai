@@ -9,7 +9,6 @@ export default function HeroSection() {
   return (
     <section className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center mb-16 sm:mb-20 lg:mb-32 pt-6 sm:pt-10">
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -z-10 w-[300px] sm:w-[600px] h-[200px] sm:h-[400px] bg-indigo-600/20 blur-[80px] sm:blur-[120px] rounded-full mix-blend-screen pointer-events-none" />
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -21,7 +20,6 @@ export default function HeroSection() {
           Yapay Zeka Destekli Kariyer Koçu
         </span>
       </motion.div>
-
       <motion.h1
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -36,7 +34,6 @@ export default function HeroSection() {
           Başla.
         </span>
       </motion.h1>
-
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -47,7 +44,6 @@ export default function HeroSection() {
         <span className="text-white font-medium">CareerAI</span>, CV&apos;ni
         analiz eder, mülakatlara hazırlar ve sana özel kariyer rotası çizer.
       </motion.p>
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
