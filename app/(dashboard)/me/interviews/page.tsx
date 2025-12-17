@@ -47,7 +47,6 @@ export default async function MyInterviewsPage() {
           </Button>
         </Link>
       </div>
-
       {interviews.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-800 bg-slate-950/50 py-24 text-center">
           <div className="p-6 bg-slate-900/50 rounded-full mb-6">

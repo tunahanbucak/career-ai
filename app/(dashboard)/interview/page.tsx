@@ -11,7 +11,7 @@ import InterviewChat from "./components/InterviewChat";
 // Kullanıcı seçtiği pozisyon için yapay zeka ile mülakat yapabilir.
 export default function InterviewPage() {
   const { data: session, status } = useSession();
-  
+
   // State Tanımları
   const [position, setPosition] = useState<string>("Frontend Developer"); // Hedef pozisyon
   const [message, setMessage] = useState<string>(""); // Kullanıcının yazdığı anlık mesaj
@@ -28,7 +28,7 @@ export default function InterviewPage() {
       </div>
     );
   }
-  
+
   // Oturum yoksa ana sayfaya yönlendir
   if (!session || !session.user) {
     redirect("/");
@@ -50,17 +50,21 @@ export default function InterviewPage() {
       if (!res.ok) {
         throw new Error(data?.error || "İstek hatası");
       }
-      
+
       // AI'dan gelen ilk soruyu geçmişe ekle
       if (data?.reply) {
-        setHistory((h) => [...h, { role: "assistant", content: String(data.reply) }]);
+        setHistory((h) => [
+          ...h,
+          { role: "assistant", content: String(data.reply) },
+        ]);
       }
       // ID'yi kaydet (devamlılık için)
       if (data?.interviewId && typeof data.interviewId === "string") {
         setInterviewId(data.interviewId);
       }
     } catch (e: unknown) {
-      const msg = typeof e === "object" && e !== null && "message" in e
+      const msg =
+        typeof e === "object" && e !== null && "message" in e
           ? String((e as { message?: unknown }).message)
           : "Beklenmeyen bir hata oluştu.";
       setError(msg);
@@ -72,7 +76,7 @@ export default function InterviewPage() {
   const sendMessage = async () => {
     const text = message.trim();
     if (!text) return;
-    
+
     try {
       setError(null);
       setMessage("");
@@ -88,12 +92,16 @@ export default function InterviewPage() {
       if (!res.ok) {
         throw new Error(data?.error || "İstek hatası");
       }
-      setHistory((h) => [...h, { role: "assistant", content: String(data.reply || "") }]);
+      setHistory((h) => [
+        ...h,
+        { role: "assistant", content: String(data.reply || "") },
+      ]);
       if (data?.interviewId && typeof data.interviewId === "string") {
         setInterviewId(data.interviewId);
       }
     } catch (e: unknown) {
-      const msg = typeof e === "object" && e !== null && "message" in e
+      const msg =
+        typeof e === "object" && e !== null && "message" in e
           ? String((e as { message?: unknown }).message)
           : "Beklenmeyen bir hata oluştu.";
       setError(msg);
@@ -116,7 +124,6 @@ export default function InterviewPage() {
         canReset={history.length > 0}
         onReset={resetChat}
       />
-
       <InterviewChat
         position={position}
         history={history}

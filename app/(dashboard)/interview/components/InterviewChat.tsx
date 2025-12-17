@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Bot, Loader2, User, Sparkles, Send, Play, AlertCircle } from "lucide-react";
+import { Bot, Loader2, User, Send, Play, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -49,30 +49,27 @@ export default function InterviewChat({
 
   return (
     <div className="flex-1 relative rounded-3xl border border-slate-800 bg-slate-950/40 backdrop-blur-sm overflow-hidden flex flex-col shadow-2xl">
-      {/* Messages Area */}
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth"
       >
         {history.length === 0 ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="h-full flex flex-col items-center justify-center text-center p-8"
           >
             <div className="relative mb-8">
-               <div className="absolute inset-0 bg-indigo-500 blur-2xl opacity-20 rounded-full" />
-               <div className="h-28 w-28 relative rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-slate-700 flex items-center justify-center shadow-2xl">
-                 <Bot className="h-14 w-14 text-indigo-400" />
-               </div>
+              <div className="absolute inset-0 bg-indigo-500 blur-2xl opacity-20 rounded-full" />
+              <div className="h-28 w-28 relative rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border-2 border-slate-700 flex items-center justify-center shadow-2xl">
+                <Bot className="h-14 w-14 text-indigo-400" />
+              </div>
             </div>
-            
             <h2 className="text-3xl font-bold text-white mb-4">Hazır mısın?</h2>
             <p className="text-slate-400 max-w-md mb-10 text-lg leading-relaxed">
               <span className="text-indigo-400 font-bold">{position}</span>{" "}
               pozisyonu için teknik mülakat simülasyonu başlatılacak.
             </p>
-            
             <Button
               onClick={onStart}
               disabled={loading}
@@ -96,15 +93,20 @@ export default function InterviewChat({
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex gap-5 ${isAI ? "justify-start" : "justify-end"}`}
+                  className={`flex gap-5 ${
+                    isAI ? "justify-start" : "justify-end"
+                  }`}
                 >
                   {isAI && (
                     <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center mt-1 shadow-lg">
                       <Bot size={20} className="text-indigo-400" />
                     </div>
                   )}
-
-                  <div className={`max-w-[85%] md:max-w-[75%] space-y-1 ${isAI ? "" : "items-end flex flex-col"}`}>
+                  <div
+                    className={`max-w-[85%] md:max-w-[75%] space-y-1 ${
+                      isAI ? "" : "items-end flex flex-col"
+                    }`}
+                  >
                     <div
                       className={`px-6 py-4 text-base leading-relaxed shadow-lg whitespace-pre-wrap relative overflow-hidden ${
                         isAI
@@ -112,16 +114,15 @@ export default function InterviewChat({
                           : "bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-3xl rounded-tr-sm shadow-indigo-500/20"
                       }`}
                     >
-                      {/* Decoration for AI bubbles */}
-                      {isAI && <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500" />}
-                      
+                      {isAI && (
+                        <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500" />
+                      )}
                       {m.content}
                     </div>
                     <span className="text-[11px] font-medium text-slate-500 px-1 uppercase tracking-wider opacity-60">
                       {isAI ? "AI Mülakatçı" : "Sen"}
                     </span>
                   </div>
-
                   {!isAI && (
                     <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-gradient-to-tr from-slate-700 to-slate-600 border border-slate-500/30 flex items-center justify-center mt-1 shadow-lg">
                       <User size={20} className="text-white" />
@@ -132,56 +133,55 @@ export default function InterviewChat({
             })}
           </AnimatePresence>
         )}
-
         {loading && (
-             <motion.div 
-               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-               className="flex gap-5 justify-start"
-             >
-                <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg">
-                  <Bot size={20} className="text-indigo-400" />
-                </div>
-                <div className="bg-slate-900/50 border border-slate-800 rounded-3xl rounded-tl-sm px-6 py-4 flex items-center gap-1.5 h-[58px]">
-                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                   <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" />
-                </div>
-             </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex gap-5 justify-start"
+          >
+            <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg">
+              <Bot size={20} className="text-indigo-400" />
+            </div>
+            <div className="bg-slate-900/50 border border-slate-800 rounded-3xl rounded-tl-sm px-6 py-4 flex items-center gap-1.5 h-[58px]">
+              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" />
+            </div>
+          </motion.div>
         )}
       </div>
-
       {error && (
         <div className="px-6 pb-4">
-          <Alert variant="destructive" className="bg-red-950/30 border-red-900/50 text-red-200 backdrop-blur-sm">
+          <Alert
+            variant="destructive"
+            className="bg-red-950/30 border-red-900/50 text-red-200 backdrop-blur-sm"
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         </div>
       )}
-
-      {/* Input Area */}
       {history.length > 0 && (
         <div className="p-4 md:p-6 bg-slate-950/80 border-t border-slate-800/80 backdrop-blur-2xl">
           <div className="relative flex items-end gap-3 max-w-4xl mx-auto">
             <div className="relative flex-1 group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
-                <input
-                  ref={inputRef}
-                  value={message}
-                  onChange={(e) => onChangeMessage(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      if (!loading) onSend();
-                    }
-                  }}
-                  placeholder="Cevabınızı buraya yazın..."
-                  className="relative block w-full bg-slate-900 text-slate-100 placeholder:text-slate-500 border border-slate-800 rounded-2xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-slate-900/80 transition-all shadow-xl"
-                  disabled={loading}
-                  autoComplete="off"
-                />
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
+              <input
+                ref={inputRef}
+                value={message}
+                onChange={(e) => onChangeMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    if (!loading) onSend();
+                  }
+                }}
+                placeholder="Cevabınızı buraya yazın..."
+                className="relative block w-full bg-slate-900 text-slate-100 placeholder:text-slate-500 border border-slate-800 rounded-2xl px-5 py-4 text-base focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:bg-slate-900/80 transition-all shadow-xl"
+                disabled={loading}
+                autoComplete="off"
+              />
             </div>
-            
             <Button
               onClick={onSend}
               disabled={loading || !message.trim()}

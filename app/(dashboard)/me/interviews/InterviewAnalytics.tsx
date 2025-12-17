@@ -29,7 +29,15 @@ type Props = {
   interviews: InterviewItem[];
 };
 
-const COLORS = ["#6366f1", "#22c55e", "#f97316", "#e11d48", "#06b6d4", "#a855f7", "#facc15"]; // Tailwind renkleri
+const COLORS = [
+  "#6366f1",
+  "#22c55e",
+  "#f97316",
+  "#e11d48",
+  "#06b6d4",
+  "#a855f7",
+  "#facc15",
+]; // Tailwind renkleri
 
 function formatDateLabel(dateStr: string) {
   const d = new Date(dateStr);
@@ -54,14 +62,21 @@ export default function InterviewAnalytics({ interviews }: Props) {
 
     const byDateMap = new Map<string, number>();
     const byPositionMap = new Map<string, number>();
-    const byInterviewMessagesRaw: { id: string; label: string; messages: number; date: string }[] = [];
+    const byInterviewMessagesRaw: {
+      id: string;
+      label: string;
+      messages: number;
+      date: string;
+    }[] = [];
 
     for (const it of interviews) {
       const messages: number = it._count?.messages ?? 0;
       totalMessages += messages;
 
       const d = new Date(it.date);
-      const key = !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : "unknown";
+      const key = !Number.isNaN(d.getTime())
+        ? d.toISOString().slice(0, 10)
+        : "unknown";
       byDateMap.set(key, (byDateMap.get(key) ?? 0) + 1);
 
       const pos = it.position || "Diğer";
@@ -76,7 +91,10 @@ export default function InterviewAnalytics({ interviews }: Props) {
     }
 
     const totalInterviews = interviews.length;
-    const avgMessages = totalInterviews > 0 ? Math.round((totalMessages / totalInterviews) * 10) / 10 : 0;
+    const avgMessages =
+      totalInterviews > 0
+        ? Math.round((totalMessages / totalInterviews) * 10) / 10
+        : 0;
 
     const byDate = Array.from(byDateMap.entries())
       .map(([date, count]) => ({ date, count }))
@@ -95,7 +113,14 @@ export default function InterviewAnalytics({ interviews }: Props) {
       .sort((a, b) => b.value - a.value)
       .slice(0, 6);
 
-    return { totalInterviews, totalMessages, avgMessages, byDate, byInterviewMessages, byPosition };
+    return {
+      totalInterviews,
+      totalMessages,
+      avgMessages,
+      byDate,
+      byInterviewMessages,
+      byPosition,
+    };
   }, [interviews]);
 
   if (stats.totalInterviews === 0) return null;
@@ -122,20 +147,32 @@ export default function InterviewAnalytics({ interviews }: Props) {
           accent="from-fuchsia-500/40 via-fuchsia-500/10 to-transparent"
         />
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-950/80 to-slate-950 p-4 md:p-5 shadow-lg shadow-indigo-500/10">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h3 className="text-sm font-semibold text-slate-100">Zaman İçinde Aktivite</h3>
-              <p className="text-xs text-slate-500">Son dönemlerde ne kadar aktif olduğunu gösterir.</p>
+              <h3 className="text-sm font-semibold text-slate-100">
+                Zaman İçinde Aktivite
+              </h3>
+              <p className="text-xs text-slate-500">
+                Son dönemlerde ne kadar aktif olduğunu gösterir.
+              </p>
             </div>
           </div>
           <div className="h-52 md:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={stats.byDate} margin={{ left: -20, right: 0, top: 10, bottom: 0 }}>
+              <AreaChart
+                data={stats.byDate}
+                margin={{ left: -20, right: 0, top: 10, bottom: 0 }}
+              >
                 <defs>
-                  <linearGradient id="interviewActivity" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="interviewActivity"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
                     <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
                   </linearGradient>
@@ -162,8 +199,13 @@ export default function InterviewAnalytics({ interviews }: Props) {
                     border: "1px solid #1f2937",
                     padding: "8px 10px",
                   }}
-                  labelFormatter={(v: string | number) => formatDateLabel(String(v))}
-                  formatter={(value: number | string) => [value, "Mülakat Sayısı"]}
+                  labelFormatter={(v: string | number) =>
+                    formatDateLabel(String(v))
+                  }
+                  formatter={(value: number | string) => [
+                    value,
+                    "Mülakat Sayısı",
+                  ]}
                 />
                 <Area
                   type="monotone"
@@ -178,11 +220,14 @@ export default function InterviewAnalytics({ interviews }: Props) {
             </ResponsiveContainer>
           </div>
         </div>
-
         <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 md:p-5 shadow-lg shadow-emerald-500/10 flex flex-col">
           <div className="mb-3">
-            <h3 className="text-sm font-semibold text-slate-100">Pozisyona Göre Dağılım</h3>
-            <p className="text-xs text-slate-500">Hangi pozisyonlara daha çok odaklandığını gösterir.</p>
+            <h3 className="text-sm font-semibold text-slate-100">
+              Pozisyona Göre Dağılım
+            </h3>
+            <p className="text-xs text-slate-500">
+              Hangi pozisyonlara daha çok odaklandığını gösterir.
+            </p>
           </div>
           <div className="flex-1 flex items-center justify-center">
             {stats.byPosition.length === 0 ? (
@@ -223,7 +268,10 @@ export default function InterviewAnalytics({ interviews }: Props) {
           </div>
           <div className="mt-3 space-y-1 max-h-24 overflow-y-auto pr-1 text-[11px] text-slate-400">
             {stats.byPosition.map((p, i) => (
-              <div key={p.name} className="flex items-center justify-between gap-2">
+              <div
+                key={p.name}
+                className="flex items-center justify-between gap-2"
+              >
                 <div className="flex items-center gap-2 min-w-0">
                   <span
                     className="h-2 w-2 rounded-full flex-shrink-0"
@@ -239,17 +287,22 @@ export default function InterviewAnalytics({ interviews }: Props) {
           </div>
         </div>
       </div>
-
       <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 md:p-5 shadow-lg shadow-sky-500/10">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="text-sm font-semibold text-slate-100">Mülakata Göre Mesaj Sayısı</h3>
-            <p className="text-xs text-slate-500">Son mülakatlarındaki etkileşim yoğunluğunu gösterir.</p>
+            <h3 className="text-sm font-semibold text-slate-100">
+              Mülakata Göre Mesaj Sayısı
+            </h3>
+            <p className="text-xs text-slate-500">
+              Son mülakatlarındaki etkileşim yoğunluğunu gösterir.
+            </p>
           </div>
         </div>
         <div className="h-52 md:h-60">
           {stats.byInterviewMessages.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-xs text-slate-600">Veri yetersiz.</div>
+            <div className="flex h-full items-center justify-center text-xs text-slate-600">
+              Veri yetersiz.
+            </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -257,7 +310,11 @@ export default function InterviewAnalytics({ interviews }: Props) {
                 layout="vertical"
                 margin={{ left: 40, right: 10, top: 10, bottom: 10 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#111827" horizontal={false} />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="#111827"
+                  horizontal={false}
+                />
                 <XAxis
                   type="number"
                   tick={{ fontSize: 10, fill: "#9ca3af" }}
@@ -280,7 +337,10 @@ export default function InterviewAnalytics({ interviews }: Props) {
                     border: "1px solid #1f2937",
                     padding: "8px 10px",
                   }}
-                  formatter={(value: number | string) => [value, "Mesaj Sayısı"]}
+                  formatter={(value: number | string) => [
+                    value,
+                    "Mesaj Sayısı",
+                  ]}
                   labelFormatter={(label: string | number) =>
                     `Mülakat ${String(label).replace(".", "")}`
                   }
@@ -312,9 +372,13 @@ function StatCard({ label, value, description, accent }: StatCardProps) {
         )}
       />
       <div className="relative space-y-1">
-        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">{label}</div>
+        <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+          {label}
+        </div>
         <div className="text-2xl font-semibold text-slate-50">{value}</div>
-        {description && <p className="text-[11px] text-slate-400 max-w-xs">{description}</p>}
+        {description && (
+          <p className="text-[11px] text-slate-400 max-w-xs">{description}</p>
+        )}
       </div>
     </div>
   );
