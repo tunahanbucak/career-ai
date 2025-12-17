@@ -36,7 +36,6 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
 
   return (
     <div className="space-y-6">
-      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between p-1 bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-slate-800">
         <div className="relative w-full sm:w-96 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-hover:text-indigo-400 transition-colors" />
@@ -52,8 +51,6 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
           <span>{filtered.length} Kayıt</span>
         </div>
       </div>
-
-      {/* Grid */}
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 text-center border border-dashed border-slate-800 rounded-3xl bg-slate-900/20">
           <div className="h-16 w-16 rounded-full bg-slate-800/50 flex items-center justify-center mb-4">
@@ -67,7 +64,7 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
-            {filtered.map((cv, i) => (
+            {filtered.map((cv) => (
               <motion.div
                 key={cv.id}
                 variants={item}
@@ -75,7 +72,6 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
               >
                 <Link href={`/me/cvs/${cv.id}`} className="group block h-full">
                   <div className="relative h-full bg-slate-900/40 backdrop-blur-md rounded-3xl border border-slate-800/60 p-6 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-900/80 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col justify-between overflow-hidden">
-                    {/* Header */}
                     <div className="flex items-start justify-between mb-4 relative z-10">
                       <div className="flex items-start gap-4">
                         <div className="h-12 w-12 rounded-2xl bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors shadow-lg">
@@ -101,8 +97,6 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                         <ArrowUpRight className="h-5 w-5" />
                       </div>
                     </div>
-
-                    {/* Summary & Tags */}
                     {cv.analysis && (
                       <div className="relative z-10 space-y-4">
                         <div className="bg-slate-950/50 rounded-xl p-3 border border-slate-800/50">
@@ -110,7 +104,6 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                             {cv.analysis.summary}
                           </p>
                         </div>
-
                         <div className="flex flex-wrap gap-1.5">
                           {cv.analysis.keywords.slice(0, 3).map((k, idx) => (
                             <span
@@ -128,7 +121,6 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                         </div>
                       </div>
                     )}
-
                     {!cv.analysis && (
                       <div className="relative z-10 mt-4 p-3 rounded-xl bg-slate-800/30 border border-slate-800/50 flex items-center gap-2">
                         <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
@@ -137,8 +129,6 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                         </span>
                       </div>
                     )}
-
-                    {/* Decoration */}
                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-indigo-500/10 transition-colors" />
                     <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500/0 via-indigo-500/50 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>

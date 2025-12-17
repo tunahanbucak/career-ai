@@ -89,7 +89,6 @@ export default async function CVDetailPage({
           </div>
         </div>
       </div>
-
       {!analysis ? (
         <div className="rounded-2xl border-2 border-dashed border-slate-800 bg-slate-950/50 p-16 text-center">
           <div className="p-6 bg-slate-900/50 rounded-full inline-block mb-4">
@@ -219,7 +218,6 @@ export default async function CVDetailPage({
                       )}
                     </ul>
                   </div>
-
                   <div className="bg-gradient-to-br from-orange-900/20 to-slate-950/90 border border-orange-900/20 rounded-2xl p-6 backdrop-blur-xl">
                     <div className="flex items-center gap-3 mb-4">
                       <div className="p-2 bg-orange-500/10 rounded-lg">
@@ -322,7 +320,6 @@ function ScoreCard({
     if (score >= 70) return "text-amber-400";
     return "text-orange-400";
   };
-
   return (
     <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-5 backdrop-blur-xl shadow-xl hover:scale-105 transition-transform">
       <div

@@ -186,22 +186,16 @@ export default function CvUploadPage() {
 
   return (
     <div className="flex flex-col xl:flex-row gap-8 min-h-[calc(100vh-100px)]">
-      {/* LEFT COLUMN: Input & History (Scrollable) */}
       <div className="w-full xl:w-1/2 space-y-8">
-        {/* HEADER */}
         <div>
           <h2 className="text-3xl font-bold text-white mb-2">CV Analizi</h2>
           <p className="text-slate-400">
             Yapay zeka ile CV&apos;ni saniyeler içinde analiz et ve geliştir.
           </p>
         </div>
-
-        {/* UPLOAD CARD */}
         <div className="relative group rounded-3xl p-[1px] bg-gradient-to-b from-slate-700 to-slate-800">
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-
           <div className="relative bg-slate-950/80 backdrop-blur-xl rounded-3xl p-8 space-y-8 overflow-hidden">
-            {/* Drag Area */}
             <div
               className={`
                   relative cursor-pointer rounded-2xl border-2 border-dashed p-10 transition-all duration-300
@@ -275,7 +269,6 @@ export default function CvUploadPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-
             <Button
               onClick={handleUploadAndAnalyze}
               disabled={loading || !file}
@@ -292,8 +285,6 @@ export default function CvUploadPage() {
             </Button>
           </div>
         </div>
-
-        {/* RECENT HISTORY */}
         <div className="bg-slate-900/40 backdrop-blur-md rounded-3xl border border-slate-800/50 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -307,7 +298,6 @@ export default function CvUploadPage() {
               Tümünü Gör
             </Link>
           </div>
-
           <div className="space-y-3">
             {fetchingHistory ? (
               [1, 2, 3].map((i) => (
@@ -350,8 +340,6 @@ export default function CvUploadPage() {
           </div>
         </div>
       </div>
-
-      {/* RIGHT COLUMN: Results Section (Sticky) */}
       <div className="w-full xl:w-1/2">
         <AnimatePresence mode="wait">
           {!analysis && !loading && step !== "analyzing" ? (
@@ -401,10 +389,8 @@ export default function CvUploadPage() {
               className="h-full flex flex-col"
             >
               <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex-1 flex flex-col">
-                {/* HEADER with Score - Premium Gradient */}
                 <div className="relative p-8 pb-12 bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-
                   <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-8">
                     <div className="text-center sm:text-left space-y-2">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase border border-indigo-500/20 backdrop-blur-sm">
@@ -440,8 +426,6 @@ export default function CvUploadPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* TABS CONTENT AREA */}
                 <div className="flex-1 bg-slate-950/30 -mt-6 rounded-t-3xl border-t border-slate-800/50 backdrop-blur-sm relative z-20">
                   <Tabs
                     defaultValue="overview"
@@ -469,9 +453,7 @@ export default function CvUploadPage() {
                         </TabsTrigger>
                       </TabsList>
                     </div>
-
                     <div className="flex-1 p-6 overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
-                      {/* TAB: OVERVIEW */}
                       <TabsContent
                         value="overview"
                         className="mt-0 space-y-6 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500"
@@ -484,7 +466,6 @@ export default function CvUploadPage() {
                             {analysis.analysis?.summary}
                           </div>
                         </div>
-
                         <div className="space-y-4">
                           <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <Target size={16} /> Öne Çıkanlar
@@ -501,8 +482,6 @@ export default function CvUploadPage() {
                           </div>
                         </div>
                       </TabsContent>
-
-                      {/* TAB: DETAILS (Mock Data for Visuals) */}
                       <TabsContent
                         value="details"
                         className="mt-0 space-y-6 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500"
@@ -551,7 +530,6 @@ export default function CvUploadPage() {
                             </div>
                           ))}
                         </div>
-
                         <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
                           <div className="flex items-center gap-3">
                             <div className="h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
@@ -585,8 +563,6 @@ export default function CvUploadPage() {
                           </div>
                         </div>
                       </TabsContent>
-
-                      {/* TAB: ACTION PLAN */}
                       <TabsContent
                         value="action"
                         className="mt-0 space-y-6 focus-visible:outline-none animate-in fade-in slide-in-from-bottom-4 duration-500"
@@ -599,7 +575,6 @@ export default function CvUploadPage() {
                             {analysis.analysis?.suggestion}
                           </p>
                         </div>
-
                         <div className="space-y-3">
                           <h4 className="text-xs font-bold text-slate-500 uppercase">
                             Sonraki Adımlar
@@ -631,8 +606,6 @@ export default function CvUploadPage() {
                     </div>
                   </Tabs>
                 </div>
-
-                {/* FOOTER ACTIONS */}
                 <div className="p-4 bg-slate-950 border-t border-slate-800 flex gap-3">
                   <Button
                     className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-500/25"

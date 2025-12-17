@@ -110,7 +110,6 @@ export default function CvAnalytics({ cvs }: Props) {
           accent="from-fuchsia-500/40 via-fuchsia-500/10 to-transparent"
         />
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-950/80 to-slate-950 p-4 md:p-5 shadow-lg shadow-indigo-500/10">
           <div className="flex items-center justify-between mb-3">
@@ -189,7 +188,6 @@ export default function CvAnalytics({ cvs }: Props) {
               </p>
             </div>
           </div>
-
           <div className="space-y-2 overflow-y-auto pr-1 max-h-60">
             {stats.latestCvs.map((cv, index) => (
               <div
@@ -216,7 +214,6 @@ export default function CvAnalytics({ cvs }: Props) {
                     {cv.title}
                   </div>
                 </div>
-
                 {index === 0 && (
                   <span className="ml-2 inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
                     En Güncel
@@ -224,7 +221,6 @@ export default function CvAnalytics({ cvs }: Props) {
                 )}
               </div>
             ))}
-
             {stats.latestCvs.length === 0 && (
               <div className="text-xs text-slate-600">
                 Görüntülenecek CV bulunamadı.
