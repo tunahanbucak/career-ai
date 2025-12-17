@@ -52,7 +52,6 @@ export default async function AccountPage() {
             </p>
           </div>
         </div>
-
         <Link href="/settings">
           <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold px-6 h-11 rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/50 transition-all flex items-center gap-2">
             <Edit className="w-4 h-4" />
@@ -94,7 +93,6 @@ export default async function AccountPage() {
                 CV Analizi
               </div>
             </div>
-
             <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-purple-500/20 rounded-2xl p-5 text-center hover:border-purple-500/40 transition-all shadow-xl">
               <div className="inline-flex p-3 bg-purple-500/10 rounded-xl mb-3">
                 <MessageSquare className="w-6 h-6 text-purple-400" />

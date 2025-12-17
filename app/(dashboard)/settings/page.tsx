@@ -12,7 +12,6 @@ export default async function SettingsPage() {
     redirect("/");
   }
 
-  // Fetch FRESH user data from DB to avoid session staleness for the form
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     select: {
@@ -42,7 +41,6 @@ export default async function SettingsPage() {
           </p>
         </div>
       </div>
-
       <SettingsForm user={user} />
     </div>
   );
