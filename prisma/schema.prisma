@@ -21,6 +21,7 @@ model User {
   image         String? // Profil resmi URL'i
   accounts      Account[] // Bağlı sosyal hesaplar
   sessions      Session[] // Aktif oturumlar
+  // İlişkiler: Bir kullanıcı silinirse, ona ait CV ve Mülakatlar da silinsin.
   cvs           CV[] // Yüklenen CV'ler
   interviews    Interview[] // Yapılan mülakatlar
 }
@@ -63,7 +64,8 @@ model CV {
   rawText    String?      @db.Text // Çıkarılan ham metin
   uploadDate DateTime     @default(now()) // Yükleme tarihi
   userId     String // Yükleyen kullanıcı
-  user       User         @relation(fields: [userId], references: [id])
+  //Kullanıcı silinirse CV de silinsin (Cascade)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   analyses   CVAnalysis[] // Yapılan analizler
 }
 
@@ -75,16 +77,17 @@ model CVAnalysis {
   summary    String   @db.Text // Özet
   keywords   String[] // Anahtar kelimeler
   suggestion String   @db.Text // Gelişim önerileri
-  
-  // Analiz Skorları (Gemini tarafından üretilecek)
-  score      Int?     @default(0) // Genel Skor (0-100)
-  impact     Int?     @default(0) // Etki Odaklılık
-  brevity    Int?     @default(0) // Kısalık / Öz
-  ats        Int?     @default(0) // ATS Uyumu
-  style      Int?     @default(0) // Dil Bilgisi / Stil
 
-  createdAt  DateTime @default(now()) // Oluşturulma tarihi
-  cv         CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
+  // Analiz Skorları (Gemini tarafından üretilecek)
+  score   Int? @default(0) // Genel Skor (0-100)
+  impact  Int? @default(0) // Etki Odaklılık
+  brevity Int? @default(0) // Kısalık / Öz
+  ats     Int? @default(0) // ATS Uyumu
+  style   Int? @default(0) // Dil Bilgisi / Stil
+
+  createdAt DateTime @default(now()) // Oluşturulma tarihi
+  // CV silinirse Analiz de silinsin (Cascade) 
+  cv        CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
 }
 
 // Mülakat Modeli: AI ile yapılan mülakat oturumları.
@@ -93,7 +96,8 @@ model Interview {
   position String // Mülakat yapılan pozisyon
   date     DateTime           @default(now()) // Tarih
   userId   String // Mülakatı yapan kullanıcı
-  user     User               @relation(fields: [userId], references: [id])
+  // Kullanıcı silinirse Mülakat da silinsin (Cascade)
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages InterviewMessage[] // Mesajlaşma geçmişi
 }
 
@@ -110,6 +114,7 @@ model InterviewMessage {
   role        InterviewRole // Gönderen (AI veya Kullanıcı)
   content     String        @db.Text // Mesaj içeriği
   createdAt   DateTime      @default(now()) // Mesaj zamanı
+  // Mülakat silinirse Mesajlar da silinsin (Cascade) -.
   interview   Interview     @relation(fields: [interviewId], references: [id], onDelete: Cascade)
 }
 
