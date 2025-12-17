@@ -83,12 +83,12 @@ export default function LandingNavbar() {
             >
               <Link href="/auth/signin">Giriş Yap</Link>
             </Button>
-            <Button
+            {/* <Button
               className="w-full justify-center bg-indigo-600 hover:bg-indigo-500"
               asChild
             >
               <Link href="/auth/signin?mode=signup">Ücretsiz Başla</Link>
-            </Button>
+            </Button> */}
           </div>
         </div>
       )}

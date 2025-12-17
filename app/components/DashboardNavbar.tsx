@@ -29,7 +29,6 @@ export default function DashboardNavbar({
   const { isSidebarCollapsed } = useLayout();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Generate breadcrumbs from pathname
   const getBreadcrumbs = () => {
     const paths = pathname?.split("/").filter(Boolean) || [];
     const items: { href: string; label: string; icon?: React.ElementType }[] = [
@@ -89,8 +88,6 @@ export default function DashboardNavbar({
             );
           })}
         </div>
-
-        {/* Global Search */}
         <div className="hidden lg:flex items-center max-w-md w-full relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
@@ -105,10 +102,7 @@ export default function DashboardNavbar({
           </div>
         </div>
       </div>
-
-      {/* Right: Actions & User */}
       <div className="flex items-center gap-3 sm:gap-4 pl-4">
-        {/* Notification */}
         <Button
           variant="ghost"
           size="icon"
@@ -117,10 +111,7 @@ export default function DashboardNavbar({
           <Bell size={20} />
           <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-primary border-2 border-background shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
         </Button>
-
         <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
-
-        {/* Profile Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-3 pl-2 pr-1.5 py-1.5 rounded-full bg-secondary/50 border border-border/80 hover:border-primary/30 hover:bg-secondary transition-all group outline-none focus:ring-2 focus:ring-primary/20">
@@ -173,7 +164,6 @@ export default function DashboardNavbar({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-
       <SettingsDialog
         open={isSettingsOpen}
         onOpenChange={setIsSettingsOpen}

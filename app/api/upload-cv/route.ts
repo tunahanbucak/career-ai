@@ -1,7 +1,4 @@
-// app/api/upload-cv/route.ts
-// PDF ve DOCX DOSYALARINDAN METİN ÇIKARAN NİHAİ SERVER ACTION
-
-/* eslint-disable @typescript-eslint/no-require-imports */ // require hatasını engeller
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 import { NextRequest, NextResponse } from "next/server";
 import mammoth from "mammoth"; // DOCX için (Kurulu olmalı)
@@ -16,7 +13,8 @@ const pdfParse = require("pdf-parse");
 export const runtime = "nodejs";
 
 // Tür yardımcıları
-const isRecord = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object";
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  v !== null && typeof v === "object";
 
 // pdf-parse fonksiyonunu basit ve stabil şekilde çöz
 type PdfParseFn = (b: Buffer) => Promise<{ text?: string }>;
@@ -24,7 +22,8 @@ type PdfParseFn = (b: Buffer) => Promise<{ text?: string }>;
 async function resolvePdfParse(): Promise<PdfParseFn> {
   const m: unknown = pdfParse;
   if (typeof m === "function") return m as PdfParseFn;
-  if (isRecord(m) && typeof m.default === "function") return m.default as PdfParseFn;
+  if (isRecord(m) && typeof m.default === "function")
+    return m.default as PdfParseFn;
   if (isRecord(m) && typeof (m as Record<string, unknown>).pdf === "function") {
     return (m as { pdf: PdfParseFn }).pdf;
   }
@@ -32,8 +31,11 @@ async function resolvePdfParse(): Promise<PdfParseFn> {
   // Dinamik import fallback
   const mod: unknown = await import("pdf-parse");
   if (typeof mod === "function") return mod as PdfParseFn;
-  if (isRecord(mod) && typeof mod.default === "function") return mod.default as PdfParseFn;
-  throw new TypeError("pdf-parse modülü çözümlenemedi (uyumlu fonksiyon bulunamadı)");
+  if (isRecord(mod) && typeof mod.default === "function")
+    return mod.default as PdfParseFn;
+  throw new TypeError(
+    "pdf-parse modülü çözümlenemedi (uyumlu fonksiyon bulunamadı)"
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -51,8 +53,11 @@ export async function POST(request: NextRequest) {
 
     const fileName = file.name || "cv";
     const contentType = file.type || "";
-    const isPDF = contentType.includes("pdf") || fileName.toLowerCase().endsWith(".pdf");
-    const isDOCX = contentType.includes("officedocument.wordprocessingml.document") || fileName.toLowerCase().endsWith(".docx");
+    const isPDF =
+      contentType.includes("pdf") || fileName.toLowerCase().endsWith(".pdf");
+    const isDOCX =
+      contentType.includes("officedocument.wordprocessingml.document") ||
+      fileName.toLowerCase().endsWith(".docx");
     if (!isPDF && !isDOCX) {
       return NextResponse.json(
         { error: "Desteklenmeyen dosya türü. Lütfen PDF veya DOCX yükleyin." },
@@ -60,7 +65,10 @@ export async function POST(request: NextRequest) {
       );
     }
     const MAX_SIZE = 8 * 1024 * 1024;
-    if (typeof (file as File).size === "number" && (file as File).size > MAX_SIZE) {
+    if (
+      typeof (file as File).size === "number" &&
+      (file as File).size > MAX_SIZE
+    ) {
       return NextResponse.json(
         { error: "Dosya boyutu 8MB sınırını aşıyor." },
         { status: 400 }
@@ -76,8 +84,8 @@ export async function POST(request: NextRequest) {
       const parseFunction = await resolvePdfParse();
       const data = await parseFunction(buffer);
       rawText = data.text || "";
-      
-    // --- DOCX PARSING ---
+
+      // --- DOCX PARSING ---
     } else if (isDOCX) {
       const result = await mammoth.extractRawText({ buffer });
       rawText = result.value || "";
@@ -88,19 +96,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    rawText = rawText.replace(/\u0000/g, " ").replace(/\s+/g, " ").trim();
+    rawText = rawText
+      .replace(/\u0000/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
 
     if (!rawText) {
       return NextResponse.json(
-        { error: "Dosyadan metin çıkarılamadı. Lütfen farklı bir dosya deneyin." },
+        {
+          error:
+            "Dosyadan metin çıkarılamadı. Lütfen farklı bir dosya deneyin.",
+        },
         { status: 422 }
       );
     }
 
     // DB'ye kaydet
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
     if (!user) {
-      return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
+      return NextResponse.json(
+        { error: "Kullanıcı bulunamadı." },
+        { status: 404 }
+      );
     }
     const data: Record<string, unknown> = {
       title: fileName.replace(/\.(pdf|docx)$/i, ""),
@@ -114,7 +133,12 @@ export async function POST(request: NextRequest) {
     }
     const created = await prisma.cV.create({
       data: data as {
-        title: string; filename: string; mime: string | null; rawText: string; userId: string; size?: number;
+        title: string;
+        filename: string;
+        mime: string | null;
+        rawText: string;
+        userId: string;
+        size?: number;
       },
       select: { id: true, title: true },
     });

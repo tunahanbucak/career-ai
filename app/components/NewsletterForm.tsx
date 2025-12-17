@@ -9,9 +9,13 @@ interface NewsletterFormProps {
   variant?: "footer" | "inline";
 }
 
-export default function NewsletterForm({ variant = "footer" }: NewsletterFormProps) {
+export default function NewsletterForm({
+  variant = "footer",
+}: NewsletterFormProps) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [message, setMessage] = useState("");
 
   const validateEmail = (email: string): boolean => {
@@ -31,14 +35,12 @@ export default function NewsletterForm({ variant = "footer" }: NewsletterFormPro
     setStatus("loading");
     setMessage("");
 
-    // Simulated API call - replace with actual API later
     setTimeout(() => {
       console.log("Newsletter signup:", email);
       setStatus("success");
       setMessage("Harika! E-posta listemize katıldınız 🎉");
       setEmail("");
-      
-      // Reset after 5 seconds
+
       setTimeout(() => {
         setStatus("idle");
         setMessage("");
@@ -67,7 +69,6 @@ export default function NewsletterForm({ variant = "footer" }: NewsletterFormPro
             `}
           />
         </div>
-
         <Button
           type="submit"
           disabled={status === "loading" || status === "success"}
@@ -80,13 +81,14 @@ export default function NewsletterForm({ variant = "footer" }: NewsletterFormPro
           {status === "loading" && (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           )}
-          {status === "success" && (
-            <CheckCircle2 className="mr-2 h-4 w-4" />
-          )}
-          {status === "loading" ? "Gönderiliyor..." : status === "success" ? "Kaydedildi!" : "Abone Ol"}
+          {status === "success" && <CheckCircle2 className="mr-2 h-4 w-4" />}
+          {status === "loading"
+            ? "Gönderiliyor..."
+            : status === "success"
+            ? "Kaydedildi!"
+            : "Abone Ol"}
         </Button>
       </form>
-
       <AnimatePresence mode="wait">
         {message && (
           <motion.p
@@ -101,7 +103,6 @@ export default function NewsletterForm({ variant = "footer" }: NewsletterFormPro
           </motion.p>
         )}
       </AnimatePresence>
-
       {isFooterVariant && status === "idle" && (
         <p className="mt-3 text-xs text-slate-500">
           Haftalık kariyer ipuçları ve güncellemeler alın. Spam yok, söz!
