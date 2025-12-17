@@ -3,7 +3,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
 import { Search, Download, ShieldAlert, FileText } from "lucide-react";
-// ... imports
 import AdminStats from "./components/AdminStats";
 import { DataCard } from "./components/AdminTables";
 import GlobalActivityChart from "./components/GlobalActivityChart";
@@ -179,17 +178,14 @@ export default async function AdminPage({
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black via-transparent to-black"></div>
       </div>
-
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-900/10 blur-[120px]" />
       </div>
-
       <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col gap-8 px-6 py-10">
         <header className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl" />
-
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-lg shadow-indigo-500/30">
@@ -205,7 +201,6 @@ export default async function AdminPage({
                 </p>
               </div>
             </div>
-
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3 px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
                 <div className="flex flex-col">
@@ -226,7 +221,6 @@ export default async function AdminPage({
             </div>
           </div>
         </header>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-3">
             <AdminStats
@@ -240,9 +234,7 @@ export default async function AdminPage({
             />
           </div>
         </div>
-
         <GlobalActivityChart data={activityData} />
-
         <section className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-sm p-1">
           <div className="flex flex-col lg:flex-row justify-between items-center bg-slate-950/50 rounded-xl p-4 gap-4">
             <form
@@ -275,7 +267,6 @@ export default async function AdminPage({
                 </a>
               )}
             </form>
-
             <div className="w-full lg:w-auto flex items-center gap-3 border-t lg:border-t-0 lg:border-l border-slate-800 pt-4 lg:pt-0 lg:pl-4">
               <form
                 action="/api/admin/export"
@@ -299,10 +290,9 @@ export default async function AdminPage({
             </div>
           </div>
         </section>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2">
+        <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
           <DataCard
-            title="Son Yüklenen CV&apos;ler"
+            title="Son Yüklenen CV'ler"
             total={cvTotal}
             page={pageIndex}
             pageSize={pageSize}
@@ -355,7 +345,6 @@ export default async function AdminPage({
               </tbody>
             </table>
           </DataCard>
-
           <DataCard
             title="Son Analizler"
             total={analysisTotal}
@@ -418,7 +407,6 @@ export default async function AdminPage({
             </table>
           </DataCard>
         </div>
-
         <section>
           <DataCard
             title="Mülakat Oturumları"
