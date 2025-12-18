@@ -135,7 +135,7 @@ export default function DashboardNavbar({
             align="end"
             className="w-56 bg-background/95 backdrop-blur-xl border-border text-foreground mt-2 px-1 py-1.5 shadow-2xl"
           >
-            <DropdownMenuItem className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5">
+            <DropdownMenuItem asChild className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5">
               <Link href="/me" className="flex w-full font-medium">
                 Hesabım
               </Link>
@@ -149,7 +149,7 @@ export default function DashboardNavbar({
                     >
                         <div className="flex w-full font-medium">Ayarlar</div>
                     </DropdownMenuItem> */}
-            <DropdownMenuItem className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5">
+            <DropdownMenuItem asChild className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5">
               <Link href="/admin" className="flex w-full font-medium">
                 Yönetim Paneli
               </Link>
@@ -157,7 +157,7 @@ export default function DashboardNavbar({
             <DropdownMenuSeparator className="bg-border/50 my-1" />
             <DropdownMenuItem
               className="text-red-400 focus:text-red-300 focus:bg-red-500/10 cursor-pointer rounded-lg py-2.5 group"
-              onClick={() => signOut({ callbackUrl: "/" })}
+              onSelect={() => signOut({ callbackUrl: "/" })}
             >
               <span className="flex-1 font-medium">Çıkış Yap</span>
             </DropdownMenuItem>
