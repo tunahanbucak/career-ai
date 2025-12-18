@@ -5,6 +5,7 @@ import ai from "@/app/utils/gemini";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
 import { AnalysisResult } from "@/types";
+import { addXP, XP_VALUES } from "@/app/utils/xp";
 
 // Zod şeması: Gelen istek verilerinin doğrulanması için kullanılır.
 const analyzeCvSchema = z.object({
@@ -111,6 +112,12 @@ export async function POST(request: NextRequest) {
         style: details.style,
       },
     });
+
+    // Kullanıcıya XP ekle (+25 CV analizi bonusu)
+    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (user) {
+      await addXP(user.id, XP_VALUES.CV_ANALYSIS);
+    }
 
     // 7. Başarılı yanıtı döndür
     return NextResponse.json(

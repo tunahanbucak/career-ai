@@ -5,8 +5,9 @@ import mammoth from "mammoth"; // DOCX için (Kurulu olmalı)
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/app/lib/prisma";
+import { addXP, XP_VALUES } from "@/app/utils/xp";
 
-// 💡 ÇÖZÜM: Kütüphanenin kendisini import ediyoruz ve içindeki fonksiyonu kullanacağız.
+// Node.js runtime kullandeki fonksiyonu kullanacağız.
 // Bu, require ile import edilen objenin içindeki fonksiyonu bulmanın en güvenilir yoludur.
 const pdfParse = require("pdf-parse");
 
@@ -142,6 +143,9 @@ export async function POST(request: NextRequest) {
       },
       select: { id: true, title: true },
     });
+
+    // Kullanıcıya XP ekle (+10 CV yükleme bonusu)
+    await addXP(user.id, XP_VALUES.CV_UPLOAD);
 
     // Başarılı yanıt gönder (Faz 4'e girdi)
     return NextResponse.json(
