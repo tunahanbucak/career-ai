@@ -25,6 +25,8 @@ interface InterviewItem {
   id: string;
   position: string;
   date: string | Date;
+  isCompleted: boolean;
+  score: number | null;
   _count: { messages: number };
 }
 
@@ -41,14 +43,7 @@ export default function InterviewHistoryList({
     (item.position.toLowerCase() || "").includes(term.toLowerCase())
   );
 
-  const getMockScore = (id: string, count: number) => {
-    if (count < 5) return null;
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      hash = id.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return Math.abs(hash % 30) + 70;
-  };
+
 
   return (
     <div className="space-y-6">
@@ -86,9 +81,6 @@ export default function InterviewHistoryList({
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((it) => {
-              const score = getMockScore(it.id, it._count.messages);
-              const isCompleted = it._count.messages > 5;
-
               return (
                 <motion.div key={it.id} variants={item} layout>
                   <Link
@@ -106,13 +98,13 @@ export default function InterviewHistoryList({
                           className={`
                                     border font-normal
                                     ${
-                                      isCompleted
+                                      it.isCompleted
                                         ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                                         : "bg-amber-500/10 text-amber-400 border-amber-500/20"
                                     }
                                 `}
                         >
-                          {isCompleted ? "Tamamlandı" : "Yarım Kaldı"}
+                          {it.isCompleted ? "Analiz Edildi" : "Yarım Kaldı"}
                         </Badge>
                       </div>
                       <div className="flex-1">
@@ -139,10 +131,10 @@ export default function InterviewHistoryList({
                             <span className="text-xs text-slate-500">Puan</span>
                             <span
                               className={`text-sm font-bold ${
-                                score ? "text-emerald-400" : "text-slate-400"
+                                it.score !== null ? "text-emerald-400" : "text-slate-400"
                               }`}
                             >
-                              {score ? `%${score}` : "-"}
+                              {it.score !== null ? it.score : "-"}
                             </span>
                           </div>
                         </div>

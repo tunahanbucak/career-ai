@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Bot, Loader2, User, Send, Play, AlertCircle } from "lucide-react";
+import { Bot, Loader2, User, Send, Play, AlertCircle, CheckCircle, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,9 +14,13 @@ type Props = {
   message: string;
   loading: boolean;
   error: string | null;
+  analyzing?: boolean;
+  analysisComplete?: boolean;
+  canComplete?: boolean;
   onChangeMessage: (value: string) => void;
   onStart: () => void;
   onSend: () => void;
+  onComplete?: () => void;
 };
 
 export default function InterviewChat({
@@ -25,9 +29,13 @@ export default function InterviewChat({
   message,
   loading,
   error,
+  analyzing = false,
+  analysisComplete = false,
+  canComplete = false,
   onChangeMessage,
   onStart,
   onSend,
+  onComplete,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -195,6 +203,34 @@ export default function InterviewChat({
               )}
             </Button>
           </div>
+          
+          {/* Mülakatı Bitir Butonu */}
+          {canComplete && onComplete && (
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <Button
+                onClick={onComplete}
+                disabled={analyzing || analysisComplete}
+                className="h-12 px-8 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all"
+              >
+                {analyzing ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Analiz Yapılıyor...
+                  </>
+                ) : analysisComplete ? (
+                  <>
+                    <CheckCircle className="mr-2 h-5 w-5" />
+                    Analiz Tamamlandı!
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Mülakatı Bitir ve Analiz Et
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
           <div className="text-center mt-3">
             <span className="text-[10px] uppercase tracking-widest font-semibold text-slate-600">
               AI Powered • Career Simulation

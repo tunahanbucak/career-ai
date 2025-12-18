@@ -25,6 +25,8 @@ export default async function MyInterviewsPage() {
       id: true,
       position: true,
       date: true,
+      isCompleted: true,
+      score: true,
       _count: { select: { messages: true } },
     },
   });
@@ -81,6 +83,8 @@ export default async function MyInterviewsPage() {
                 id: it.id,
                 position: it.position,
                 date: it.date instanceof Date ? it.date.toISOString() : it.date,
+                isCompleted: it.isCompleted,
+                score: it.score,
                 _count: it._count,
               }))}
             />

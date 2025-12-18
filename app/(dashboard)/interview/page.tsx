@@ -19,6 +19,8 @@ export default function InterviewPage() {
   const [loading, setLoading] = useState(false); // AI yanıtı bekleniyor mu?
   const [error, setError] = useState<string | null>(null); // Hata durumları
   const [interviewId, setInterviewId] = useState<string | null>(null); // Veritabanındaki mülakat ID'si
+  const [analyzing, setAnalyzing] = useState(false); // Analiz yapılıyor mu?
+  const [analysisComplete, setAnalysisComplete] = useState(false); // Analiz tamamlandı mı?
 
   // Oturum yükleniyorsa bekleme ekranı göster
   if (status === "loading") {
@@ -114,6 +116,53 @@ export default function InterviewPage() {
     setHistory([]);
     setError(null);
     setInterviewId(null);
+    setAnalyzing(false);
+    setAnalysisComplete(false);
+  };
+
+  // Mülakatı Bitir ve Analiz Et
+  const completeInterview = async () => {
+    if (!interviewId) {
+      setError("Mülakat ID bulunamadı.");
+      return;
+    }
+
+    // Minimum mesaj kontrolü (en az 10 mesaj = 5 soru-cevap)
+    if (history.length < 10) {
+      setError("Analiz için en az 5 soru-cevap gerekli.");
+      return;
+    }
+
+    try {
+      setAnalyzing(true);
+      setError(null);
+
+      const res = await fetch("/api/interview/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ interviewId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Analiz hatası");
+      }
+
+      // Başarılı - mülakat detay sayfasına yönlendir
+      setAnalysisComplete(true);
+      setTimeout(() => {
+        window.location.href = `/me/interviews/${interviewId}`;
+      }, 1500);
+    } catch (e: unknown) {
+      const msg =
+        typeof e === "object" && e !== null && "message" in e
+          ? String((e as { message?: unknown }).message)
+          : "Analiz sırasında bir hata oluştu.";
+      setError(msg);
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
   return (
@@ -130,9 +179,13 @@ export default function InterviewPage() {
         message={message}
         loading={loading}
         error={error}
+        analyzing={analyzing}
+        analysisComplete={analysisComplete}
+        canComplete={history.length >= 10 && interviewId !== null}
         onChangeMessage={setMessage}
         onStart={startInterview}
         onSend={sendMessage}
+        onComplete={completeInterview}
       />
     </div>
   );
