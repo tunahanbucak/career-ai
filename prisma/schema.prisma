@@ -19,6 +19,12 @@ model User {
   email         String?     @unique // E-posta (Eşsiz olmalı)
   emailVerified DateTime? // E-posta doğrulama tarihi
   image         String? // Profil resmi URL'i
+  
+  // Gamification / Level Sistemi
+  level         Int         @default(1) // Kullanıcı seviyesi (1'den başlar)
+  xp            Int         @default(0) // Experience Points (deneyim puanı)
+  levelName     String      @default("Beginner") // Seviye adı
+  
   accounts      Account[] // Bağlı sosyal hesaplar
   sessions      Session[] // Aktif oturumlar
   // İlişkiler: Bir kullanıcı silinirse, ona ait CV ve Mülakatlar da silinsin.
@@ -96,6 +102,15 @@ model Interview {
   position String // Mülakat yapılan pozisyon
   date     DateTime           @default(now()) // Tarih
   userId   String // Mülakatı yapan kullanıcı
+  
+  // Mülakat Analizi Sonuçları (AI tarafından üretilecek)
+  isCompleted Boolean @default(false) // Mülakat tamamlandı mı?
+  score       Int? // Genel performans skoru (0-100)
+  summary     String?   @db.Text // Performans özeti
+  strengths   String[] // Güçlü yönler (dizi)
+  improvements String[] // Gelişim alanları (dizi)
+  analyzedAt  DateTime? // Analiz tarihi
+  
   // Kullanıcı silinirse Mülakat da silinsin (Cascade)
   user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages InterviewMessage[] // Mesajlaşma geçmişi
