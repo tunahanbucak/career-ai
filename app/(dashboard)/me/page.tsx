@@ -25,7 +25,16 @@ export default async function AccountPage() {
 
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      title: true,
+      phone: true,
+      about: true,
+      email: true,
+      level: true,
+      xp: true,
+      levelName: true,
       cvs: { select: { id: true } },
       interviews: { select: { id: true } },
     },
@@ -175,13 +184,18 @@ export default async function AccountPage() {
               </div>
               <div className="space-y-2">
                 <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Üyelik Tipi
+                  Seviye
                 </div>
-                <div className="flex items-center gap-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 p-3 rounded-xl">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span className="text-sm font-bold text-amber-400">
-                    Premium
-                  </span>
+                <div className="flex items-center gap-3 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 p-3 rounded-xl">
+                  <Award className="w-5 h-5 text-amber-400" />
+                  <div>
+                    <div className="text-sm font-bold text-amber-400">
+                      Level {user.level} - {user.levelName}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {user.xp} XP
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

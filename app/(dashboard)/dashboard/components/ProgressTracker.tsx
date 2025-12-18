@@ -7,16 +7,26 @@ import Link from "next/link";
 interface ProgressTrackerProps {
   totalAnalyses: number;
   totalInterviews: number;
+  level: number;
+  xp: number;
+  levelName: string;
 }
 
 export default function ProgressTracker({
   totalAnalyses,
   totalInterviews,
+  level,
+  xp,
+  levelName,
 }: ProgressTrackerProps) {
-  // Basit bir level sistemi: Her 3 analiz ve 2 mülakat 1 level
-  const totalPoints = totalAnalyses * 10 + totalInterviews * 15;
-  const level = Math.floor(totalPoints / 50) + 1;
-  const progressToNextLevel = ((totalPoints % 50) / 50) * 100;
+  // XP sistemini kullan
+  const xpForNextLevel = 100 * level; // Her level 100 * level XP gerektirir
+  let totalXP = 0;
+  for (let i = 1; i < level; i++) {
+    totalXP += 100 * i;
+  }
+  const xpInCurrentLevel = xp - totalXP;
+  const progressToNextLevel = (xpInCurrentLevel / xpForNextLevel) * 100;
 
   const milestones = [
     {
@@ -45,7 +55,7 @@ export default function ProgressTracker({
     },
   ];
 
-  const isNewUser = totalPoints === 0;
+  const isNewUser = xp === 0;
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-gradient-to-br from-slate-900/90 to-slate-950/90 p-6 shadow-xl relative overflow-hidden">
@@ -121,7 +131,7 @@ export default function ProgressTracker({
                   Seviye {level}
                 </span>
                 <span className="text-sm text-slate-400">
-                  ({totalPoints} puan)
+                  ({xp} XP)
                 </span>
               </div>
               <div className="relative">
@@ -134,7 +144,7 @@ export default function ProgressTracker({
                   />
                 </div>
                 <p className="text-xs text-slate-500 mt-2">
-                  Sonraki seviyeye {50 - (totalPoints % 50)} puan kaldı
+                  Sonraki seviyeye {xpForNextLevel - xpInCurrentLevel} XP kaldı
                 </p>
               </div>
             </div>

@@ -29,6 +29,9 @@ export default async function DashboardPage() {
     select: {
       id: true,
       name: true,
+      level: true,
+      xp: true,
+      levelName: true,
     },
   });
 
@@ -89,6 +92,9 @@ export default async function DashboardPage() {
             <ProgressTracker
               totalAnalyses={stats.totalAnalyses}
               totalInterviews={stats.totalInterviews}
+              level={dbUser.level}
+              xp={dbUser.xp}
+              levelName={dbUser.levelName}
             />
           </div>
         </div>
