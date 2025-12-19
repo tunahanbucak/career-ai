@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { prisma } from "@/app/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import ai from "@/app/utils/gemini";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
 

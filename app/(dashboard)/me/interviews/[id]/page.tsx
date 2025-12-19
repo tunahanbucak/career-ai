@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { prisma } from "@/app/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, User, Bot, Calendar, Award, CheckCircle, Target, Sparkles, MessageSquare } from "lucide-react";
@@ -199,7 +199,7 @@ export default async function InterviewDetailPage({
                   Bu mülakat henüz analiz edilmedi.
                 </p>
                 <p className="text-xs text-slate-500">
-                  Mülakat sayfasında "Mülakatı Bitir ve Analiz Et" butonuyla analiz yapabilirsiniz.
+                  Mülakat sayfasında &quot;Mülakatı Bitir ve Analiz Et&quot; butonuyla analiz yapabilirsiniz.
                 </p>
               </CardContent>
             </Card>

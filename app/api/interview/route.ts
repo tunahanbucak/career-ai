@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import ai from "@/app/utils/gemini";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { prisma } from "@/app/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // Node.js runtime kullanılacağını belirtiyoruz (AI işlemleri için gerekli olabilir)
 export const runtime = "nodejs";
