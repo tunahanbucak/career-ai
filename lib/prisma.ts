@@ -1,5 +1,5 @@
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient } from "@/app/generated/prisma";
 
 // Global Prisma istemcisi tanımı (Development ortamında hot-reload sorunlarını önlemek için)
 const globalForPrisma = global as unknown as { prisma: PrismaClient };

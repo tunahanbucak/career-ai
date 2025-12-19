@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { redirect } from "next/navigation";
-import Sidebar from "@/app/components/Sidebar";
-import DashboardNavbar from "@/app/components/DashboardNavbar";
+import Sidebar from "@/components/layout/Sidebar";
+import DashboardNavbar from "@/components/layout/DashboardNavbar";
 import { LayoutProvider } from "@/app/context/LayoutContext";
-import DashboardLayoutShell from "@/app/components/DashboardLayoutShell";
+import DashboardLayoutShell from "@/components/layout/DashboardLayoutShell";
 
 // Dashboard Layout: Panelin genel düzeninden sorumludur.
 // Sunucu tarafında (Server Component) çalışır ve oturum kontrolü yapar.

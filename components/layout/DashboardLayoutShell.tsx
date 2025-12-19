@@ -2,7 +2,7 @@
 
 import { useLayout } from "@/app/context/LayoutContext";
 import { cn } from "@/lib/utils";
-import PageTransition from "@/app/components/PageTransition";
+import PageTransition from "@/components/shared/PageTransition";
 
 export default function DashboardLayoutShell({
   children,

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, ArrowRight } from "lucide-react";
-import Logo from "./Logo";
+import Logo from "@/components/shared/Logo";
 
 // LandingNavbar: Karşılama sayfası için navigasyon barı bileşeni.
 export default function LandingNavbar() {

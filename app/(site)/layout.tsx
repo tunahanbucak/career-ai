@@ -1,4 +1,4 @@
-import LandingNavbar from "@/app/components/LandingNavbar";
+import LandingNavbar from "@/components/layout/LandingNavbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
