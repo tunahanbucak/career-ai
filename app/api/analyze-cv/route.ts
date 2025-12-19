@@ -3,8 +3,8 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import ai from "@/app/utils/gemini";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { prisma } from "@/app/lib/prisma";
-import { AnalysisResult } from "@/types";
+import { prisma } from "@/lib/prisma";
+import { AnalysisData } from "@/types";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
 
 // Zod şeması: Gelen istek verilerinin doğrulanması için kullanılır.
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     // 5. JSON yanıtını temizle ve parse et (Markdown bloklarını kaldır)
     const cleanJson = text.replace(/```json|```/g, "").trim();
 
-    let parsedData: AnalysisResult;
+    let parsedData: AnalysisData;
     try {
       parsedData = JSON.parse(cleanJson);
     } catch (e) {

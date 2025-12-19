@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import mammoth from "mammoth"; // DOCX için (Kurulu olmalı)
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { prisma } from "@/app/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
 
 // Node.js runtime kullandeki fonksiyonu kullanacağız.
