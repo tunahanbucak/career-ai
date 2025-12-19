@@ -11,7 +11,7 @@ interface DashboardHeaderProps {
 export default function DashboardHeader({ userName }: DashboardHeaderProps) {
   const currentHour = new Date().getHours();
   const greeting =
-    currentHour < 12
+    currentHour < 6
       ? "İyi Geceler"
       : currentHour < 12
       ? "Günaydın"

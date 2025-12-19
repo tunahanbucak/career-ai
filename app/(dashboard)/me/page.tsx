@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import { prisma } from "@/app/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import {
   User,
@@ -9,7 +9,6 @@ import {
   FileText,
   MessageSquare,
   Edit,
-  Sparkles,
   Award,
   TrendingUp,
   Shield,

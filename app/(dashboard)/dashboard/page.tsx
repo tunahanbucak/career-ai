@@ -22,7 +22,7 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  const { prisma } = await import("@/app/lib/prisma");
+  const { prisma } = await import("@/lib/prisma");
 
   const dbUser = await prisma.user.findUnique({
     where: { email: session.user.email },

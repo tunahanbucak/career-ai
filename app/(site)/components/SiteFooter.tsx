@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Logo from "@/app/components/Logo";
-import NewsletterForm from "@/app/components/NewsletterForm";
-import SocialLinks from "@/app/components/SocialLinks";
+import Logo from "@/components/shared/Logo";
+import NewsletterForm from "@/components/shared/NewsletterForm";
+import SocialLinks from "@/components/shared/SocialLinks";
 
 export default function SiteFooter() {
   return (
