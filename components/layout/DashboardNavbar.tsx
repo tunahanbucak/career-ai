@@ -88,7 +88,7 @@ export default function DashboardNavbar({
             );
           })}
         </div>
-        <div className="hidden lg:flex items-center max-w-md w-full relative group">
+        {/* <div className="hidden lg:flex items-center max-w-md w-full relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
             type="text"
@@ -100,7 +100,7 @@ export default function DashboardNavbar({
               <span className="text-xs">⌘</span>K
             </kbd>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="flex items-center gap-3 sm:gap-4 pl-4">
         <Button

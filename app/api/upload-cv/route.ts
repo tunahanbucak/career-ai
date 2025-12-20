@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 
 import { NextRequest, NextResponse } from "next/server";
-import mammoth from "mammoth"; // DOCX için (Kurulu olmalı)
+import mammoth from "mammoth"; // DOCX için
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
 
-// Node.js runtime kullandeki fonksiyonu kullanacağız.
+// Node.js runtime kullandaki fonksiyonu kullanacağız.
 // Bu, require ile import edilen objenin içindeki fonksiyonu bulmanın en güvenilir yoludur.
 const pdfParse = require("pdf-parse");
 
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
     // Kullanıcıya XP ekle (+10 CV yükleme bonusu)
     await addXP(user.id, XP_VALUES.CV_UPLOAD);
 
-    // Başarılı yanıt gönder (Faz 4'e girdi)
+    // Başarılı yanıt gönder
     return NextResponse.json(
       {
         success: true,

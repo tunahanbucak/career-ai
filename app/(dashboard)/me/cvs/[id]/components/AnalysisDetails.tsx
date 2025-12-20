@@ -23,7 +23,7 @@ interface AnalysisDetailsProps {
 
 export default function AnalysisDetails({ analysis }: AnalysisDetailsProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className=" grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-6">
         {/* AI Summary */}
         <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-6 backdrop-blur-xl shadow-xl">
