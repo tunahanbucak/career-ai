@@ -6,7 +6,6 @@ import {
   Radar,
   RadarChart,
   ResponsiveContainer,
-  Tooltip,
 } from "recharts";
 import { Zap, Target } from "lucide-react";
 import { SkillData } from "@/types";
@@ -48,29 +47,32 @@ export default function SkillsRadarWidget({ data }: Props) {
           <Zap className="w-5 h-5 text-purple-400" /> Yetkinlik Analizi
         </h3>
       </div>
-      <div className="flex-1 w-full h-full">
+      <div className="h-[280px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
-            <PolarGrid stroke="#334155" />
+          <RadarChart
+            cx="50%"
+            cy="50%"
+            outerRadius="60%"
+            data={data}
+            margin={{ top: 15, right: 35, bottom: 15, left: 35 }}
+          >
+            <PolarGrid
+              stroke="#334155"
+              strokeDasharray="3 3"
+              strokeWidth={0.5}
+            />
             <PolarAngleAxis
               dataKey="subject"
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#94a3b8", fontSize: 10 }}
             />
             <Radar
-              name="Senin Profilin"
+              name="Yetkinlikler"
               dataKey="A"
-              stroke="#a855f7"
-              strokeWidth={3}
-              fill="#a855f7"
-              fillOpacity={0.3}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#0f172a",
-                borderColor: "#1e293b",
-                color: "#f8fafc",
-              }}
-              itemStyle={{ color: "#a855f7" }}
+              stroke="#a78bfa"
+              strokeWidth={2}
+              fill="#8b5cf6"
+              fillOpacity={0.5}
+              dot={{ r: 3, fill: "#a78bfa", strokeWidth: 0 }}
             />
           </RadarChart>
         </ResponsiveContainer>

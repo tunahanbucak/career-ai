@@ -34,11 +34,17 @@ export default function SkillsRadar() {
       </div>
       <div className="h-[300px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
+          <RadarChart 
+            cx="50%" 
+            cy="50%" 
+            outerRadius="65%" 
+            data={data}
+            margin={{ top: 20, right: 40, bottom: 20, left: 40 }}
+          >
             <PolarGrid stroke="#334155" />
             <PolarAngleAxis
               dataKey="subject"
-              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              tick={{ fill: "#94a3b8", fontSize: 11 }}
             />
             <Radar
               name="My Skills"

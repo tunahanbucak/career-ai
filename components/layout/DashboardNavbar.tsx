@@ -135,7 +135,10 @@ export default function DashboardNavbar({
             align="end"
             className="w-56 bg-background/95 backdrop-blur-xl border-border text-foreground mt-2 px-1 py-1.5 shadow-2xl"
           >
-            <DropdownMenuItem asChild className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5">
+            <DropdownMenuItem
+              asChild
+              className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5"
+            >
               <Link href="/me" className="flex w-full font-medium">
                 Hesabım
               </Link>
@@ -149,9 +152,12 @@ export default function DashboardNavbar({
                     >
                         <div className="flex w-full font-medium">Ayarlar</div>
                     </DropdownMenuItem> */}
-            <DropdownMenuItem asChild className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5">
+            <DropdownMenuItem
+              asChild
+              className="focus:bg-primary/10 focus:text-primary cursor-pointer rounded-lg py-2.5"
+            >
               <Link href="/admin" className="flex w-full font-medium">
-                Yönetim Paneli
+                Admin Paneli
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-border/50 my-1" />
