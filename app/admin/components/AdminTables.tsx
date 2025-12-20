@@ -33,13 +33,13 @@ export function DataCard({
           {title}
         </h3>
         <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-950 px-2 py-1 rounded border border-slate-800 tracking-wider">
-          Total: {total}
+          Toplam: {total}
         </span>
       </div>
       <div className="overflow-x-auto flex-1">{children}</div>
       <div className="flex items-center justify-between border-t border-slate-800 bg-slate-950/50 px-4 py-3">
         <div className="text-xs font-mono text-slate-500">
-          PAGE {page} / {totalPages || 1}
+          SAYFA {page} / {totalPages || 1}
         </div>
         <div className="flex gap-2">
           {page > 1 && (

@@ -40,12 +40,12 @@ export default function InterviewTable({ data }: InterviewTableProps) {
             </td>
             <td className="px-6 py-3.5 text-center">
               <span className="font-mono text-xs font-bold text-slate-300">
-                {i.messages?.length ?? 0} msgs
+                {i.messages?.length ?? 0} mesaj
               </span>
             </td>
             <td className="px-6 py-3.5 text-center">
               <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-500/20">
-                COMPLETED
+                TAMAMLANDI
               </span>
             </td>
             <td className="px-6 py-3.5 text-right text-xs text-slate-500 tabular-nums font-mono">
