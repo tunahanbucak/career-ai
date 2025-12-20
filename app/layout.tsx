@@ -9,7 +9,24 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 // Sayfa Metadata bilgileri (SEO için başlık ve açıklama)
-export const metadata: Metadata = { title: "CareerAI", description: "Kariyer Asistanı" };
+export const metadata: Metadata = {
+  title: {
+    default: "CareerAI",
+    template: "%s | CareerAI",
+  },
+  description: "Yapay zeka destekli kariyer asistanınız. CV analizi, mülakat simülasyonları ve daha fazlası.",
+  icons: {
+    icon: "/favicon.ico",
+  },
+  openGraph: {
+    title: "CareerAI - Kariyer Yolculuğunuzu Hızlandırın",
+    description: "Yapay zeka ile CV'nizi analiz edin, mülakatlara hazırlanın ve kariyer basamaklarını hızla tırmanın.",
+    url: "https://career-ai.app",
+    siteName: "CareerAI",
+    locale: "tr_TR",
+    type: "website",
+  },
+};
 
 // RootLayout: Tüm uygulamanın kök bileşeni.
 // Her sayfada ortak olan HTML, Body yapısını ve global sağlayıcıları (Providers) içerir.

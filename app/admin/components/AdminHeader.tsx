@@ -1,4 +1,5 @@
 import { ShieldAlert } from "lucide-react";
+import ExportDropdown from "./ExportDropdown";
 
 interface AdminHeaderProps {
   email: string | null | undefined;
@@ -25,6 +26,8 @@ export default function AdminHeader({ email }: AdminHeaderProps) {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <ExportDropdown />
+          
           <div className="flex items-center gap-3 px-4 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
             <div className="flex flex-col">
               <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">

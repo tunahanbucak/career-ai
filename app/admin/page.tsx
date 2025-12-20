@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
+import RoleBasedGuard from "@/components/shared/RoleBasedGuard";
 
 // Sub-components
 import AdminStats from "./components/AdminStats";
@@ -30,14 +30,26 @@ export default async function AdminPage({
 }) {
   // 1. Auth & Admin Control
   const session = await getServerSession(authOptions);
-  if (!session || !session.user?.email) redirect("/");
+  
+  // Eğer oturum yoksa RoleBasedGuard göster (Giriş yapması gerektiğini belirtir)
+  if (!session || !session.user?.email) {
+    return (
+      <RoleBasedGuard 
+        title="Giriş Yapılmadı" 
+        description="Bu sayfayı görüntülemek için lütfen yönetici hesabınızla giriş yapın." 
+      />
+    );
+  }
 
   const admins = (process.env.ADMIN_EMAILS || "")
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
-  if (admins.length === 0 || !admins.includes(session.user.email.toLowerCase()))
-    redirect("/");
+
+  // Eğer emaili admin listesinde yoksa RoleBasedGuard göster
+  if (admins.length === 0 || !admins.includes(session.user.email.toLowerCase())) {
+     return <RoleBasedGuard />;
+  }
 
   // 2. Data Fetching (Stats)
   const [usersCount, cvsCount, analysesCount, interviewsCount, messagesCount] =

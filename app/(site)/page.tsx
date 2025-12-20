@@ -1,6 +1,13 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { redirect } from "next/navigation";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Geleceğin Kariyer Asistanı",
+  description:
+    "CV'nizi yapay zeka ile analiz edin, eksiklerinizi görün ve mülakat simülasyonları ile işe alım sürecine 1-0 önde başlayın.",
+};
 
 import HeroSection from "./components/HeroSection";
 import DashboardPreview from "./components/DashboardPreview";
