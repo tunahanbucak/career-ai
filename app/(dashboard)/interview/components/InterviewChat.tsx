@@ -6,8 +6,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Sohbet mesajı tipi: AI (assistant) veya kullanıcı (user) tarafından gönderilen mesaj
 export type ChatItem = { role: "assistant" | "user"; content: string };
 
+// AI Mülakat Simülasyonu - Sohbet Arayüzü
+// Kullanıcının yapay zeka ile gerçek zamanlı mülakat pratiği yapabilmesi için
+// WhatsApp/Telegram benzeri modern sohbet arayüzü
 type Props = {
   position: string;
   history: ChatItem[];

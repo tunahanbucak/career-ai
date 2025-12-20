@@ -16,16 +16,20 @@ import AnalysisResultView from "./components/AnalysisResultView";
 import EmptyState from "./components/EmptyState";
 import LoadingState from "./components/LoadingState";
 
+// CV Yükleme ve Analiz Ana Sayfası
+// İki kolonlu responsive layout: Sol tarafta dosya yükleme ve geçmiş, sağ tarafta sonuçlar
+// İşlem akışı: Dosya yükleme → Parse → AI analizi → Sonuç gösterimi
 export default function CvUploadPage() {
   // State Tanımları
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [fetchingHistory, setFetchingHistory] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [step, setStep] = useState<Step>("idle");
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]);
+  const [file, setFile] = useState<File | null>(null); // Seçilen dosya
+  const [loading, setLoading] = useState(false); // Yükleme durumu
+  const [fetchingHistory, setFetchingHistory] = useState(true); // Geçmiş çekiliyor mu?
+  const [error, setError] = useState<string | null>(null); // Hata mesajı
+  const [step, setStep] = useState<Step>("idle"); // İşlem adımı (idle/uploading/analyzing/done)
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null); // AI analiz sonucu
+  const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]); // Geçmiş analizler
 
+  // Kullanıcının daha önce yaptığı analizleri API'den çek
   // FETCH HISTORY
   useEffect(() => {
     let isMounted = true;

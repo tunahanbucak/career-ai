@@ -5,6 +5,9 @@ import { ArrowRight, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
+// Ana Sayfa Karşılama Bölümü (Hero Section)
+// Kullanıcının ilk gördüğü ekran. Ürünü tanıtır ve kayıt olmaya teşvik eder.
+// Framer Motion ile animasyonlu giriş efektleri ve gradient arka plan içerir.
 export default function HeroSection() {
   return (
     <section className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center mb-16 sm:mb-20 lg:mb-32 pt-6 sm:pt-10">

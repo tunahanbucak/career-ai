@@ -5,6 +5,8 @@ import { UploadCloud, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+// CV Dosya Yükleme Alanı
+// Kullanıcıların PDF veya DOCX formatında CV yüklemesi için sürükle-bırak destekli arayüz
 interface UploadZoneProps {
   file: File | null;
   setFile: (file: File | null) => void;
@@ -13,6 +15,8 @@ interface UploadZoneProps {
   onAnalyze: () => void;
 }
 
+// Dosya yükleme ve analiz başlatma component'i
+// Drag & drop ile dosya seçimi, dosya tipi kontrolü ve hata gösterimi içerir
 export default function UploadZone({
   file,
   setFile,
