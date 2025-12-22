@@ -12,6 +12,7 @@ import AdminSearch from "./components/AdminSearch";
 import CVTable from "./components/CVTable";
 import AnalysisTable from "./components/AnalysisTable";
 import InterviewTable from "./components/InterviewTable";
+import UsersTableWithModal from "./components/UsersTable";
 
 // Types
 import {
@@ -52,14 +53,23 @@ export default async function AdminPage({
   }
 
   // 2. Data Fetching (Stats)
-  const [usersCount, cvsCount, analysesCount, interviewsCount, messagesCount] =
-    await Promise.all([
-      prisma.user.count(),
-      prisma.cV.count(),
-      prisma.cVAnalysis.count(),
-      prisma.interview.count(),
-      prisma.interviewMessage.count(),
-    ]);
+  const [
+    usersCount, 
+    cvsCount, 
+    analysesCount, 
+    interviewsCount, 
+    messagesCount,
+    verifiedUsersCount,
+    unverifiedUsersCount
+  ] = await Promise.all([
+    prisma.user.count(),
+    prisma.cV.count(),
+    prisma.cVAnalysis.count(),
+    prisma.interview.count(),
+    prisma.interviewMessage.count(),
+    prisma.user.count({ where: { approved: true } }), // Onaylanmış
+    prisma.user.count({ where: { approved: false } }), // Onay bekliyor
+  ]);
 
   const stats: AdminStatsData = {
     users: usersCount,
@@ -148,6 +158,30 @@ export default async function AdminPage({
     prisma.interview.count({ where: interviewWhere }),
   ]);
 
+  // 5. KULLANICI LİSTESİ DATA (YENİ!)
+  const users = await prisma.user.findMany({
+    take: 10,
+    orderBy: { id: "desc" },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      emailVerified: true,
+      level: true,
+      xp: true,
+      approved: true,
+      approvedAt: true,
+      approvedBy: true,
+      _count: {
+        select: {
+          cvs: true,
+          interviews: true,
+        },
+      },
+    },
+  });
+
   const [recentCVs, recentAnalyses, recentInterviews] = (await Promise.all([
     prisma.cV.findMany({
       where: cvWhere,
@@ -198,7 +232,40 @@ export default async function AdminPage({
           </div>
         </div>
 
+        {/* DETAYLI İSTATİSTİKLER */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="p-6 rounded-lg bg-green-950/20 border border-green-800/30">
+            <h3 className="text-sm font-medium text-green-400 mb-2">✅ Aktif Kullanıcılar</h3>
+            <p className="text-3xl font-bold text-green-300">{verifiedUsersCount}</p>
+            <p className="text-xs text-slate-400 mt-1">Email doğrulanmış</p>
+          </div>
+          
+          <div className="p-6 rounded-lg bg-amber-950/20 border border-amber-800/30">
+            <h3 className="text-sm font-medium text-amber-400 mb-2">⚠️ Onay Bekleyenler</h3>
+            <p className="text-3xl font-bold text-amber-300">{unverifiedUsersCount}</p>
+            <p className="text-xs text-slate-400 mt-1">Email doğrulanmamış</p>
+          </div>
+          
+          <div className="p-6 rounded-lg bg-indigo-950/20 border border-indigo-800/30">
+            <h3 className="text-sm font-medium text-indigo-400 mb-2">👥 Toplam</h3>
+            <p className="text-3xl font-bold text-indigo-300">{usersCount}</p>
+            <p className="text-xs text-slate-400 mt-1">Kayıtlı kullanıcı</p>
+          </div>
+        </div>
+
         <GlobalActivityChart data={Array.from(activityMap.values())} />
+
+        {/* KULLANICI LİSTESİ */}
+        <DataCard
+          title="👥 Kayıtlı Kullanıcılar"
+          total={usersCount}
+          page={1}
+          pageSize={10}
+          query=""
+          accentColor="indigo"
+        >
+          <UsersTableWithModal data={users} />
+        </DataCard>
 
         <AdminSearch query={q} />
 

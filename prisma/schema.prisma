@@ -25,6 +25,11 @@ model User {
   xp            Int         @default(0) // Experience Points (deneyim puanı)
   levelName     String      @default("Beginner") // Seviye adı
   
+  // Admin Onay Sistemi
+  approved      Boolean     @default(false)
+  approvedAt    DateTime?
+  approvedBy    String?
+  
   accounts      Account[] // Bağlı sosyal hesaplar
   sessions      Session[] // Aktif oturumlar
   // İlişkiler: Bir kullanıcı silinirse, ona ait CV ve Mülakatlar da silinsin.
