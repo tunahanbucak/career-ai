@@ -15,12 +15,14 @@ export const authOptions: NextAuthOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
+      allowDangerousEmailAccountLinking: true, // Aynı email'e sahip hesapları birleştir
     }),
 
     // Google ile Giriş Sağlayıcısı
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true, // Aynı email'e sahip hesapları birleştir
     }),
 
     // E-posta ile Giriş (Magic Link) Sağlayıcısı (Gmail SMTP)
@@ -110,6 +112,35 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
+    async signIn({ user, account }) {
+      // OAuth providers (Google, GitHub) veya Email ile giriş
+      if (user.email) {
+        // DB'den kullanıcıyı kontrol et
+        const dbUser = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { name: true },
+        });
+
+        // Sadece DB'de name NULL ise update et
+        if (dbUser && !dbUser.name) {
+          const userName = user.name || user.email.split("@")[0];
+          await prisma.user.update({
+            where: { email: user.email },
+            data: { 
+              emailVerified: new Date(),
+              name: userName,
+            },
+          });
+        } else if (dbUser) {
+          // Name varsa sadece emailVerified güncelle
+          await prisma.user.update({
+            where: { email: user.email },
+            data: { emailVerified: new Date() },
+          });
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, trigger, session }) {
       if (trigger === "update" && session) {
         // İstemci tarafında update() çağrıldığında token'ı güncelle
@@ -118,6 +149,27 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         return { ...token, ...user, title: (user as User).title };
       }
+
+      // HER TOKEN REFRESH: name yoksa DB'den al veya oluştur
+      if (token.email && (!token.name || token.name === null)) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email as string },
+        });
+
+        if (dbUser && !dbUser.name) {
+          // DB'de de name yoksa email'den oluştur
+          const generatedName = (token.email as string).split("@")[0];
+          await prisma.user.update({
+            where: { email: token.email as string },
+            data: { name: generatedName },
+          });
+          token.name = generatedName;
+        } else if (dbUser?.name) {
+          // DB'de name varsa token'a koy
+          token.name = dbUser.name;
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
