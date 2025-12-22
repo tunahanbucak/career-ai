@@ -12,6 +12,7 @@ import LoadingScreen from "@/components/shared/LoadingScreen";
 import Testimonials from "./components/Testimonials";
 import SocialLogins from "./components/SocialLogins";
 import SignInForm from "./components/SignInForm";
+import RecaptchaProvider from "@/components/providers/RecaptchaProvider";
 
 export default function SignInPage() {
   const { data: session, status } = useSession();
@@ -36,7 +37,8 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen w-full flex bg-slate-950 text-slate-200 selection:bg-indigo-500/30 overflow-hidden">
+    <RecaptchaProvider>
+      <div className="min-h-screen w-full flex bg-slate-950 text-slate-200 selection:bg-indigo-500/30 overflow-hidden">
       {/* Left Panel: Testimonials */}
       <Testimonials />
 
@@ -78,8 +80,14 @@ export default function SignInPage() {
             </a>
             &apos;nı kabul etmiş olursun.
           </p>
+          
+          {/* reCAPTCHA Info */}
+          <p className="mt-4 text-center text-[10px] text-slate-600">
+            🔒 Bu site Google reCAPTCHA ile korunmaktadır
+          </p>
         </motion.div>
       </div>
     </div>
+    </RecaptchaProvider>
   );
 }
