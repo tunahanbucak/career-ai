@@ -83,6 +83,14 @@ Yanıtlarını Türkçe ver.`;
     const user = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (!user) return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
 
+    // ADMIN ONAYI KONTROLÜ
+    if (!user.approved) {
+      return NextResponse.json(
+        { error: "Hesabınız henüz yönetici tarafından onaylanmadı. Mülakat yapabilmek için admin onayı beklemeniz gerekmektedir." },
+        { status: 403 }
+      );
+    }
+
     let createdInterviewId = interviewId;
     
     // Eğer yeni bir mülakatsa DB kaydı oluştur

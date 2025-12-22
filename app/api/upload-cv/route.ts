@@ -122,12 +122,20 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // ADMIN ONAYI KONTROLÜ
+    if (!user.approved) {
+      return NextResponse.json(
+        { error: "Hesabınız henüz yönetici tarafından onaylanmadı. CV yükleyebilmek için admin onayı beklemen iz gerekmektedir." },
+        { status: 403 }
+      );
+    }
+
     const data: Record<string, unknown> = {
       title: fileName.replace(/\.(pdf|docx)$/i, ""),
       filename: fileName,
       mime: contentType || null,
       rawText,
-      userId: user.id,
     };
     if (typeof (file as File).size === "number") {
       (data as { size: number }).size = (file as File).size;

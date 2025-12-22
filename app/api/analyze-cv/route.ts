@@ -6,6 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { AnalysisData } from "@/types";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
+import { checkRateLimit, withRetry } from "@/lib/rate-limit";
 
 // Zod şeması: Gelen istek verilerinin doğrulanması için kullanılır.
 const analyzeCvSchema = z.object({
@@ -22,6 +23,24 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.email) {
       // Oturum açmamış kullanıcıya yetkisiz hatası dön.
       return NextResponse.json({ error: "Yetkisiz erişim." }, { status: 401 });
+    }
+
+    // 1.5. Rate Limiting: Kullanıcı dakikada en fazla 10 CV analiz edebilir
+    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (!dbUser) {
+      return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
+    }
+
+    const rateLimitResult = checkRateLimit(dbUser.id, 10); // Dakikada 10 istek
+    if (!rateLimitResult.allowed) {
+      const waitSeconds = Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000);
+      return NextResponse.json(
+        { 
+          error: `Çok fazla istek gönderdiniz. ${waitSeconds} saniye sonra tekrar deneyin.`,
+          retryAfter: waitSeconds 
+        },
+        { status: 429 }
+      );
     }
 
     // 2. İstek verisini al ve doğrula
