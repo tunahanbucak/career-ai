@@ -126,7 +126,10 @@ export async function POST(request: NextRequest) {
     // ADMIN ONAYI KONTROLÜ
     if (!user.approved) {
       return NextResponse.json(
-        { error: "Hesabınız henüz yönetici tarafından onaylanmadı. CV yükleyebilmek için admin onayı beklemen iz gerekmektedir." },
+        {
+          error:
+            "Hesabınız henüz yönetici tarafından onaylanmadı. CV yükleyebilmek için admin onayı beklemen iz gerekmektedir.",
+        },
         { status: 403 }
       );
     }
@@ -136,6 +139,7 @@ export async function POST(request: NextRequest) {
       filename: fileName,
       mime: contentType || null,
       rawText,
+      userId: user.id,
     };
     if (typeof (file as File).size === "number") {
       (data as { size: number }).size = (file as File).size;
