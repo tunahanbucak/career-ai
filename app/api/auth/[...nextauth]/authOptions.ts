@@ -112,7 +112,7 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user }) {
       // OAuth providers (Google, GitHub) veya Email ile giriş
       if (user.email) {
         // DB'den kullanıcıyı kontrol et
@@ -126,7 +126,7 @@ export const authOptions: NextAuthOptions = {
           const userName = user.name || user.email.split("@")[0];
           await prisma.user.update({
             where: { email: user.email },
-            data: { 
+            data: {
               emailVerified: new Date(),
               name: userName,
             },

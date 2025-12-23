@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
-import ai from "@/app/utils/gemini";
+import { generateGeminiContent } from "@/app/utils/gemini";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { AnalysisData } from "@/types";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
-import { checkRateLimit, withRetry } from "@/lib/rate-limit";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // Zod şeması: Gelen istek verilerinin doğrulanması için kullanılır.
 const analyzeCvSchema = z.object({
@@ -26,18 +26,25 @@ export async function POST(request: NextRequest) {
     }
 
     // 1.5. Rate Limiting: Kullanıcı dakikada en fazla 10 CV analiz edebilir
-    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
     if (!dbUser) {
-      return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
+      return NextResponse.json(
+        { error: "Kullanıcı bulunamadı." },
+        { status: 404 }
+      );
     }
 
     const rateLimitResult = checkRateLimit(dbUser.id, 10); // Dakikada 10 istek
     if (!rateLimitResult.allowed) {
-      const waitSeconds = Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000);
+      const waitSeconds = Math.ceil(
+        (rateLimitResult.resetTime - Date.now()) / 1000
+      );
       return NextResponse.json(
-        { 
+        {
           error: `Çok fazla istek gönderdiniz. ${waitSeconds} saniye sonra tekrar deneyin.`,
-          retryAfter: waitSeconds 
+          retryAfter: waitSeconds,
         },
         { status: 429 }
       );
@@ -80,13 +87,9 @@ export async function POST(request: NextRequest) {
       Sadece bu JSON objesini döndür. Başka hiçbir açıklama yapma.
     `;
 
-    // 4. Gemini AI servisine isteği gönder
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash", 
-      contents: prompt,
-    });
-
-    const text = response.text ? response.text.trim() : "";
+    // 4. Gemini AI servisine isteği gönder (Fallback Mekanizması ile)
+    // generateGeminiContent artık doğrudan string döndürüyor.
+    const text = await generateGeminiContent(prompt);
 
     // AI yanıtı boşsa hata fırlat.
     if (!text) {
@@ -108,12 +111,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Default değerler ata eğer AI eksik döndürürse
-    const { 
-      summary, 
-      keywords, 
-      suggestion, 
-      score = 0, 
-      details = { impact: 0, brevity: 0, ats: 0, style: 0 } 
+    const {
+      summary,
+      keywords,
+      suggestion,
+      score = 0,
+      details = { impact: 0, brevity: 0, ats: 0, style: 0 },
     } = parsedData;
 
     // 6. Sonuçları Veritabanına Kaydet
@@ -133,7 +136,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Kullanıcıya XP ekle (+25 CV analizi bonusu)
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
     if (user) {
       await addXP(user.id, XP_VALUES.CV_ANALYSIS);
     }
@@ -151,9 +156,29 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // Beklenmedik hataları yakala ve logla
     console.error("Analyze CV API Error:", error);
-    return NextResponse.json(
-      { error: "İşlem sırasında bir hata oluştu." },
-      { status: 500 }
-    );
+
+    let errorMessage = "İşlem sırasında bir hata oluştu.";
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase();
+      if (
+        msg.includes("resource exhausted") ||
+        msg.includes("quota") ||
+        msg.includes("429")
+      ) {
+        errorMessage =
+          "Servis şu an çok yoğun. Lütfen 1-2 dakika bekleyip tekrar deneyin.";
+        statusCode = 429;
+      } else if (msg.includes("candidate block") || msg.includes("safety")) {
+        errorMessage = "İçerik güvenlik politikaları nedeniyle işlenemedi.";
+        statusCode = 400;
+      } else if (msg.includes("not found") || msg.includes("404")) {
+        errorMessage =
+          "Analiz servisine şu an erişilemiyor. Lütfen daha sonra tekrar deneyin.";
+      }
+    }
+
+    return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
 }

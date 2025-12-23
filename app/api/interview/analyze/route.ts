@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
-import ai from "@/app/utils/gemini";
+import { generateGeminiContent } from "@/app/utils/gemini";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
 
 // POST: Mülakat analizi oluştur
@@ -16,18 +16,24 @@ export async function POST(request: NextRequest) {
 
     // 2. İstek Verilerini Okuma
     const { interviewId } = await request.json();
-    
+
     if (!interviewId) {
-      return NextResponse.json({ error: "interviewId gerekli." }, { status: 400 });
+      return NextResponse.json(
+        { error: "interviewId gerekli." },
+        { status: 400 }
+      );
     }
 
     // 3. Kullanıcıyı Bul
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
-    
+
     if (!user) {
-      return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
+      return NextResponse.json(
+        { error: "Kullanıcı bulunamadı." },
+        { status: 404 }
+      );
     }
 
     // 4. Mülakatı ve Mesajları Çek
@@ -45,17 +51,26 @@ export async function POST(request: NextRequest) {
     });
 
     if (!interview) {
-      return NextResponse.json({ error: "Mülakat bulunamadı." }, { status: 404 });
+      return NextResponse.json(
+        { error: "Mülakat bulunamadı." },
+        { status: 404 }
+      );
     }
 
     // 5. Kullanıcının mülakatı olduğundan emin ol
     if (interview.userId !== user.id) {
-      return NextResponse.json({ error: "Bu mülakat size ait değil." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Bu mülakat size ait değil." },
+        { status: 403 }
+      );
     }
 
     // 6. Zaten analiz edilmişse hata dön
     if (interview.isCompleted) {
-      return NextResponse.json({ error: "Bu mülakat zaten analiz edilmiş." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Bu mülakat zaten analiz edilmiş." },
+        { status: 400 }
+      );
     }
 
     // 7. Minimum mesaj kontrolü (en az 5 mesaj değişimi = 10 mesaj)
@@ -101,27 +116,24 @@ ${conversationText}
 Sadece JSON objesini döndür, başka hiçbir şey yazma.
     `.trim();
 
-    // 10. Gemini AI'dan Analiz Al
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+    // 10. Gemini AI'dan Analiz Al (Fallback ile)
+    // generateGeminiContent artık doğrudan string döndürüyor.
+    const text = await generateGeminiContent(prompt);
 
-    const text = response.text?.trim();
     if (!text) {
       throw new Error("AI yanıtı boş.");
     }
 
     // 11. JSON Temizle ve Parse Et
     const cleanJson = text.replace(/```json|```/g, "").trim();
-    
+
     let analysisData: {
       score: number;
       summary: string;
       strengths: string[];
       improvements: string[];
     };
-    
+
     try {
       analysisData = JSON.parse(cleanJson);
     } catch (e) {
@@ -134,10 +146,17 @@ Sadece JSON objesini döndür, başka hiçbir şey yazma.
     }
 
     // 12. Veri Validasyonu ve Default Değerler
-    const score = typeof analysisData.score === "number" ? Math.min(100, Math.max(0, analysisData.score)) : 70;
+    const score =
+      typeof analysisData.score === "number"
+        ? Math.min(100, Math.max(0, analysisData.score))
+        : 70;
     const summary = analysisData.summary || "Analiz oluşturuldu.";
-    const strengths = Array.isArray(analysisData.strengths) ? analysisData.strengths.slice(0, 5) : [];
-    const improvements = Array.isArray(analysisData.improvements) ? analysisData.improvements.slice(0, 5) : [];
+    const strengths = Array.isArray(analysisData.strengths)
+      ? analysisData.strengths.slice(0, 5)
+      : [];
+    const improvements = Array.isArray(analysisData.improvements)
+      ? analysisData.improvements.slice(0, 5)
+      : [];
 
     // 13. Veritabanını Güncelle
     await prisma.interview.update({
@@ -177,9 +196,26 @@ Sadece JSON objesini döndür, başka hiçbir şey yazma.
     );
   } catch (error) {
     console.error("Interview Analysis API Error:", error);
+
+    let errorMessage = "Analiz sırasında bir hata oluştu.";
+    let statusCode = 500;
+
+    if (error instanceof Error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("resource exhausted") || msg.includes("quota") || msg.includes("429")) {
+        errorMessage = "Servis şu an çok yoğun. Lütfen 1-2 dakika bekleyip tekrar deneyin.";
+        statusCode = 429;
+      } else if (msg.includes("candidate block") || msg.includes("safety")) {
+         errorMessage = "İçerik güvenlik politikaları nedeniyle işlenemedi.";
+         statusCode = 400;
+      } else if (msg.includes("not found") || msg.includes("404")) {
+          errorMessage = "Analiz servisine şu an erişilemiyor. Lütfen daha sonra tekrar deneyin.";
+      }
+    }
+
     return NextResponse.json(
-      { error: "Analiz sırasında bir hata oluştu." },
-      { status: 500 }
+      { error: errorMessage },
+      { status: statusCode }
     );
   }
 }

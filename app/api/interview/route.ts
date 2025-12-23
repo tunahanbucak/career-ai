@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import ai from "@/app/utils/gemini";
+import { generateGeminiContent } from "@/app/utils/gemini";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
@@ -32,17 +32,22 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. İstek Verilerini Okuma
-    const { position, history, message, start, interviewId } = (await req.json()) as InterviewRequestBody;
+    const { position, history, message, start, interviewId } =
+      (await req.json()) as InterviewRequestBody;
 
-    const hasUserMessage = typeof message === "string" && message.trim().length > 0;
+    const hasUserMessage =
+      typeof message === "string" && message.trim().length > 0;
     const isStart = Boolean(start);
-    
+
     // Mesaj yoksa ve başlangıç değilse hata ver
     if (!hasUserMessage && !isStart) {
       return NextResponse.json({ error: "Mesaj gerekli." }, { status: 400 });
     }
 
-    const role = typeof position === "string" && position.trim().length > 0 ? position.trim() : "Genel Yazılım Geliştirici";
+    const role =
+      typeof position === "string" && position.trim().length > 0
+        ? position.trim()
+        : "Genel Yazılım Geliştirici";
 
     // 3. AI Sistem Talimatı (Prompt) Hazırlama
     const systemPrompt = `Sen profesyonel bir teknik mülakat simülatörüsün. Rol: ${role}.
@@ -56,8 +61,7 @@ Yanıtlarını Türkçe ver.`;
       ? history
           .map((m) => {
             const r = m.role === "assistant" ? "Mülakatçı" : "Aday";
-            const c = m.content || "";
-            return `${r}: ${c}`;
+            return `${r}: ${m.content || ""}`;
           })
           .join("\n")
       : "";
@@ -68,31 +72,36 @@ Yanıtlarını Türkçe ver.`;
       : `${systemPrompt}\n\nGeçmiş:\n${historyText}\n\nAday: ${message}\n\nMülakatçı:`;
 
     // 6. Gemini AI İsteği
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: fullPrompt,
-    });
+    const reply = await generateGeminiContent(fullPrompt);
 
-    if (!response.text) {
-      return NextResponse.json({ error: "Yanıt oluşturulamadı." }, { status: 500 });
-    }
-
-    const reply = response.text.trim();
-
-    // 7. Veritabanına Kayıt
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!user) return NextResponse.json({ error: "Kullanıcı bulunamadı." }, { status: 404 });
-
-    // ADMIN ONAYI KONTROLÜ
-    if (!user.approved) {
+    if (!reply) {
       return NextResponse.json(
-        { error: "Hesabınız henüz yönetici tarafından onaylanmadı. Mülakat yapabilmek için admin onayı beklemeniz gerekmektedir." },
-        { status: 403 }
+        { error: "Yanıt oluşturulamadı." },
+        { status: 500 }
       );
     }
 
+    // 7. Veritabanına Kayıt
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user)
+      return NextResponse.json(
+        { error: "Kullanıcı bulunamadı." },
+        { status: 404 }
+      );
+    if (!user.approved)
+      return NextResponse.json(
+        {
+          error:
+            "Hesabınız henüz yönetici tarafından onaylanmadı. Mülakat yapabilmek için admin onayı beklemeniz gerekmektedir.",
+        },
+        { status: 403 }
+      );
+
     let createdInterviewId = interviewId;
-    
+
     // Eğer yeni bir mülakatsa DB kaydı oluştur
     if (isStart) {
       const created = await prisma.interview.create({
@@ -101,28 +110,34 @@ Yanıtlarını Türkçe ver.`;
       });
       createdInterviewId = created.id;
     }
-    if (!createdInterviewId) {
-      return NextResponse.json({ error: "interviewId gerekli." }, { status: 400 });
-    }
 
+    if (!createdInterviewId)
+      return NextResponse.json(
+        { error: "interviewId gerekli." },
+        { status: 400 }
+      );
     // Kullanıcı mesajını kaydet
+
     if (hasUserMessage) {
       await prisma.interviewMessage.create({
-        data: { interviewId: createdInterviewId, role: "USER", content: message!.trim() },
-        select: { id: true }
+        data: {
+          interviewId: createdInterviewId,
+          role: "USER",
+          content: message!.trim(),
+        },
       });
     }
     // AI yanıtını kaydet
     await prisma.interviewMessage.create({
-      data: { interviewId: createdInterviewId, role: "ASSISTANT", content: reply },
-      select: { id: true }
+      data: {
+        interviewId: createdInterviewId,
+        role: "ASSISTANT",
+        content: reply,
+      },
     });
 
     return NextResponse.json(
-      {
-        reply,
-        interviewId: createdInterviewId,
-      },
+      { reply, interviewId: createdInterviewId },
       { status: 200 }
     );
   } catch (err) {
