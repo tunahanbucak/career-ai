@@ -1,11 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { User, FileText, MessageSquare, BarChart3, CheckCircle, XCircle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  User,
+  FileText,
+  MessageSquare,
+  BarChart3,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ApproveButton from "./ApproveButton";
-
+import Image from "next/image";
 interface UserData {
   id: string;
   name: string | null;
@@ -28,9 +40,7 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-500">
-        Henüz kullanıcı yok
-      </div>
+      <div className="text-center py-8 text-slate-500">Henüz kullanıcı yok</div>
     );
   }
 
@@ -58,7 +68,7 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                 <td className="py-3 px-2">
                   <div className="flex items-center gap-2">
                     {user.image ? (
-                      <img
+                      <Image
                         src={user.image}
                         alt={user.name || "User"}
                         className="w-8 h-8 rounded-full"
@@ -134,7 +144,7 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-3">
               {selectedUser?.image ? (
-                <img
+                <Image
                   src={selectedUser.image}
                   alt={selectedUser.name || "User"}
                   className="w-12 h-12 rounded-full"
@@ -164,8 +174,10 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                       Admin Onaylı ✅
                     </p>
                     <p className="text-xs text-slate-400">
-                      {selectedUser.approvedAt 
-                        ? new Date(selectedUser.approvedAt).toLocaleDateString("tr-TR")
+                      {selectedUser.approvedAt
+                        ? new Date(selectedUser.approvedAt).toLocaleDateString(
+                            "tr-TR"
+                          )
                         : "Onaylandı"}
                     </p>
                   </div>
@@ -231,16 +243,30 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
               </h4>
               <div className="space-y-2 text-sm text-slate-300">
                 <p>
-                  • Toplam <span className="text-emerald-400 font-semibold">{selectedUser?._count.cvs}</span> adet CV yüklemiş
+                  • Toplam{" "}
+                  <span className="text-emerald-400 font-semibold">
+                    {selectedUser?._count.cvs}
+                  </span>{" "}
+                  adet CV yüklemiş
                 </p>
                 <p>
-                  • Toplam <span className="text-amber-400 font-semibold">{selectedUser?._count.interviews}</span> adet mülakat yapmış
+                  • Toplam{" "}
+                  <span className="text-amber-400 font-semibold">
+                    {selectedUser?._count.interviews}
+                  </span>{" "}
+                  adet mülakat yapmış
                 </p>
                 <p>
-                  • Level <span className="text-indigo-400 font-semibold">{selectedUser?.level}</span> seviyesinde
+                  • Level{" "}
+                  <span className="text-indigo-400 font-semibold">
+                    {selectedUser?.level}
+                  </span>{" "}
+                  seviyesinde
                 </p>
                 {selectedUser?.approved ? (
-                  <p className="text-green-400">• Admin tarafından onaylandı ✅</p>
+                  <p className="text-green-400">
+                    • Admin tarafından onaylandı ✅
+                  </p>
                 ) : (
                   <p className="text-amber-400">• Admin onayı bekleniyor ⚠️</p>
                 )}
@@ -250,7 +276,7 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
 
           {/* ONAYLAMA BUTONU */}
           <div className="mt-6 p-4 border-t border-slate-700">
-            <ApproveButton 
+            <ApproveButton
               userId={selectedUser?.id || ""}
               currentStatus={selectedUser?.approved || false}
               userName={selectedUser?.name || "Kullanıcı"}

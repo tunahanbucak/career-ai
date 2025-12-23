@@ -4,14 +4,12 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

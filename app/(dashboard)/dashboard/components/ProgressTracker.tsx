@@ -17,7 +17,6 @@ export default function ProgressTracker({
   totalInterviews,
   level,
   xp,
-  levelName,
 }: ProgressTrackerProps) {
   // XP sistemini kullan
   const xpForNextLevel = 100 * level; // Her level 100 * level XP gerektirir
@@ -130,9 +129,7 @@ export default function ProgressTracker({
                 <span className="text-4xl font-black text-white">
                   Seviye {level}
                 </span>
-                <span className="text-sm text-slate-400">
-                  ({xp} XP)
-                </span>
+                <span className="text-sm text-slate-400">({xp} XP)</span>
               </div>
               <div className="relative">
                 <div className="h-3 bg-slate-800 rounded-full overflow-hidden">

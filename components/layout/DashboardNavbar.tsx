@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Bell, ChevronDown, Search, Slash, Home } from "lucide-react";
+import { Bell, ChevronDown, Slash, Home } from "lucide-react";
 import { signOut } from "next-auth/react";
 import {
   DropdownMenu,

@@ -12,7 +12,11 @@ interface ApproveButtonProps {
   onClose?: () => void; // Dialog kapatma
 }
 
-export default function ApproveButton({ userId, currentStatus, userName, onClose }: ApproveButtonProps) {
+export default function ApproveButton({
+  userId,
+  currentStatus,
+  onClose,
+}: ApproveButtonProps) {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -37,6 +41,7 @@ export default function ApproveButton({ userId, currentStatus, userName, onClose
       router.refresh();
     } catch (error) {
       alert("İşlem başarısız!");
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -50,7 +55,11 @@ export default function ApproveButton({ userId, currentStatus, userName, onClose
           disabled={loading}
           className="bg-green-600 hover:bg-green-700"
         >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <CheckCircle className="w-4 h-4" />
+          )}
           <span className="ml-2">ONAYLA</span>
         </Button>
       ) : (
@@ -59,7 +68,11 @@ export default function ApproveButton({ userId, currentStatus, userName, onClose
           disabled={loading}
           variant="destructive"
         >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <XCircle className="w-4 h-4" />
+          )}
           <span className="ml-2">ONAYI KALDIR</span>
         </Button>
       )}
