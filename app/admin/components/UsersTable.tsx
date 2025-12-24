@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import ApproveButton from "./ApproveButton";
 import Image from "next/image";
+
 interface UserData {
   id: string;
   name: string | null;
@@ -72,6 +73,8 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                         src={user.image}
                         alt={user.name || "User"}
                         className="w-8 h-8 rounded-full"
+                        width={32}
+                        height={32}
                       />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
@@ -148,6 +151,8 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                   src={selectedUser.image}
                   alt={selectedUser.name || "User"}
                   className="w-12 h-12 rounded-full"
+                  width={48}
+                  height={48}
                 />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center">
@@ -155,7 +160,7 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                 </div>
               )}
               <div>
-                <div>{selectedUser?.name || "İsimsiz"}</div>
+                <div className="text-slate-100">{selectedUser?.name || "İsimsiz"}</div>
                 <div className="text-sm font-normal text-slate-400">
                   {selectedUser?.email}
                 </div>
@@ -237,7 +242,7 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
 
             {/* Özet */}
             <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-700">
-              <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
+              <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-slate-200">
                 <BarChart3 className="w-4 h-4" />
                 Kullanıcı Özeti
               </h4>
@@ -263,25 +268,26 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                   </span>{" "}
                   seviyesinde
                 </p>
-                {selectedUser?.approved ? (
-                  <p className="text-green-400">
-                    • Admin tarafından onaylandı ✅
-                  </p>
-                ) : (
-                  <p className="text-amber-400">• Admin onayı bekleniyor ⚠️</p>
-                )}
               </div>
             </div>
-          </div>
 
-          {/* ONAYLAMA BUTONU */}
-          <div className="mt-6 p-4 border-t border-slate-700">
-            <ApproveButton
-              userId={selectedUser?.id || ""}
-              currentStatus={selectedUser?.approved || false}
-              userName={selectedUser?.name || "Kullanıcı"}
-              onClose={() => setSelectedUser(null)}
-            />
+            {/* ONAYLAMA VE GEÇMİŞ BUTONLARI */}
+            <div className="mt-6 p-4 border-t border-slate-700 flex flex-col gap-3">
+              <Button
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                onClick={() => (window.location.href = `/admin/users/${selectedUser?.id}`)}
+              >
+                <BarChart3 className="w-4 h-4 mr-2" />
+                Tüm Geçmişi Gör
+              </Button>
+
+              <ApproveButton
+                userId={selectedUser?.id || ""}
+                currentStatus={selectedUser?.approved || false}
+                userName={selectedUser?.name || "Kullanıcı"}
+                onClose={() => setSelectedUser(null)}
+              />
+            </div>
           </div>
         </DialogContent>
       </Dialog>

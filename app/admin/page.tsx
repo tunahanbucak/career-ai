@@ -31,13 +31,13 @@ export default async function AdminPage({
 }) {
   // 1. Auth & Admin Control
   const session = await getServerSession(authOptions);
-  
+
   // Eğer oturum yoksa RoleBasedGuard göster (Giriş yapması gerektiğini belirtir)
   if (!session || !session.user?.email) {
     return (
-      <RoleBasedGuard 
-        title="Giriş Yapılmadı" 
-        description="Bu sayfayı görüntülemek için lütfen yönetici hesabınızla giriş yapın." 
+      <RoleBasedGuard
+        title="Giriş Yapılmadı"
+        description="Bu sayfayı görüntülemek için lütfen yönetici hesabınızla giriş yapın."
       />
     );
   }
@@ -48,19 +48,22 @@ export default async function AdminPage({
     .filter(Boolean);
 
   // Eğer emaili admin listesinde yoksa RoleBasedGuard göster
-  if (admins.length === 0 || !admins.includes(session.user.email.toLowerCase())) {
-     return <RoleBasedGuard />;
+  if (
+    admins.length === 0 ||
+    !admins.includes(session.user.email.toLowerCase())
+  ) {
+    return <RoleBasedGuard />;
   }
 
   // 2. Data Fetching (Stats)
   const [
-    usersCount, 
-    cvsCount, 
-    analysesCount, 
-    interviewsCount, 
+    usersCount,
+    cvsCount,
+    analysesCount,
+    interviewsCount,
     messagesCount,
     verifiedUsersCount,
-    unverifiedUsersCount
+    unverifiedUsersCount,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.cV.count(),
@@ -235,19 +238,33 @@ export default async function AdminPage({
         {/* DETAYLI İSTATİSTİKLER */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-lg bg-green-950/20 border border-green-800/30">
-            <h3 className="text-sm font-medium text-green-400 mb-2">✅ Aktif Kullanıcılar</h3>
-            <p className="text-3xl font-bold text-green-300">{verifiedUsersCount}</p>
-            <p className="text-xs text-slate-400 mt-1">Email doğrulanmış</p>
+            <h3 className="text-sm font-medium text-green-400 mb-2">
+              ✅ Aktif Kullanıcılar
+            </h3>
+            <p className="text-3xl font-bold text-green-300">
+              {verifiedUsersCount}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              Admin tarafından onaylanmış
+            </p>
           </div>
-          
+
           <div className="p-6 rounded-lg bg-amber-950/20 border border-amber-800/30">
-            <h3 className="text-sm font-medium text-amber-400 mb-2">⚠️ Onay Bekleyenler</h3>
-            <p className="text-3xl font-bold text-amber-300">{unverifiedUsersCount}</p>
-            <p className="text-xs text-slate-400 mt-1">Email doğrulanmamış</p>
+            <h3 className="text-sm font-medium text-amber-400 mb-2">
+              ⚠️ Onay Bekleyenler
+            </h3>
+            <p className="text-3xl font-bold text-amber-300">
+              {unverifiedUsersCount}
+            </p>
+            <p className="text-xs text-slate-400 mt-1">
+              Admin tarafından onaylanmamış
+            </p>
           </div>
-          
+
           <div className="p-6 rounded-lg bg-indigo-950/20 border border-indigo-800/30">
-            <h3 className="text-sm font-medium text-indigo-400 mb-2">👥 Toplam</h3>
+            <h3 className="text-sm font-medium text-indigo-400 mb-2">
+              👥 Toplam
+            </h3>
             <p className="text-3xl font-bold text-indigo-300">{usersCount}</p>
             <p className="text-xs text-slate-400 mt-1">Kayıtlı kullanıcı</p>
           </div>

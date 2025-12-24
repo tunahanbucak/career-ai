@@ -7,6 +7,7 @@ export interface AdminCV {
   title: string;
   uploadDate: Date;
   user: AdminUserEmail;
+  rawText: string | null;
 }
 
 export interface AdminCVAnalysis {
