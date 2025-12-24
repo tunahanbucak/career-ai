@@ -2,7 +2,10 @@
 
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { Badge } from "@/components/ui/badge";
+import LevelUpModal from "../../../components/modals/LevelUpModal";
 import type { ChatItem } from "./components/InterviewChat";
 import InterviewHeader from "./components/InterviewHeader";
 import InterviewChat from "./components/InterviewChat";
@@ -21,6 +24,17 @@ export default function InterviewPage() {
   const [interviewId, setInterviewId] = useState<string | null>(null); // Veritabanındaki mülakat ID'si
   const [analyzing, setAnalyzing] = useState(false); // Analiz yapılıyor mu?
   const [analysisComplete, setAnalysisComplete] = useState(false); // Analiz tamamlandı mı?
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  // Level Up State
+  const [levelUpInfo, setLevelUpInfo] = useState<{
+    isOpen: boolean;
+    newLevel: number;
+    levelName: string;
+  }>({ isOpen: false, newLevel: 0, levelName: "" });
+  
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   // Oturum yükleniyorsa bekleme ekranı göster
   if (status === "loading") {
@@ -38,31 +52,58 @@ export default function InterviewPage() {
 
   // Mülakatı Başlatma Fonksiyonu
   // İlk mesajı AI'dan almak için tetiklenir ("start: true")
-  const startInterview = async () => {
+  const startInterview = useCallback(async () => {
     try {
       setError(null);
       setLoading(true);
+      
+      // reCAPTCHA Token
+      let recaptchaToken = "";
+      if (executeRecaptcha) {
+        recaptchaToken = await executeRecaptcha("start_interview");
+      }
+
       // API isteği gönder
       const res = await fetch("/api/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ position, history, start: true, interviewId }),
+        body: JSON.stringify({ position, history, start: true, interviewId, recaptchaToken }),
       });
-      const data = await res.json();
+
       if (!res.ok) {
+        const data = await res.json();
         throw new Error(data?.error || "İstek hatası");
       }
 
-      // AI'dan gelen ilk soruyu geçmişe ekle
-      if (data?.reply) {
-        setHistory((h) => [
-          ...h,
-          { role: "assistant", content: String(data.reply) },
-        ]);
-      }
-      // ID'yi kaydet (devamlılık için)
-      if (data?.interviewId && typeof data.interviewId === "string") {
-        setInterviewId(data.interviewId);
+      const newId = res.headers.get("X-Interview-Id");
+      if (newId) setInterviewId(newId);
+
+      // AI yanıtını stream olarak oku
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let aiContent = "";
+
+      // Assistant için mesajı başlat
+      setHistory((h) => [...h, { role: "assistant", content: "" }]);
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          aiContent += chunk;
+
+          // Son mesajı güncelle
+          setHistory((h) => {
+            const next = [...h];
+            const last = next[next.length - 1];
+            if (last && last.role === "assistant") {
+              last.content = aiContent;
+            }
+            return next;
+          });
+        }
       }
     } catch (e: unknown) {
       const msg =
@@ -73,9 +114,9 @@ export default function InterviewPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [position, history, interviewId, executeRecaptcha]);
 
-  const sendMessage = async () => {
+  const sendMessage = useCallback(async () => {
     const text = message.trim();
     if (!text) return;
 
@@ -85,21 +126,58 @@ export default function InterviewPage() {
       setHistory((h) => [...h, { role: "user", content: text }]);
       setLoading(true);
 
+      // reCAPTCHA Token
+      let recaptchaToken = "";
+      if (executeRecaptcha) {
+        recaptchaToken = await executeRecaptcha("send_message");
+      }
+
       const res = await fetch("/api/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ position, history, message: text, interviewId }),
+        body: JSON.stringify({
+          position,
+          history,
+          message: text,
+          interviewId,
+          recaptchaToken,
+        }),
       });
-      const data = await res.json();
+
       if (!res.ok) {
+        const data = await res.json();
         throw new Error(data?.error || "İstek hatası");
       }
-      setHistory((h) => [
-        ...h,
-        { role: "assistant", content: String(data.reply || "") },
-      ]);
-      if (data?.interviewId && typeof data.interviewId === "string") {
-        setInterviewId(data.interviewId);
+
+      const newId = res.headers.get("X-Interview-Id");
+      if (newId) setInterviewId(newId);
+
+      // AI yanıtını stream olarak oku
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let aiContent = "";
+
+      // Assistant için boş bir balon ekle
+      setHistory((h) => [...h, { role: "assistant", content: "" }]);
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          aiContent += chunk;
+
+          // Son mesajı güncelle
+          setHistory((h) => {
+            const next = [...h];
+            const last = next[next.length - 1];
+            if (last && last.role === "assistant") {
+              last.content = aiContent;
+            }
+            return next;
+          });
+        }
       }
     } catch (e: unknown) {
       const msg =
@@ -110,7 +188,7 @@ export default function InterviewPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [message, position, history, interviewId, executeRecaptcha]);
 
   const resetChat = () => {
     setHistory([]);
@@ -137,10 +215,16 @@ export default function InterviewPage() {
       setAnalyzing(true);
       setError(null);
 
+      // reCAPTCHA Token
+      let recaptchaToken = "";
+      if (executeRecaptcha) {
+        recaptchaToken = await executeRecaptcha("analyze_interview");
+      }
+
       const res = await fetch("/api/interview/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ interviewId }),
+        body: JSON.stringify({ interviewId, recaptchaToken }),
       });
 
       const data = await res.json();
@@ -186,6 +270,13 @@ export default function InterviewPage() {
         onStart={startInterview}
         onSend={sendMessage}
         onComplete={completeInterview}
+      />
+
+      <LevelUpModal
+        isOpen={levelUpInfo.isOpen}
+        onClose={() => setLevelUpInfo((p) => ({ ...p, isOpen: false }))}
+        newLevel={levelUpInfo.newLevel}
+        levelName={levelUpInfo.levelName}
       />
     </div>
   );

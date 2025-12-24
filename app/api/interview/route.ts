@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateGeminiContent } from "@/app/utils/gemini";
+import { streamGeminiContent } from "@/app/utils/gemini";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 // Node.js runtime kullanılacağını belirtiyoruz (AI işlemleri için gerekli olabilir)
 export const runtime = "nodejs";
@@ -20,6 +21,7 @@ interface InterviewRequestBody {
   history?: InterviewHistoryMessage[];
   start?: boolean;
   interviewId?: string;
+  recaptchaToken?: string;
 }
 
 // POST: Mülakat simülasyonu için AI yanıtı oluşturur
@@ -32,8 +34,19 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. İstek Verilerini Okuma
-    const { position, history, message, start, interviewId } =
+    const { position, history, message, start, interviewId, recaptchaToken } =
       (await req.json()) as InterviewRequestBody;
+      
+    // 2.5 reCAPTCHA Doğrulaması
+    if (recaptchaToken) {
+      const isValid = await verifyRecaptcha(recaptchaToken);
+      if (!isValid) {
+        return NextResponse.json(
+          { error: "Güvenlik doğrulaması başarısız oldu." },
+          { status: 400 }
+        );
+      }
+    }
 
     const hasUserMessage =
       typeof message === "string" && message.trim().length > 0;
@@ -50,11 +63,25 @@ export async function POST(req: NextRequest) {
         : "Genel Yazılım Geliştirici";
 
     // 3. AI Sistem Talimatı (Prompt) Hazırlama
-    const systemPrompt = `Sen profesyonel bir teknik mülakat simülatörüsün. Rol: ${role}.
-- Kısa ve net sorular sor.
-- Adayın yanıtına göre derinleş.
-- Gerektiğinde geri bildirim ver.
-Yanıtlarını Türkçe ver.`;
+    const systemPrompt = `
+      Sen profesyonel, nazik bir teknik mülakat simülatörüsün. 
+      Rolün: ${role}.
+      
+      TALİMATLAR:
+      - HER SEFERINDE TEK BİR SORU SOR (çok önemli!)
+      - Sorular KISA ve NET olsun (maksimum 2-3 cümle)
+      - Adayın yanıtına göre takip sorusu sor
+      - Çok detaylı veya çok parçalı sorular SORMA
+      - Doğal bir konuşma akışı kur
+      - Profesyonel ama samimi bir ton kullan
+      - Yanıtlarını sadece Türkçe ver
+      
+      KÖTÜ ÖRNEK (KULLANMA):
+      "Açıklamanız için teşekkürler. Verdiğiniz detaylar üzerine bazı derinleştirici sorularım olacak: 1. Modül Bağımlılıkları... 2. Domain Katmanında... 3. ViewModel..."
+      
+      İYİ ÖRNEK (KULLAN):
+      "Anladım. Peki bu modül bağımlılıklarını pratikte nasıl kontrol ediyorsunuz?"
+    `;
 
     // 4. Geçmişi Metne Çevirme (Context Window için)
     const historyText = Array.isArray(history)
@@ -71,17 +98,7 @@ Yanıtlarını Türkçe ver.`;
       ? `${systemPrompt}\n\nGeçmiş:\n${historyText}\n\nLütfen ${role} pozisyonu için ilk teknik mülakat sorunu sor. Kısa ve net olsun.\n\nMülakatçı:`
       : `${systemPrompt}\n\nGeçmiş:\n${historyText}\n\nAday: ${message}\n\nMülakatçı:`;
 
-    // 6. Gemini AI İsteği
-    const reply = await generateGeminiContent(fullPrompt);
-
-    if (!reply) {
-      return NextResponse.json(
-        { error: "Yanıt oluşturulamadı." },
-        { status: 500 }
-      );
-    }
-
-    // 7. Veritabanına Kayıt
+    // 7. Kullanıcı ve Onay Kontrolü
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
@@ -116,8 +133,11 @@ Yanıtlarını Türkçe ver.`;
         { error: "interviewId gerekli." },
         { status: 400 }
       );
-    // Kullanıcı mesajını kaydet
 
+    // 6. Gemini AI İsteği (Streaming)
+    const stream = streamGeminiContent(fullPrompt, systemPrompt);
+
+    // Veritabanına kullanıcı mesajını kaydet
     if (hasUserMessage) {
       await prisma.interviewMessage.create({
         data: {
@@ -127,19 +147,42 @@ Yanıtlarını Türkçe ver.`;
         },
       });
     }
-    // AI yanıtını kaydet
-    await prisma.interviewMessage.create({
-      data: {
-        interviewId: createdInterviewId,
-        role: "ASSISTANT",
-        content: reply,
+
+    // Streaming Response oluştur
+    const encoder = new TextEncoder();
+    const customStream = new ReadableStream({
+      async start(controller) {
+        let fullReply = "";
+        try {
+          for await (const chunk of stream) {
+            fullReply += chunk;
+            controller.enqueue(encoder.encode(chunk));
+          }
+
+          // Akış bittiğinde AI yanıtını DB'ye kaydet
+          await prisma.interviewMessage.create({
+            data: {
+              interviewId: createdInterviewId!,
+              role: "ASSISTANT",
+              content: fullReply,
+            },
+          });
+
+          controller.close();
+        } catch (err) {
+          console.error("Streaming error:", err);
+          controller.error(err);
+        }
       },
     });
 
-    return NextResponse.json(
-      { reply, interviewId: createdInterviewId },
-      { status: 200 }
-    );
+    return new Response(customStream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "X-Interview-Id": createdInterviewId,
+      },
+    });
   } catch (err) {
     console.error("Interview API Error:", err);
     return NextResponse.json({ error: "Sunucu hatası." }, { status: 500 });

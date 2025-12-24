@@ -145,7 +145,8 @@ export default function InterviewChat({
             })}
           </AnimatePresence>
         )}
-        {loading && (
+        {/* Loading indicator - sadece mesaj yokken göster */}
+        {loading && history.length > 0 && history[history.length - 1]?.content === "" && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

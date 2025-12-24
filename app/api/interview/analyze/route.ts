@@ -90,35 +90,63 @@ export async function POST(request: NextRequest) {
       .join("\n\n");
 
     // 9. AI Analiz Prompt'u Hazırla
+    const systemInstruction = `
+      Sen deneyimli bir İK uzmanı ve teknik mülakat değerlendiricisisin.
+      Görevin, mülakat konuşmasını derinlemesine analiz ederek adaya DETAYLI ve YAPILANDIRICI geri bildirim sunmaktır.
+      
+      ÖNEMLI KURALLAR:
+      1. Genel ve belirsiz ifadeler KULLANMA ("iyi", "orta", "geliştirilmeli" gibi)
+      2. SOMUT ÖRNEKLER ver (konuşmadan alıntılar yap)
+      3. SAYISAL değerlendirmeler yap (1-10 skalası)
+      4. EYLEM ÖNERİLERİ sun (ne yapmalı, nasıl gelişmeli)
+      5. SADECE JSON formatında yanıt ver, başka açıklama yapma
+      
+      JSON YAPISI:
+      {
+        "score": 0-100 arası sayı (objektif değerlendirme),
+        "summary": "2-3 cümlelik DETAYLI genel değerlendirme. Adayın en güçlü ve en zayıf yönlerini SOMUT olarak belirt.",
+        "strengths": ["Somut güçlü yön 1", "Somut güçlü yön 2", "Somut güçlü yön 3"],
+        "improvements": ["Spesifik gelişim alanı 1", "Spesifik gelişim alanı 2", "Spesifik gelişim alanı 3"],
+        "culturalFit": "2-3 cümlelik DETAYLI kültürel uyum analizi. Adayın iletişim tarzı, motivasyonu, takım çalışmasına yatkınlığı hakkında SOMUT gözlemler.",
+        "roadmap": [
+          "Kısa vadeli eylem 1 (1 ay içinde yapılabilir)",
+          "Orta vadeli eylem 2 (3 ay içinde)",
+          "Uzun vadeli eylem 3 (6+ ay)",
+          "Kaynak önerisi (kurs, kitap, proje)"
+        ]
+      }
+      
+      ÖRNEK YANIT (KÖTÜ - KULLANMA):
+      {
+        "summary": "Analiz tamamlandı.",
+        "culturalFit": "Kültürel uyum analizi tamamlandı."
+      }
+      
+      ÖRNEK YANIT (İYİ - KULLAN):
+      {
+        "summary": "Aday, React ve TypeScript konularında güçlü teknik bilgi sergiledi ancak state management ve performans optimizasyonu konularında eksiklikleri var. İletişim becerileri orta seviyede, bazı sorulara net yanıt vermekte zorlandı.",
+        "culturalFit": "Aday, öğrenmeye açık ve gelişime istekli bir tutum sergiledi. Ancak takım çalışması deneyimleri sınırlı görünüyor. Proaktif problem çözme yerine reaktif yaklaşım gösterdi. Şirket kültürüne uyum sağlayabilir ancak mentorluk desteğine ihtiyacı var."
+      }
+    `;
+
     const prompt = `
-Sen profesyonel bir İK uzmanısın. Aşağıdaki ${interview.position} pozisyonu için yapılan mülakat konuşmasını analiz et.
+      Aşağıdaki ${interview.position} pozisyonu için yapılan mülakat konuşmasını DETAYLI olarak analiz et.
+      
+      MÜLAKAT KONUŞMASI:
+      """
+      ${conversationText}
+      """
+      
+      ÖNEMLİ: 
+      - Her değerlendirmede SOMUT örnekler ver
+      - "İyi", "orta", "geliştirilmeli" gibi genel ifadeler KULLANMA
+      - Adayın verdiği GERÇEK yanıtlardan alıntı yap
+      - Roadmap'te UYGULANABILIR eylemler öner
+      - JSON formatında yanıt ver
+    `;
 
-İSTENEN ÇIKTI FORMATI (sadece JSON döndür, başka açıklama yapma):
-{
-  "score": 0-100 arası genel performans puanı (sayı),
-  "summary": "Adayın genel performansının 2-3 cümlelik özeti",
-  "strengths": ["Güçlü yön 1", "Güçlü yön 2", "Güçlü yön 3"],
-  "improvements": ["Gelişim alanı 1", "Gelişim alanı 2", "Gelişim alanı 3"]
-}
-
-DEĞERLENDİRME KRİTERLERİ:
-- İletişim becerisi
-- Teknik bilgi düzeyi
-- Problem çözme yaklaşımı
-- Cevapların niteliği ve detayı
-- Öz güven ve profesyonellik
-
-MÜLAKAT KONUŞMASI:
-"""
-${conversationText}
-"""
-
-Sadece JSON objesini döndür, başka hiçbir şey yazma.
-    `.trim();
-
-    // 10. Gemini AI'dan Analiz Al (Fallback ile)
-    // generateGeminiContent artık doğrudan string döndürüyor.
-    const text = await generateGeminiContent(prompt);
+    // 10. Gemini AI'dan Analiz Al (Fallback ve System Instruction ile)
+    const text = await generateGeminiContent(prompt, systemInstruction);
 
     if (!text) {
       throw new Error("AI yanıtı boş.");
@@ -132,6 +160,8 @@ Sadece JSON objesini döndür, başka hiçbir şey yazma.
       summary: string;
       strengths: string[];
       improvements: string[];
+      culturalFit: string;
+      roadmap: string[];
     };
 
     try {
@@ -167,6 +197,8 @@ Sadece JSON objesini döndür, başka hiçbir şey yazma.
         summary,
         strengths,
         improvements,
+        culturalFit: analysisData.culturalFit || "Kültürel uyum analizi tamamlandı.",
+        roadmap: Array.isArray(analysisData.roadmap) ? analysisData.roadmap : [],
         analyzedAt: new Date(),
       },
     });
@@ -183,6 +215,8 @@ Sadece JSON objesini döndür, başka hiçbir şey yazma.
           summary,
           strengths,
           improvements,
+          culturalFit: analysisData.culturalFit || "Kültürel uyum analizi tamamlandı.",
+          roadmap: Array.isArray(analysisData.roadmap) ? analysisData.roadmap : [],
         },
         xp: {
           gained: XP_VALUES.INTERVIEW_COMPLETE,
