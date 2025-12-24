@@ -1,10 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-
-export default ai;
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 const MODELS = [
   "gemini-2.5-flash",
@@ -12,31 +8,31 @@ const MODELS = [
   "gemini-3.0-flash",
 ];
 
-// Farklı SDK sürümlerini desteklemek için esnek arayüz
-interface GeminiResponse {
-  text?: string | (() => string);
-  response?: {
-    text?: string | (() => string);
-  };
-}
-
-export async function generateGeminiContent(prompt: string): Promise<string> {
+/**
+ * Gemini AI içeriği üretir.
+ * @param prompt Kullanıcı mesajı
+ * @param systemInstruction Sistem talimatı (opsiyonel)
+ * @returns Üretilen metin
+ */
+export async function generateGeminiContent(
+  prompt: string,
+  systemInstruction?: string
+): Promise<string> {
   let lastError: unknown;
 
   for (const modelName of MODELS) {
     try {
-      const result = await ai.models.generateContent({
+      const model = genAI.getGenerativeModel({
         model: modelName,
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }],
-          },
-        ],
+        systemInstruction: systemInstruction,
+        generationConfig: {
+          temperature: 0.3, // Daha tutarlı sonuçlar için düşük sıcaklık
+        },
       });
 
-      // Response'dan metni güvenli bir şekilde çıkar
-      const text = extractTextFromResponse(result);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
 
       const cleanText = text?.trim();
       if (cleanText) {
@@ -47,43 +43,56 @@ export async function generateGeminiContent(prompt: string): Promise<string> {
       if (error instanceof Error) {
         console.warn(`Error details for ${modelName}:`, error.message);
       }
-      // Hata objesini detaylı yazdır (status code vb. görmek için)
-      console.warn(error);
-
       lastError = error;
-      // Sıradaki modele geç
     }
   }
 
-  // Tüm denemeler başarısız olursa
   throw lastError || new Error("All AI models failed to generate content.");
 }
 
-// Helper: Yanıt objesinden metni çıkarmak için güvenli fonksiyon
-function extractTextFromResponse(input: unknown): string | undefined {
+/**
+ * Gemini AI içeriği üretir (Streaming)
+ * @param prompt Kullanıcı mesajı
+ * @param systemInstruction Sistem talimatı (opsiyonel)
+ * @returns AsyncGenerator - içerik parçalarını döner
+ */
+export async function* streamGeminiContent(
+  prompt: string,
+  systemInstruction?: string
+) {
+  for (const modelName of MODELS) {
+    try {
+      const model = genAI.getGenerativeModel({
+        model: modelName,
+        systemInstruction: systemInstruction,
+      });
+
+      const result = await model.generateContentStream(prompt);
+      
+      for await (const chunk of result.stream) {
+        const chunkText = chunk.text();
+        if (chunkText) {
+          yield chunkText;
+        }
+      }
+      return; // Başarılı olursa döngüden çık
+    } catch (error) {
+      console.warn(`Gemini Streaming Fallback - ${modelName} failed.`);
+      // Sıradaki modele geç
+    }
+  }
+}
+
+/**
+ * Yanıt objesinden metni çıkarmak için güvenli yardımcı fonksiyon.
+ */
+export function extractTextFromResponse(input: any): string | undefined {
   if (!input) return undefined;
-
-  const result = input as GeminiResponse;
-
-  // 1. Durum: .text() fonksiyonu varsa (Yaygın durum)
-  if (typeof result.text === "function") {
-    return result.text();
+  try {
+    if (typeof input.text === "function") return input.text();
+    if (typeof input.response?.text === "function") return input.response.text();
+    return input.text || input.response?.text;
+  } catch (e) {
+    return undefined;
   }
-
-  // 2. Durum: .text string özelliği varsa
-  if (typeof result.text === "string") {
-    return result.text;
-  }
-
-  // 3. Durum: response içinde response objesi varsa (Bazı SDK versiyonları)
-  if (result.response) {
-    if (typeof result.response.text === "function") {
-      return result.response.text();
-    }
-    if (typeof result.response.text === "string") {
-      return result.response.text;
-    }
-  }
-
-  return undefined;
 }

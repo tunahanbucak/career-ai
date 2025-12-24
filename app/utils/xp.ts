@@ -9,10 +9,10 @@ export const XP_VALUES = {
 
 // Seviye isimleri
 export function getLevelName(level: number): string {
-  if (level <= 2) return "Beginner";
-  if (level <= 5) return "Intermediate";
-  if (level <= 10) return "Advanced";
-  return "Expert";
+  if (level <= 2) return "Başlangıç";
+  if (level <= 5) return "Orta Seviye";
+  if (level <= 10) return "İleri Seviye";
+  return "Uzman";
 }
 
 // Belirli bir seviye için gereken toplam XP
@@ -60,39 +60,52 @@ export async function addXP(userId: string, amount: number): Promise<{
   newXP: number;
   newLevelName: string;
 }> {
-  // Mevcut kullanıcıyı al
-  const user = await prisma.user.findUnique({
+  // 1. Önce eski seviyeyi ve verileri alalım (Opsiyonel ama dönüş değerleri için gerekli)
+  const oldUser = await prisma.user.findUnique({
     where: { id: userId },
-    select: { level: true, xp: true, levelName: true },
+    select: { level: true, xp: true },
   });
-  
-  if (!user) {
+
+  if (!oldUser) {
     throw new Error("Kullanıcı bulunamadı");
   }
-  
-  const oldLevel = user.level;
-  const newXP = user.xp + amount;
-  
-  // Yeni seviyeyi hesapla
-  const levelInfo = calculateLevel(newXP);
-  const newLevel = levelInfo.level;
-  const newLevelName = getLevelName(newLevel);
-  
-  // Veritabanını güncelle
-  await prisma.user.update({
+
+  // 2. XP'yi atomik olarak artır ve güncel kullanıcıyı al
+  const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: {
-      xp: newXP,
-      level: newLevel,
-      levelName: newLevelName,
+      xp: { increment: amount },
     },
+    select: { level: true, xp: true },
   });
-  
+
+  const oldLevel = updatedUser.level;
+  const currentTotalXP = updatedUser.xp;
+
+  // 3. Yeni seviye ve isimleri hesapla
+  const levelInfo = calculateLevel(currentTotalXP);
+  const newLevel = levelInfo.level;
+  const newLevelName = getLevelName(newLevel);
+
+  let finalLevel = newLevel;
+  let finalLevelName = newLevelName;
+
+  // 4. Eğer seviye değişmişse veritabanını tekrar güncelle (Seviye ve İsim için)
+  if (newLevel !== oldLevel) {
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        level: newLevel,
+        levelName: newLevelName,
+      },
+    });
+  }
+
   return {
     oldLevel,
-    newLevel,
-    leveledUp: newLevel > oldLevel,
-    newXP,
-    newLevelName,
+    newLevel: finalLevel,
+    leveledUp: finalLevel > oldLevel,
+    newXP: currentTotalXP,
+    newLevelName: finalLevelName,
   };
 }

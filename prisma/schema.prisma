@@ -99,6 +99,11 @@ model CVAnalysis {
   createdAt DateTime @default(now()) // Oluşturulma tarihi
   // CV silinirse Analiz de silinsin (Cascade) 
   cv        CV       @relation(fields: [cvId], references: [id], onDelete: Cascade)
+
+  // Caching için içerik hash'i (SHA-256)
+  contentHash String?  @db.Text
+  
+  @@index([contentHash]) // Hızlı arama için index
 }
 
 // Mülakat Modeli: AI ile yapılan mülakat oturumları.
@@ -114,6 +119,8 @@ model Interview {
   summary     String?   @db.Text // Performans özeti
   strengths   String[] // Güçlü yönler (dizi)
   improvements String[] // Gelişim alanları (dizi)
+  culturalFit String?   @db.Text // Kültürel uyum analizi 
+  roadmap      String[] // Gelişim yol haritası 
   analyzedAt  DateTime? // Analiz tarihi
   
   // Kullanıcı silinirse Mülakat da silinsin (Cascade)
