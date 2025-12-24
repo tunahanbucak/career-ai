@@ -240,24 +240,27 @@ export default function AnalysisResultView({
                   <Button
                     variant="outline"
                     className="w-full justify-between h-auto py-4 px-4 border-slate-700 bg-slate-800/30 hover:bg-slate-800 text-left group"
+                    asChild
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                        <Zap size={16} className="text-emerald-500" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">
-                          Mülakat Simülasyonu Başlat
+                    <Link href="/interview">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                          <Zap size={16} className="text-emerald-500" />
                         </div>
-                        <div className="text-xs text-slate-500">
-                          Bu CV ile mülakata gir
+                        <div>
+                          <div className="text-sm font-bold text-slate-200 group-hover:text-emerald-400 transition-colors">
+                            Mülakat Simülasyonu Başlat
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            Bu CV ile mülakata gir
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <ChevronRight
-                      size={16}
-                      className="text-slate-600 group-hover:text-emerald-500 transition-colors"
-                    />
+                      <ChevronRight
+                        size={16}
+                        className="text-slate-600 group-hover:text-emerald-500 transition-colors"
+                      />
+                    </Link>
                   </Button>
                 </div>
               </TabsContent>

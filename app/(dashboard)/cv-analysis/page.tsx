@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import {
   Step,
   AnalysisResult,
@@ -15,6 +16,7 @@ import AnalysisHistory from "./components/AnalysisHistory";
 import AnalysisResultView from "./components/AnalysisResultView";
 import EmptyState from "./components/EmptyState";
 import LoadingState from "./components/LoadingState";
+import LevelUpModal from "../../../components/modals/LevelUpModal";
 
 // CV Yükleme ve Analiz Ana Sayfası
 // İki kolonlu responsive layout: Sol tarafta dosya yükleme ve geçmiş, sağ tarafta sonuçlar
@@ -28,6 +30,15 @@ export default function CvUploadPage() {
   const [step, setStep] = useState<Step>("idle"); // İşlem adımı (idle/uploading/analyzing/done)
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null); // AI analiz sonucu
   const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]); // Geçmiş analizler
+  
+  // Level Up State
+  const [levelUpInfo, setLevelUpInfo] = useState<{
+    isOpen: boolean;
+    newLevel: number;
+    levelName: string;
+  }>({ isOpen: false, newLevel: 0, levelName: "" });
+  
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   // Kullanıcının daha önce yaptığı analizleri API'den çek
   // FETCH HISTORY
@@ -53,7 +64,7 @@ export default function CvUploadPage() {
     };
   }, []);
 
-  const handleUploadAndAnalyze = async () => {
+  const handleUploadAndAnalyze = useCallback(async () => {
     try {
       setError(null);
       setAnalysis(null);
@@ -81,6 +92,12 @@ export default function CvUploadPage() {
 
       setStep("analyzing");
 
+      // 1.5 Get reCAPTCHA Token
+      let recaptchaToken = "";
+      if (executeRecaptcha) {
+        recaptchaToken = await executeRecaptcha("analyze_cv");
+      }
+
       // 2. Analyze
       const analyzeRes = await fetch("/api/analyze-cv", {
         method: "POST",
@@ -89,14 +106,24 @@ export default function CvUploadPage() {
           rawText: uploadJson.rawText,
           title: uploadJson.title,
           cvId: uploadJson.cvId,
+          recaptchaToken,
         }),
       });
-      const analyzeJson = (await analyzeRes.json()) as AnalysisResult;
+      const analyzeJson = await analyzeRes.json();
       if (!analyzeRes.ok)
         throw new Error(analyzeJson?.error || "Analiz hatası.");
 
       setAnalysis(analyzeJson);
       setStep("done");
+
+      // Level Up Kontrolü
+      if (analyzeJson.levelUp) {
+        setLevelUpInfo({
+          isOpen: true,
+          newLevel: analyzeJson.newLevel,
+          levelName: analyzeJson.levelName,
+        });
+      }
 
       // Update List
       const newEntry: RecentAnalysis = {
@@ -114,7 +141,7 @@ export default function CvUploadPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [file, executeRecaptcha]);
 
   return (
     <div className="flex flex-col xl:flex-row gap-8 min-h-[calc(100vh-100px)]">
@@ -153,6 +180,13 @@ export default function CvUploadPage() {
           ) : null}
         </AnimatePresence>
       </div>
+
+      <LevelUpModal
+        isOpen={levelUpInfo.isOpen}
+        onClose={() => setLevelUpInfo((p) => ({ ...p, isOpen: false }))}
+        newLevel={levelUpInfo.newLevel}
+        levelName={levelUpInfo.levelName}
+      />
     </div>
   );
 }

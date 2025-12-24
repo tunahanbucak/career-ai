@@ -7,12 +7,14 @@ import { prisma } from "@/lib/prisma";
 import { AnalysisData } from "@/types";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 // Zod şeması: Gelen istek verilerinin doğrulanması için kullanılır.
 const analyzeCvSchema = z.object({
   rawText: z.string().min(1, "CV metni boş olamaz."), // CV içeriği zorunludur.
   title: z.string().optional(), // Başlık opsiyoneldir.
   cvId: z.string().min(1, "cvId gereklidir."), // Hangi CV'nin analiz edildiği bilinmelidir.
+  recaptchaToken: z.string().optional(), // Güvenlik doğrulaması (v3)
 });
 
 // POST Metodu: CV analizi işlemini gerçekleştirir.
@@ -62,62 +64,130 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { rawText, title, cvId } = result.data;
+    const { rawText, title, cvId, recaptchaToken } = result.data;
+
+    // 2.5 reCAPTCHA Doğrulaması
+    if (recaptchaToken) {
+      const isValid = await verifyRecaptcha(recaptchaToken);
+      if (!isValid) {
+        return NextResponse.json(
+          { error: "Güvenlik doğrulaması başarısız oldu." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // 2.6 CACHING: İPTAL EDİLDİ
+    // Kullanıcı talebi üzerine cache mekanizması devre dışı bırakıldı.
+    // Her analiz canlı olarak yeniden yapılacak.
+    
+    // İçeriğin SHA-256 özetini (hash) oluştur
+    const contentHash = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(rawText)
+    ).then(hash => Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join(''));
+
+    /*
+    // Veritabanında aynı hash'e sahip analiz var mı?
+    // Analysis model adı şemada CVAnalysis olarak geçiyor
+    const existingAnalysis = await prisma.cVAnalysis.findFirst({
+      where: {
+        contentHash: contentHash,
+        // Sadece bu kullanıcının eski analizlerine bak
+        cv: {
+          userId: dbUser.id
+        }
+      },
+      orderBy: { createdAt: "desc" }, // En son analizi getir
+    });
+
+    // CACHE HIT KONTROLÜ: AKTİF
+    // Sadece geçerli bir skora ve özete sahip analizleri döndür (Tutarlılık için)
+    if (existingAnalysis && (existingAnalysis.score ?? 0) > 0 && existingAnalysis.summary) {
+      console.log(`CACHE HIT: Mevcut analiz döndürülüyor (Score: ${existingAnalysis.score})`);
+      return NextResponse.json(existingAnalysis);
+    } else if (existingAnalysis) {
+      console.log("CACHE MISS (BAD DATA): Mevcut analiz hatalı veya eksik, yeniden analiz ediliyor...");
+    }
+    */
 
     // 3. Yapay Zeka (Gemini) için prompt hazırlığı
-    const prompt = `
-      Sen, üst düzey bir İK uzmanı ve kariyer danışmanısın. Aşağıdaki CV metnini analiz et ve aşağıdaki JSON formatında detaylı bir rapor oluştur.
+    const systemInstruction = `
+      Sen, üst düzey bir İK uzmanı, teknik işe alım yöneticisi ve profesyonel kariyer danışmanısın. 
+      Görevin, sana sunulan CV metinlerini titizlikle analiz etmek ve adaya profesyonel, yapıcı ve somut geri bildirimler sağlamaktır.
+      
+      ANALİZ KRİTERLERİN:
+      1. Etki (Impact): Başarılar somut (sayısal veriler, yüzdeler vb.) mi?
+      2. Kısalık (Brevity): Gereksiz dolgu kelimelerden kaçınılmış mı?
+      3. ATS Uyumu: Teknik terimler ve format modern sistemlere uygun mu?
+      4. Stil: Dil bilgisi ve profesyonel ton korunmuş mu?
 
+      YANIT FORMATIN SADECE JSON OLMALIDIR. Başka hiçbir metin ekleme.
+    `;
+
+    const prompt = `
+      Aşağıdaki CV metnini analiz et ve belirtilen JSON formatında detaylı bir rapor oluştur.
+      
       İSTENEN ÇIKTI FORMATI:
       {
-        "summary": "CV'yi 3 cümlede özetle. Adayın ana odak noktası ne?",
-        "keywords": ["En güçlü 5 teknik yetenek (örnek: React, SQL)"],
-        "suggestion": "Kariyer gelişimi için 1 somut öneri",
+        "summary": "CV'yi 3 cümlede özetle. Adayın ana odak noktası ve kıdem seviyesi ne?",
+        "keywords": ["En güçlü 5 teknik yetenek veya sektörel yetkinlik"],
+        "suggestion": "Kariyer gelişimi için 1 çok somut ve uygulanabilir öneri",
         "score": 0, // 0-100 arası genel CV puanı
         "details": {
-          "impact": 0, // 0-100: Etki Odaklılık (Başarıların somutluğu)
-          "brevity": 0, // 0-100: Kısalık ve Özgünlük
-          "ats": 0, // 0-100: ATS (Aday Takip Sistemi) Uyumu
-          "style": 0 // 0-100: Dil Bilgisi ve Yazım Tarzı
+          "impact": 0, // 0-100: Başarıların somutluğu
+          "brevity": 0, // 0-100: Netlik ve özlük
+          "ats": 0, // 0-100: Anahtar kelime ve format uyumu
+          "style": 0 // 0-100: Profesyonel dil kalitesi
         }
       }
 
       CV METNİ: """${rawText}"""
-      
-      Sadece bu JSON objesini döndür. Başka hiçbir açıklama yapma.
     `;
 
-    // 4. Gemini AI servisine isteği gönder (Fallback Mekanizması ile)
-    // generateGeminiContent artık doğrudan string döndürüyor.
-    const text = await generateGeminiContent(prompt);
+    // 4. Gemini AI servisine isteği gönder (Fallback Mekanizması ve System Instruction ile)
+    const text = await generateGeminiContent(prompt, systemInstruction);
 
     // AI yanıtı boşsa hata fırlat.
     if (!text) {
       throw new Error("AI yanıtı boş.");
     }
 
-    // 5. JSON yanıtını temizle ve parse et (Markdown bloklarını kaldır)
-    const cleanJson = text.replace(/```json|```/g, "").trim();
+    // 5. JSON yanıtını temizle ve parse et (Daha güvenli regex)
+    console.log("Raw AI Response:", text); // Debug için logla
 
     let parsedData: AnalysisData;
     try {
+      // Markdown bloklarını temizle
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const cleanJson = jsonMatch ? jsonMatch[0] : text.replace(/```json|```/g, "").trim();
+      
       parsedData = JSON.parse(cleanJson);
+      console.log("Parsed Data Success:", parsedData.score);
     } catch (e) {
       console.error("JSON Parse Error:", e);
+      console.log("Failed JSON Content:", text); // Hatalı içeriği gör
       return NextResponse.json(
         { error: "AI yanıtı işlenemedi." },
         { status: 500 }
       );
     }
 
-    // Default değerler ata eğer AI eksik döndürürse
-    const {
-      summary,
-      keywords,
-      suggestion,
-      score = 0,
-      details = { impact: 0, brevity: 0, ats: 0, style: 0 },
-    } = parsedData;
+    // Default değerler ata (Güvenli Destructuring)
+    const summary = parsedData.summary || "";
+    const keywords = parsedData.keywords || [];
+    const suggestion = parsedData.suggestion || "";
+    const score = parsedData.score || 0;
+    
+    // Details objesini güvenli bir şekilde oluştur
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rawDetails = (parsedData.details || {}) as any;
+    const details = {
+      impact: rawDetails.impact || 0,
+      brevity: rawDetails.brevity || 0,
+      ats: rawDetails.ats || 0,
+      style: rawDetails.style || 0,
+    };
 
     // 6. Sonuçları Veritabanına Kaydet
     await prisma.cVAnalysis.create({
@@ -132,15 +202,33 @@ export async function POST(request: NextRequest) {
         brevity: details.brevity,
         ats: details.ats,
         style: details.style,
+        contentHash, // Caching için hash'i kaydet
       },
     });
 
-    // Kullanıcıya XP ekle (+25 CV analizi bonusu)
+    // Kullanıcıya XP ekle (+25 CV analizi bonusu) ve Level kontrolü yap
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
+    
+    let levelUpData = { levelUp: false, newLevel: 0, levelName: "" };
+
     if (user) {
+      const oldLevel = user.level;
       await addXP(user.id, XP_VALUES.CV_ANALYSIS);
+      
+      // Güncel kullanıcı verisini tekrar çek
+      const updatedUser = await prisma.user.findUnique({
+        where: { id: user.id },
+      });
+      
+      if (updatedUser && updatedUser.level > oldLevel) {
+        levelUpData = {
+          levelUp: true,
+          newLevel: updatedUser.level,
+          levelName: updatedUser.levelName
+        };
+      }
     }
 
     // 7. Başarılı yanıtı döndür
@@ -150,6 +238,9 @@ export async function POST(request: NextRequest) {
         title,
         analysis: parsedData,
         cvId,
+        levelUp: levelUpData.levelUp,
+        newLevel: levelUpData.newLevel,
+        levelName: levelUpData.levelName,
       },
       { status: 200 }
     );
