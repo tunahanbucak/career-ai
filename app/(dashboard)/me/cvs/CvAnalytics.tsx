@@ -65,7 +65,7 @@ export default function CvAnalytics({ cvs }: Props) {
       .sort((a, b) => {
         const da = new Date(a.uploadDate).getTime();
         const db = new Date(b.uploadDate).getTime();
-        return db - da; // en güncel en üstte
+        return db - da;
       })
       .slice(0, 6)
       .map((cv) => ({

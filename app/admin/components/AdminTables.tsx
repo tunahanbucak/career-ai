@@ -70,14 +70,6 @@ export function AdminTable({ children }: { children: React.ReactNode }) {
       <thead className="text-[10px] text-slate-500 uppercase bg-slate-950/80 border-b border-slate-800 tracking-wider">
         {children}
       </thead>
-      {/* Body will be passed as sibling in usage or strictly structured, here we assume header is passed as child for Thead and body is sibling. 
-                Wait, standard structure is Table -> Thead -> Tr -> Th, Tbody -> Tr -> Td.
-                Let's make this component just the table wrapper.
-            */}
     </table>
   );
 }
-
-// Exports for direct use in page.tsx to keep it cleaner
-// Actually, I'll export just the DataCard and let page.tsx handle the table content structure
-// because the columns differ for each table.

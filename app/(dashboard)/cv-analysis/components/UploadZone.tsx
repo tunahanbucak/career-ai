@@ -60,7 +60,6 @@ export default function UploadZone({
             className="hidden"
             onChange={(e) => setFile(e.target.files?.[0] || null)}
           />
-
           <div className="flex flex-col items-center justify-center text-center space-y-4">
             <div
               className={`h-20 w-20 rounded-full flex items-center justify-center transition-all duration-500 ${
@@ -85,15 +84,12 @@ export default function UploadZone({
                   <div className="text-slate-200 font-semibold text-lg">
                     Dosyayı Sürükle veya Seç
                   </div>
-                  <div className="text-slate-500 text-sm mt-1">
-                    PDF max 5MB
-                  </div>
+                  <div className="text-slate-500 text-sm mt-1">PDF max 5MB</div>
                 </>
               )}
             </div>
           </div>
         </div>
-
         {error && (
           <Alert
             variant="destructive"

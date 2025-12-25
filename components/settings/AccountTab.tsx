@@ -14,7 +14,6 @@ export default function AccountTab() {
           Hesap tercihlerinizi ve planınızı yönetin.
         </p>
       </div>
-
       <div className="p-4 rounded-xl bg-secondary/50 border border-border space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -39,7 +38,6 @@ export default function AccountTab() {
           <Switch disabled />
         </div>
       </div>
-
       <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-indigo-400">Pro Plan</h3>

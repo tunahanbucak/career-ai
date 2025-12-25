@@ -18,7 +18,6 @@ export default function ProgressTracker({
   level,
   xp,
 }: ProgressTrackerProps) {
-  // XP sistemini kullan
   const xpForNextLevel = 100 * level; // Her level 100 * level XP gerektirir
   let totalXP = 0;
   for (let i = 1; i < level; i++) {

@@ -29,7 +29,6 @@ export default function RoleBasedGuard({
           </div>
         </div>
       </motion.div>
-
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -40,7 +39,6 @@ export default function RoleBasedGuard({
           {title}
         </h1>
         <p className="text-slate-400 text-lg leading-relaxed">{description}</p>
-        
         <div className="pt-6">
           <Link
             href="/"

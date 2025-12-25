@@ -28,7 +28,6 @@ export default function UserProfile({ user, isCollapsed }: UserProfileProps) {
           </div>
           <div className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-sidebar shadow-[0_0_8px_#10b981]"></div>
         </div>
-
         {!isCollapsed && (
           <div className="flex-1 overflow-hidden animate-in fade-in duration-300">
             <div className="flex items-center justify-between">

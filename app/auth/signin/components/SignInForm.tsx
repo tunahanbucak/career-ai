@@ -26,62 +26,69 @@ export default function SignInForm() {
     }
   };
 
-  const handleEmailSignIn = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleEmailSignIn = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
 
-    if (!validateEmail(email)) {
-      setEmailError("Lütfen geçerli bir e-posta adresi girin");
-      return;
-    }
-
-    if (!executeRecaptcha) {
-      setMessage("Hata: reCAPTCHA henüz hazır değil. Lütfen sayfayı yenileyin.");
-      return;
-    }
-
-    setEmailError("");
-    setLoading(true);
-    setMessage("Güvenlik doğrulaması yapılıyor...");
-
-    try {
-      // 1. reCAPTCHA Token'ı al
-      const token = await executeRecaptcha("signin");
-
-      // 2. Token'ı sunucu tarafında doğrula
-      const verifyRes = await fetch("/api/verify-recaptcha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
-
-      const verifyData = await verifyRes.json();
-
-      if (!verifyRes.ok || !verifyData.success) {
-        setMessage("Hata: " + (verifyData.message || "Güvenlik doğrulaması başarısız."));
-        setLoading(false);
+      if (!validateEmail(email)) {
+        setEmailError("Lütfen geçerli bir e-posta adresi girin");
         return;
       }
 
-      // 3. Başarılı ise Magic Link gönder
-      setMessage("Sihirli bağlantı hazırlanıyor...");
-
-      const res = await signIn("email", {
-        email,
-        redirect: false,
-      });
-
-      if (res?.error) {
-        setMessage("Hata: " + res.error);
-      } else {
-        setMessage("✅ Giriş bağlantısı e-postana gönderildi!");
+      if (!executeRecaptcha) {
+        setMessage(
+          "Hata: reCAPTCHA henüz hazır değil. Lütfen sayfayı yenileyin."
+        );
+        return;
       }
-    } catch (error) {
-      console.error("Giriş hatası:", error);
-      setMessage("Hata: Beklenmedik bir sorun oluştu.");
-    } finally {
-      setLoading(false);
-    }
-  }, [email, executeRecaptcha]);
+
+      setEmailError("");
+      setLoading(true);
+      setMessage("Güvenlik doğrulaması yapılıyor...");
+
+      try {
+        // 1. reCAPTCHA Token'ı al
+        const token = await executeRecaptcha("signin");
+
+        // 2. Token'ı sunucu tarafında doğrula
+        const verifyRes = await fetch("/api/verify-recaptcha", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+        });
+
+        const verifyData = await verifyRes.json();
+
+        if (!verifyRes.ok || !verifyData.success) {
+          setMessage(
+            "Hata: " + (verifyData.message || "Güvenlik doğrulaması başarısız.")
+          );
+          setLoading(false);
+          return;
+        }
+
+        // 3. Başarılı ise Magic Link gönder
+        setMessage("Sihirli bağlantı hazırlanıyor...");
+
+        const res = await signIn("email", {
+          email,
+          redirect: false,
+        });
+
+        if (res?.error) {
+          setMessage("Hata: " + res.error);
+        } else {
+          setMessage("✅ Giriş bağlantısı e-postana gönderildi!");
+        }
+      } catch (error) {
+        console.error("Giriş hatası:", error);
+        setMessage("Hata: Beklenmedik bir sorun oluştu.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [email, executeRecaptcha]
+  );
 
   return (
     <>
@@ -122,7 +129,6 @@ export default function SignInForm() {
             </p>
           )}
         </div>
-
         <button
           type="submit"
           disabled={loading}
@@ -137,7 +143,6 @@ export default function SignInForm() {
           )}
         </button>
       </form>
-
       {message && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}

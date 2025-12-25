@@ -61,7 +61,6 @@ export default async function CVDetailPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
-      {/* Header */}
       <div className="flex flex-col gap-4">
         <div>
           <Link
@@ -89,7 +88,6 @@ export default async function CVDetailPage({
           </div>
         </div>
       </div>
-
       {!analysis ? (
         <div className="rounded-2xl border-2 border-dashed border-slate-800 bg-slate-950/50 p-16 text-center">
           <div className="p-6 bg-slate-900/50 rounded-full inline-block mb-4">
@@ -104,7 +102,6 @@ export default async function CVDetailPage({
         </div>
       ) : (
         <div className="space-y-8">
-          {/* Score Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {analysis.score != null && (
               <ScoreCard
@@ -147,17 +144,12 @@ export default async function CVDetailPage({
               />
             )}
           </div>
-
-          {/* Details Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
               <AnalysisDetails analysis={analysis} />
             </div>
-            
             <div className="space-y-6">
               <Competencies keywords={analysis.keywords} />
-              
-              {/* Status Card */}
               <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-6 backdrop-blur-xl shadow-xl text-center">
                 <div className="inline-flex p-4 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-full mb-4">
                   <Layers className="w-8 h-8 text-indigo-400" />

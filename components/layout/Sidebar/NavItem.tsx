@@ -41,7 +41,6 @@ export default function NavItem({
       {!isCollapsed && active && (
         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-[0_0_10px_#6366f1]" />
       )}
-
       <span
         className={`${
           active
@@ -51,7 +50,6 @@ export default function NavItem({
       >
         {icon}
       </span>
-
       {!isCollapsed && (
         <span className="font-medium text-sm truncate animate-in fade-in slide-in-from-left-2 duration-300">
           {label}

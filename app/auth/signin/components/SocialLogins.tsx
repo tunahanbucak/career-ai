@@ -40,7 +40,6 @@ export default function SocialLogins() {
         <p className="text-slate-400">
           Kariyer yolculuğuna devam etmek için giriş yap.
         </p>
-
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -53,7 +52,6 @@ export default function SocialLogins() {
           </span>
         </motion.div>
       </div>
-
       <div className="space-y-4 mb-8">
         <button
           onClick={() => signIn("google")}
@@ -63,7 +61,6 @@ export default function SocialLogins() {
           <GoogleIcon />
           Google ile Devam Et
         </button>
-
         <button
           onClick={() => signIn("github")}
           aria-label="GitHub hesabınızla giriş yapın"

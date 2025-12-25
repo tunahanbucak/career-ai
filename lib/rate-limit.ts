@@ -18,7 +18,7 @@ const rateLimitStore: RateLimitStore = {};
  */
 export function checkRateLimit(
   userId: string,
-  limit: number = 10, // Dakikada 10 istek (Gemini için güvenli)
+  limit: number = 10, // Dakikada 10 istek
   windowMs: number = 60 * 1000 // 1 dakika
 ): { allowed: boolean; remaining: number; resetTime: number } {
   const now = Date.now();
@@ -51,10 +51,6 @@ export function checkRateLimit(
   };
 }
 
-/**
- * Exponential Backoff - API hatalarında yeniden deneme mekanizması
- * Gemini API rate limit hatalarında kullanılır
- */
 export async function withRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
@@ -70,10 +66,17 @@ export async function withRetry<T>(
       lastError = err;
 
       // Rate limit hatası mı kontrol et
-      if (err.message?.includes("429") || err.message?.includes("RESOURCE_EXHAUSTED")) {
+      if (
+        err.message?.includes("429") ||
+        err.message?.includes("RESOURCE_EXHAUSTED")
+      ) {
         // Exponential backoff: 1s, 2s, 4s...
         const delay = baseDelay * Math.pow(2, attempt);
-        console.warn(`Rate limit hit. Retrying in ${delay}ms... (Attempt ${attempt + 1}/${maxRetries})`);
+        console.warn(
+          `Rate limit hit. Retrying in ${delay}ms... (Attempt ${
+            attempt + 1
+          }/${maxRetries})`
+        );
         await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
         // Başka bir hata, retry yapma

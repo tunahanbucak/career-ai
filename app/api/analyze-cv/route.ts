@@ -77,15 +77,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 2.6 CACHING: İPTAL EDİLDİ
-    // Kullanıcı talebi üzerine cache mekanizması devre dışı bırakıldı.
-    // Her analiz canlı olarak yeniden yapılacak.
-    
     // İçeriğin SHA-256 özetini (hash) oluştur
-    const contentHash = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(rawText)
-    ).then(hash => Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join(''));
+    const contentHash = await crypto.subtle
+      .digest("SHA-256", new TextEncoder().encode(rawText))
+      .then((hash) =>
+        Array.from(new Uint8Array(hash))
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("")
+      );
 
     // Veritabanında aynı hash'e sahip analiz var mı?
     // Analysis model adı şemada CVAnalysis olarak geçiyor
@@ -94,15 +93,17 @@ export async function POST(request: NextRequest) {
         contentHash: contentHash,
         // Sadece geçerli, tamamlanmış analizleri kabul et
         score: { gt: 0 },
-        summary: { not: "" }
+        summary: { not: "" },
       },
       orderBy: { createdAt: "desc" }, // En son analizi getir
     });
 
     // CACHE HIT KONTROLÜ: AKTİF
     if (existingAnalysis) {
-      console.log(`CACHE HIT: Mevcut analiz döndürülüyor (Score: ${existingAnalysis.score})`);
-      
+      console.log(
+        `CACHE HIT: Mevcut analiz döndürülüyor (Score: ${existingAnalysis.score})`
+      );
+
       // Tüm detayları eksiksiz döndür
       const cachedData: AnalysisData = {
         summary: existingAnalysis.summary,
@@ -114,16 +115,9 @@ export async function POST(request: NextRequest) {
           brevity: existingAnalysis.brevity || 0,
           ats: existingAnalysis.ats || 0,
           style: existingAnalysis.style || 0,
-        }
+        },
       };
 
-      // Bu analiz yeni bir CV kaydı olarak da eklensin mi?
-      // Kullanıcı "yeni" bir analiz yaptığını sanıyor, bu yüzden
-      // bu sonuçlarla yeni bir CVAnalysis kaydı oluşturup oluşturmamaya karar verelim.
-      // EĞER "aynı analizi tekrar görmek" istiyorsa, sadece sonucu dönmek yeterli.
-      // ANCAK history listesinde görünmesi için yeni bir kayıt oluşturmak daha tutarlı olabilir.
-      // MALİYET DÜŞÜRMEK İÇİN: Var olan analizi kopyalayıp yeni kayıt açalım.
-      
       await prisma.cVAnalysis.create({
         data: {
           cvId,
@@ -136,7 +130,7 @@ export async function POST(request: NextRequest) {
           brevity: existingAnalysis.brevity,
           ats: existingAnalysis.ats,
           style: existingAnalysis.style,
-          contentHash, 
+          contentHash,
         },
       });
 
@@ -149,7 +143,7 @@ export async function POST(request: NextRequest) {
           levelUp: false, // Cache'den gelince level atlatmayalım (spam önleme)
           newLevel: 0,
           levelName: "",
-          isCached: true 
+          isCached: true,
         },
         { status: 200 }
       );
@@ -200,14 +194,16 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. JSON yanıtını temizle ve parse et (Daha güvenli regex)
-    console.log("Raw AI Response:", text); // Debug için logla
+    console.log("Raw AI Response:", text);
 
     let parsedData: AnalysisData;
     try {
       // Markdown bloklarını temizle
       const jsonMatch = text.match(/\{[\s\S]*\}/);
-      const cleanJson = jsonMatch ? jsonMatch[0] : text.replace(/```json|```/g, "").trim();
-      
+      const cleanJson = jsonMatch
+        ? jsonMatch[0]
+        : text.replace(/```json|```/g, "").trim();
+
       parsedData = JSON.parse(cleanJson);
       console.log("Parsed Data Success:", parsedData.score);
     } catch (e) {
@@ -224,8 +220,8 @@ export async function POST(request: NextRequest) {
     const keywords = parsedData.keywords || [];
     const suggestion = parsedData.suggestion || "";
     const score = parsedData.score || 0;
-    
-    // Details objesini güvenli bir şekilde oluştur 
+
+    // Details objesini güvenli bir şekilde oluştur
     const rawDetails = (parsedData.details || {}) as AnalysisDetails;
     const details = {
       impact: rawDetails.impact ?? 0,
@@ -255,23 +251,23 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
-    
+
     let levelUpData = { levelUp: false, newLevel: 0, levelName: "" };
 
     if (user) {
       const oldLevel = user.level;
       await addXP(user.id, XP_VALUES.CV_ANALYSIS);
-      
+
       // Güncel kullanıcı verisini tekrar çek
       const updatedUser = await prisma.user.findUnique({
         where: { id: user.id },
       });
-      
+
       if (updatedUser && updatedUser.level > oldLevel) {
         levelUpData = {
           levelUp: true,
           newLevel: updatedUser.level,
-          levelName: updatedUser.levelName
+          levelName: updatedUser.levelName,
         };
       }
     }

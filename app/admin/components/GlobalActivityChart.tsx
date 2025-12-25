@@ -37,7 +37,6 @@ export default function GlobalActivityChart({
           </p>
         </div>
       </div>
-
       <div className="h-[300px] w-full relative z-10">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart

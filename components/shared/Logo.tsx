@@ -5,16 +5,16 @@ interface LogoProps {
   className?: string;
   iconSize?: number;
   textSize?: "sm" | "base" | "lg" | "xl" | "2xl";
-  lightMode?: boolean; // If true, text is dark (for light backgrounds)
+  lightMode?: boolean;
   showText?: boolean;
 }
 
-export default function Logo({ 
-  className, 
-  iconSize = 20, 
-  textSize = "xl", 
+export default function Logo({
+  className,
+  iconSize = 20,
+  textSize = "xl",
   lightMode = false,
-  showText = true
+  showText = true,
 }: LogoProps) {
   return (
     <div className={cn("flex items-center gap-3 select-none", className)}>
@@ -22,15 +22,17 @@ export default function Logo({
         <Zap size={iconSize} className="text-white" fill="currentColor" />
       </div>
       {showText && (
-        <span className={cn(
-          "font-bold tracking-tight",
-          lightMode ? "text-slate-900" : "text-white",
-          textSize === "sm" && "text-sm",
-          textSize === "base" && "text-base",
-          textSize === "lg" && "text-lg",
-          textSize === "xl" && "text-xl",
-          textSize === "2xl" && "text-2xl"
-        )}>
+        <span
+          className={cn(
+            "font-bold tracking-tight",
+            lightMode ? "text-slate-900" : "text-white",
+            textSize === "sm" && "text-sm",
+            textSize === "base" && "text-base",
+            textSize === "lg" && "text-lg",
+            textSize === "xl" && "text-xl",
+            textSize === "2xl" && "text-2xl"
+          )}
+        >
           CareerAI
         </span>
       )}

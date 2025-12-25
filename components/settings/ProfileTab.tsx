@@ -46,7 +46,6 @@ export default function ProfileTab({ user }: ProfileTabProps) {
           Kişisel bilgilerinizi buradan yönetin.
         </p>
       </div>
-
       <div className="flex items-center gap-4">
         <Avatar className="h-20 w-20 border-2 border-border">
           <AvatarImage src={user?.image || ""} />
@@ -63,7 +62,6 @@ export default function ProfileTab({ user }: ProfileTabProps) {
           </Button>
         </div>
       </div>
-
       <div className="grid gap-4">
         <div className="grid gap-2">
           <Label className="text-muted-foreground">Ad Soyad</Label>

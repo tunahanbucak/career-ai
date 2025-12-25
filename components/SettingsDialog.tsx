@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { User, Settings, Bell, Shield, LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
 
-// Components
 import ProfileTab from "./settings/ProfileTab";
 import AccountTab from "./settings/AccountTab";
 import NotificationTab from "./settings/NotificationTab";
@@ -31,7 +30,6 @@ export default function SettingsDialog({
       <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-background/95 backdrop-blur-xl border-border text-foreground">
         <DialogTitle className="sr-only">Ayarlar</DialogTitle>
         <div className="flex h-[500px]">
-          {/* Sidebar */}
           <div className="w-[200px] bg-secondary/50 border-r border-border p-4 flex flex-col gap-2">
             <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2 px-2">
               Ayarlar
@@ -73,7 +71,6 @@ export default function SettingsDialog({
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-
             <div className="mt-auto border-t border-border pt-4">
               <Button
                 variant="ghost"
@@ -85,8 +82,6 @@ export default function SettingsDialog({
               </Button>
             </div>
           </div>
-
-          {/* Content */}
           <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
             <Tabs value={activeTab} className="space-y-6">
               <TabsContent value="profile" className="mt-0">

@@ -3,9 +3,6 @@
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-/**
- * Mülakat raporunu PDF (yazdırma yoluyla) olarak kaydetmeyi sağlayan buton.
- */
 export function PrintButton() {
   return (
     <Button

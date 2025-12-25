@@ -9,12 +9,9 @@ import type { ChatItem } from "./components/InterviewChat";
 import InterviewHeader from "./components/InterviewHeader";
 import InterviewChat from "./components/InterviewChat";
 
-// Mülakat Simülasyonu Sayfası
-// Kullanıcı seçtiği pozisyon için yapay zeka ile mülakat yapabilir.
 export default function InterviewPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-
   // State Tanımları
   const [position, setPosition] = useState<string>("Frontend Developer"); // Hedef pozisyon
   const [message, setMessage] = useState<string>(""); // Kullanıcının yazdığı anlık mesaj
@@ -31,7 +28,7 @@ export default function InterviewPage() {
     newLevel: number;
     levelName: string;
   }>({ isOpen: false, newLevel: 0, levelName: "" });
-  
+
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   // Mülakatı Başlatma Fonksiyonu
@@ -40,7 +37,7 @@ export default function InterviewPage() {
     try {
       setError(null);
       setLoading(true);
-      
+
       // reCAPTCHA Token
       let recaptchaToken = "";
       if (executeRecaptcha) {
@@ -51,7 +48,13 @@ export default function InterviewPage() {
       const res = await fetch("/api/interview", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ position, history, start: true, interviewId, recaptchaToken }),
+        body: JSON.stringify({
+          position,
+          history,
+          start: true,
+          interviewId,
+          recaptchaToken,
+        }),
       });
 
       if (!res.ok) {
@@ -269,7 +272,6 @@ export default function InterviewPage() {
         onSend={sendMessage}
         onComplete={completeInterview}
       />
-
       <LevelUpModal
         isOpen={levelUpInfo.isOpen}
         onClose={() => setLevelUpInfo((p) => ({ ...p, isOpen: false }))}

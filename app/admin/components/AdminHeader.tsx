@@ -26,7 +26,6 @@ export default function AdminHeader({ email, stats }: AdminHeaderProps) {
       <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl animate-pulse" />
       <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-700" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-
       <div className="relative z-10 space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -48,7 +47,6 @@ export default function AdminHeader({ email, stats }: AdminHeaderProps) {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <ExportDropdown />
-
             <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-xl backdrop-blur-sm">
               <Clock className="h-4 w-4 text-indigo-400" />
               <span className="text-sm text-slate-300 font-mono">
@@ -67,7 +65,6 @@ export default function AdminHeader({ email, stats }: AdminHeaderProps) {
             </div>
           </div>
         </div>
-
         {stats && (
           <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-800/50">
             <div className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-xl border border-slate-700/50 hover:bg-slate-800/50 transition-all group">

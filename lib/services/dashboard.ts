@@ -16,27 +16,9 @@ import { DashboardData } from "@/types";
  * @param userId - İlgili kullanıcının veritabanı ID'si
  * @returns DashboardData - İstatistikler ve liste verilerini içeren obje
  */
-// ... imports
 import { subDays, format, startOfDay } from "date-fns";
 import { tr } from "date-fns/locale";
 
-/**
- * Dashboard için gerekli verileri veritabanından çeker.
- *
- * Bu fonksiyon, dashboard sayfasının yüklenme performansını artırmak için
- * tüm veritabanı sorgularını paralel olarak (Promise.all) çalıştırır.
- *
- * Çekilen Veriler:
- * 1. Son 5 CV analizi
- * 2. Son 5 Mülakat kaydı
- * 3. Toplam analiz sayısı
- * 4. Toplam mülakat sayısı
- * 5. Aktivite verileri (Son 7 gün)
- * 6. Yetkinlik analizi verileri (Son analizlerden çıkarılan)
- *
- * @param userId - İlgili kullanıcının veritabanı ID'si
- * @returns DashboardData - İstatistikler ve liste verilerini içeren obje
- */
 export async function getDashboardData(userId: string): Promise<DashboardData> {
   const today = new Date();
   const sevenDaysAgo = subDays(today, 6); // Son 7 günü kapsayacak şekilde

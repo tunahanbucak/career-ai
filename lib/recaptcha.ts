@@ -1,4 +1,3 @@
-// Server-side reCAPTCHA doğrulama fonksiyonu
 export async function verifyRecaptcha(token: string): Promise<boolean> {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY;
 

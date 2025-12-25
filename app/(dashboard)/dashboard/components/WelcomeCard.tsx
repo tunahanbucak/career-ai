@@ -17,7 +17,7 @@ export default function WelcomeCard({
 }: WelcomeCardProps) {
   const isNewUser = !hasAnalyses && !hasInterviews;
 
-  if (!isNewUser) return null; // Sadece yeni kullanıcılara göster
+  if (!isNewUser) return null;
 
   return (
     <motion.div

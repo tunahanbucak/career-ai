@@ -60,11 +60,9 @@ export default function Testimonials() {
         <div className="absolute bottom-[-20%] right-[-20%] w-[80%] h-[80%] bg-purple-600/20 rounded-full blur-[150px] animate-pulse-slow delay-1000" />
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
       </div>
-
       <div className="relative z-10">
         <Logo textSize="2xl" />
       </div>
-
       <div className="relative z-10 max-w-lg">
         <div className="relative">
           <AnimatePresence mode="wait">
@@ -134,9 +132,8 @@ export default function Testimonials() {
           </div>
         </div>
       </div>
-
       <div className="relative z-10 text-xs text-slate-500">
-        © 2024 CareerAI Inc. Tüm hakları saklıdır.
+        © 2025 CareerAI. Tüm hakları saklıdır.
       </div>
     </div>
   );

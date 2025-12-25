@@ -10,7 +10,6 @@ import {
   HistoryApiResponse,
 } from "@/types";
 
-// Components
 import UploadZone from "./components/UploadZone";
 import AnalysisHistory from "./components/AnalysisHistory";
 import AnalysisResultView from "./components/AnalysisResultView";
@@ -18,9 +17,6 @@ import EmptyState from "./components/EmptyState";
 import LoadingState from "./components/LoadingState";
 import LevelUpModal from "../../../components/modals/LevelUpModal";
 
-// CV Yükleme ve Analiz Ana Sayfası
-// İki kolonlu responsive layout: Sol tarafta dosya yükleme ve geçmiş, sağ tarafta sonuçlar
-// İşlem akışı: Dosya yükleme → Parse → AI analizi → Sonuç gösterimi
 export default function CvUploadPage() {
   // State Tanımları
   const [file, setFile] = useState<File | null>(null); // Seçilen dosya
@@ -30,18 +26,16 @@ export default function CvUploadPage() {
   const [step, setStep] = useState<Step>("idle"); // İşlem adımı (idle/uploading/analyzing/done)
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null); // AI analiz sonucu
   const [recentAnalyses, setRecentAnalyses] = useState<RecentAnalysis[]>([]); // Geçmiş analizler
-  
-  // Level Up State
+
   const [levelUpInfo, setLevelUpInfo] = useState<{
     isOpen: boolean;
     newLevel: number;
     levelName: string;
   }>({ isOpen: false, newLevel: 0, levelName: "" });
-  
+
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   // Kullanıcının daha önce yaptığı analizleri API'den çek
-  // FETCH HISTORY
   useEffect(() => {
     let isMounted = true;
     const fetchHistory = async () => {
@@ -81,7 +75,6 @@ export default function CvUploadPage() {
       const fd = new FormData();
       fd.append("file", file);
 
-      // 1. Upload
       const uploadRes = await fetch("/api/upload-cv", {
         method: "POST",
         body: fd,
@@ -92,13 +85,11 @@ export default function CvUploadPage() {
 
       setStep("analyzing");
 
-      // 1.5 Get reCAPTCHA Token
       let recaptchaToken = "";
       if (executeRecaptcha) {
         recaptchaToken = await executeRecaptcha("analyze_cv");
       }
 
-      // 2. Analyze
       const analyzeRes = await fetch("/api/analyze-cv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -116,7 +107,6 @@ export default function CvUploadPage() {
       setAnalysis(analyzeJson);
       setStep("done");
 
-      // Level Up Kontrolü
       if (analyzeJson.levelUp) {
         setLevelUpInfo({
           isOpen: true,
@@ -124,8 +114,6 @@ export default function CvUploadPage() {
           levelName: analyzeJson.levelName,
         });
       }
-
-      // Update List
       const newEntry: RecentAnalysis = {
         id: crypto.randomUUID(),
         title: uploadJson.title,
@@ -145,15 +133,13 @@ export default function CvUploadPage() {
 
   return (
     <div className="flex flex-col xl:flex-row gap-8 min-h-[calc(100vh-100px)]">
-      {/* Sol Panel: Giriş ve Geçmiş */}
-      <div className="w-full xl:w-1/2 space-y-8">
+      <div className="w-full xl:w-1/2 space-y-8 ">
         <div>
           <h2 className="text-3xl font-bold text-white mb-2">CV Analizi</h2>
           <p className="text-slate-400">
             Yapay zeka ile CV&apos;ni saniyeler içinde analiz et ve geliştir.
           </p>
         </div>
-
         <UploadZone
           file={file}
           setFile={setFile}
@@ -161,14 +147,11 @@ export default function CvUploadPage() {
           error={error}
           onAnalyze={handleUploadAndAnalyze}
         />
-
         <AnalysisHistory
           recentAnalyses={recentAnalyses}
           fetchingHistory={fetchingHistory}
         />
       </div>
-
-      {/* Sağ Panel: Sonuç Ekranı */}
       <div className="w-full xl:w-1/2">
         <AnimatePresence mode="wait">
           {!analysis && !loading && step !== "analyzing" ? (
@@ -180,7 +163,6 @@ export default function CvUploadPage() {
           ) : null}
         </AnimatePresence>
       </div>
-
       <LevelUpModal
         isOpen={levelUpInfo.isOpen}
         onClose={() => setLevelUpInfo((p) => ({ ...p, isOpen: false }))}

@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { InterviewItem, InterviewStats } from "@/types";
 
-// Components
 import StatCard from "./components/StatCard";
 import ActivityChart from "./components/ActivityChart";
 import PositionPieChart from "./components/PositionPieChart";
@@ -94,7 +93,6 @@ export default function InterviewAnalytics({ interviews }: Props) {
 
   return (
     <section className="space-y-4">
-      {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           label="Toplam Mülakat"
@@ -115,14 +113,10 @@ export default function InterviewAnalytics({ interviews }: Props) {
           accent="from-fuchsia-500/40 via-fuchsia-500/10 to-transparent"
         />
       </div>
-
-      {/* Main Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <ActivityChart data={stats.byDate} />
         <PositionPieChart data={stats.byPosition} />
       </div>
-
-      {/* Secondary Chart */}
       <MessageBarChart data={stats.byInterviewMessages} />
     </section>
   );

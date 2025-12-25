@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, ArrowRight } from "lucide-react";
 import Logo from "@/components/shared/Logo";
 
-// LandingNavbar: Karşılama sayfası için navigasyon barı bileşeni.
 export default function LandingNavbar() {
-  const [isScrolled, setIsScrolled] = useState(false); // Sayfa kaydırma durumu state'i
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Mobil menü açık/kapalı durumu
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // useEffect Hook: Sayfa kaydırıldığında navbar stilini değiştirmek için event listener ekler.
   useEffect(() => {
@@ -27,17 +26,14 @@ export default function LandingNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "h-20 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg" // Kaydırılınca aktif olan stiller
-          : "h-24 bg-transparent" // İlk yüklemede şeffaf
+          ? "h-20 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50 shadow-lg"
+          : "h-24 bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6 h-full flex items-center justify-between">
-        {/* Logo Alanı */}
         <Link href="/" className="group">
           <Logo textSize="xl" />
         </Link>
-
-        {/* Masaüstü Aksiyon Butonları (Giriş / Kayıt) */}
         <div className="hidden md:flex items-center gap-4">
           <Button
             className="bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 rounded-xl px-6"
@@ -58,8 +54,6 @@ export default function LandingNavbar() {
             </Link>
           </Button> */}
         </div>
-
-        {/* Mobil Menü Açma/Kapama Butonu */}
         <div className="md:hidden">
           <Button
             variant="ghost"
@@ -71,8 +65,6 @@ export default function LandingNavbar() {
           </Button>
         </div>
       </div>
-
-      {/* Mobil Menü İçeriği */}
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800 p-6 md:hidden animate-in slide-in-from-top-2">
           <div className="flex flex-col gap-4">

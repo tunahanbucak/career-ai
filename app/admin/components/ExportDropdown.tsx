@@ -61,7 +61,6 @@ export default function ExportDropdown() {
           <span className="text-sm">Dışa Aktar</span>
         </button>
       </DropdownMenu.Trigger>
-
       <DropdownMenu.Portal>
         <DropdownMenu.Content
           className="min-w-[220px] bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200"
@@ -71,9 +70,7 @@ export default function ExportDropdown() {
             <Download className="w-3 h-3" />
             Veri Türü Seçin
           </DropdownMenu.Label>
-
           <DropdownMenu.Separator className="my-1 h-px bg-slate-800" />
-
           <DropdownMenu.Item
             className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg cursor-pointer outline-none transition-all group"
             onSelect={() => handleExport("cvs")}
@@ -84,7 +81,6 @@ export default function ExportDropdown() {
             </div>
             <span className="flex-1 font-medium">Tüm CV&apos;ler</span>
           </DropdownMenu.Item>
-
           <DropdownMenu.Item
             className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg cursor-pointer outline-none transition-all group"
             onSelect={() => handleExport("analyses")}
@@ -95,7 +91,6 @@ export default function ExportDropdown() {
             </div>
             <span className="flex-1 font-medium">Analiz Raporları</span>
           </DropdownMenu.Item>
-
           <DropdownMenu.Item
             className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg cursor-pointer outline-none transition-all group"
             onSelect={() => handleExport("interviews")}
@@ -106,9 +101,7 @@ export default function ExportDropdown() {
             </div>
             <span className="flex-1 font-medium">Mülakat Kayıtları</span>
           </DropdownMenu.Item>
-
           <DropdownMenu.Separator className="my-1 h-px bg-slate-800" />
-
           <div className="px-3 py-2 text-[10px] text-slate-600 text-center flex items-center justify-center gap-1">
             <FileSpreadsheet className="w-3 h-3" />
             CSV formatında indirilir

@@ -14,7 +14,6 @@ export default function NotificationTab() {
           Hangi konularda bildirim almak istediğinizi seçin.
         </p>
       </div>
-
       <div className="space-y-4">
         <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border">
           <div className="flex items-center gap-3">
@@ -32,7 +31,6 @@ export default function NotificationTab() {
           </div>
           <Switch defaultChecked />
         </div>
-
         <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/50 border border-border">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">

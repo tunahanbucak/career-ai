@@ -10,7 +10,6 @@ export default function RecaptchaProvider({
 }) {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-  // reCAPTCHA key yoksa provider olmadan render et
   if (!siteKey) {
     console.warn("reCAPTCHA site key bulunamadı");
     return <>{children}</>;

@@ -1,17 +1,22 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Bot, Loader2, User, Send, Play, AlertCircle, CheckCircle, Sparkles } from "lucide-react";
+import {
+  Bot,
+  Loader2,
+  User,
+  Send,
+  Play,
+  AlertCircle,
+  CheckCircle,
+  Sparkles,
+} from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Sohbet mesajı tipi: AI (assistant) veya kullanıcı (user) tarafından gönderilen mesaj
 export type ChatItem = { role: "assistant" | "user"; content: string };
 
-// AI Mülakat Simülasyonu - Sohbet Arayüzü
-// Kullanıcının yapay zeka ile gerçek zamanlı mülakat pratiği yapabilmesi için
-// WhatsApp/Telegram benzeri modern sohbet arayüzü
 type Props = {
   position: string;
   history: ChatItem[];
@@ -145,23 +150,24 @@ export default function InterviewChat({
             })}
           </AnimatePresence>
         )}
-        {/* Loading indicator - sadece mesaj yokken göster */}
-        {loading && history.length > 0 && history[history.length - 1]?.content === "" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex gap-5 justify-start"
-          >
-            <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg">
-              <Bot size={20} className="text-indigo-400" />
-            </div>
-            <div className="bg-slate-900/50 border border-slate-800 rounded-3xl rounded-tl-sm px-6 py-4 flex items-center gap-1.5 h-[58px]">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-              <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" />
-            </div>
-          </motion.div>
-        )}
+        {loading &&
+          history.length > 0 &&
+          history[history.length - 1]?.content === "" && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex gap-5 justify-start"
+            >
+              <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg">
+                <Bot size={20} className="text-indigo-400" />
+              </div>
+              <div className="bg-slate-900/50 border border-slate-800 rounded-3xl rounded-tl-sm px-6 py-4 flex items-center gap-1.5 h-[58px]">
+                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" />
+              </div>
+            </motion.div>
+          )}
       </div>
       {error && (
         <div className="px-6 pb-4">
@@ -208,8 +214,6 @@ export default function InterviewChat({
               )}
             </Button>
           </div>
-          
-          {/* Mülakatı Bitir Butonu */}
           {canComplete && onComplete && (
             <div className="flex items-center justify-center gap-3 mt-4">
               <Button

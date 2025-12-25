@@ -7,12 +7,10 @@ import { motion } from "framer-motion";
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-[#020617] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Arkaplan Efektleri */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-[100px]" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]" />
       </div>
-
       <div className="relative z-10 text-center space-y-8 max-w-lg mx-auto">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -25,7 +23,6 @@ export default function NotFound() {
             <SearchX className="w-24 h-24 text-slate-400" strokeWidth={1.5} />
           </div>
         </motion.div>
-
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -35,15 +32,12 @@ export default function NotFound() {
           <h1 className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-500">
             404
           </h1>
-          <h2 className="text-2xl font-bold text-white">
-            Sayfa Bulunamadı
-          </h2>
+          <h2 className="text-2xl font-bold text-white">Sayfa Bulunamadı</h2>
           <p className="text-slate-400 text-lg leading-relaxed">
             Aradığınız sayfa silinmiş, taşınmış veya hiç var olmamış olabilir.
             Yolunuzu kaybettiyseniz endişelenmeyin, sizi ana sayfaya götürelim.
           </p>
         </motion.div>
-
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}

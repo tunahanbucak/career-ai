@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     let rawText = "";
 
-    // --- PDF PARSING (HATA ÇÖZÜMÜ BURADA!) ---
+    // PDF PARSING
     if (isPDF) {
       const parseFunction = await resolvePdfParse();
       const data = await parseFunction(buffer);

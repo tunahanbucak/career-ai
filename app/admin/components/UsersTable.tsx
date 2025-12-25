@@ -86,29 +86,24 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                     </span>
                   </div>
                 </td>
-
                 <td className="py-3 px-2">
                   <span className="text-sm text-slate-400">{user.email}</span>
                 </td>
-
                 <td className="py-3 px-2 text-center">
                   <span className="inline-block px-2 py-1 text-xs bg-indigo-950/50 text-indigo-300 rounded">
                     L{user.level}
                   </span>
                 </td>
-
                 <td className="py-3 px-2 text-center">
                   <span className="text-emerald-400 font-semibold">
                     {user._count.cvs}
                   </span>
                 </td>
-
                 <td className="py-3 px-2 text-center">
                   <span className="text-amber-400 font-semibold">
                     {user._count.interviews}
                   </span>
                 </td>
-
                 <td className="py-3 px-2">
                   <div className="flex items-center justify-center gap-1">
                     {user.approved ? (
@@ -124,7 +119,6 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                     )}
                   </div>
                 </td>
-
                 <td className="py-3 px-2 text-center">
                   <Button
                     size="sm"
@@ -140,8 +134,6 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
           </tbody>
         </table>
       </div>
-
-      {/* Detay Modal */}
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
         <DialogContent className="max-w-2xl bg-slate-900 border-slate-800">
           <DialogHeader>
@@ -160,16 +152,16 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                 </div>
               )}
               <div>
-                <div className="text-slate-100">{selectedUser?.name || "İsimsiz"}</div>
+                <div className="text-slate-100">
+                  {selectedUser?.name || "İsimsiz"}
+                </div>
                 <div className="text-sm font-normal text-slate-400">
                   {selectedUser?.email}
                 </div>
               </div>
             </DialogTitle>
           </DialogHeader>
-
           <div className="mt-6 space-y-6">
-            {/* ADMIN ONAY DURUMU */}
             <div className="flex items-center gap-2 p-4 rounded-lg bg-slate-800/50">
               {selectedUser?.approved ? (
                 <>
@@ -201,8 +193,6 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                 </>
               )}
             </div>
-
-            {/* İstatistikler */}
             <div className="grid grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-indigo-950/30 border border-indigo-800/30">
                 <div className="flex items-center gap-2">
@@ -216,7 +206,6 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                   {selectedUser?.xp} XP
                 </p>
               </div>
-
               <div className="p-4 rounded-lg bg-emerald-950/30 border border-emerald-800/30">
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4 text-emerald-400" />
@@ -227,7 +216,6 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                 </p>
                 <p className="text-xs text-slate-500 mt-1">Yüklenmiş</p>
               </div>
-
               <div className="p-4 rounded-lg bg-amber-950/30 border border-amber-800/30">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-amber-400" />
@@ -239,8 +227,6 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                 <p className="text-xs text-slate-500 mt-1">Tamamlanmış</p>
               </div>
             </div>
-
-            {/* Özet */}
             <div className="p-4 rounded-lg bg-slate-800/30 border border-slate-700">
               <h4 className="text-sm font-semibold mb-3 flex items-center gap-2 text-slate-200">
                 <BarChart3 className="w-4 h-4" />
@@ -270,17 +256,16 @@ export default function UsersTableWithModal({ data }: { data: UserData[] }) {
                 </p>
               </div>
             </div>
-
-            {/* ONAYLAMA VE GEÇMİŞ BUTONLARI */}
             <div className="mt-6 p-4 border-t border-slate-700 flex flex-col gap-3">
               <Button
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                onClick={() => (window.location.href = `/admin/users/${selectedUser?.id}`)}
+                onClick={() =>
+                  (window.location.href = `/admin/users/${selectedUser?.id}`)
+                }
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 Tüm Geçmişi Gör
               </Button>
-
               <ApproveButton
                 userId={selectedUser?.id || ""}
                 currentStatus={selectedUser?.approved || false}

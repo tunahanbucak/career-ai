@@ -8,7 +8,7 @@ export default function EmptyState() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="h-full min-h-[400px] flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-slate-800/50 rounded-3xl bg-slate-900/20"
+      className=" h-full min-h-[400px] flex flex-col items-center justify-center text-center p-12 border-2 border-dashed border-slate-800/50 rounded-3xl bg-slate-900/20"
     >
       <div className="h-40 w-40 rounded-full bg-slate-800/30 flex items-center justify-center mb-6">
         <TrendingUp className="h-20 w-20 text-slate-700" />

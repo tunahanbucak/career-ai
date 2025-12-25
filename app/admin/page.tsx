@@ -13,8 +13,6 @@ import CVTable from "./components/CVTable";
 import AnalysisTable from "./components/AnalysisTable";
 import InterviewTable from "./components/InterviewTable";
 import UsersTableWithModal from "./components/UsersTable";
-
-// Types
 import {
   AdminCV,
   AdminCVAnalysis,
@@ -82,7 +80,6 @@ export default async function AdminPage({
     messages: messagesCount,
   };
 
-  // 3. Activity Chart Preparation
   const [chartCvs, chartInterviews] = await Promise.all([
     prisma.cV.findMany({
       select: { uploadDate: true },
@@ -119,7 +116,6 @@ export default async function AdminPage({
     if (activityMap.has(key)) activityMap.get(key)!.interviews += 1;
   });
 
-  // 4. Tables Data Fetching
   const q = (searchParams?.q || "").trim();
   const pageIndex = Math.max(1, Number(searchParams?.page || 1));
   const pageSize = 10;
@@ -161,7 +157,7 @@ export default async function AdminPage({
     prisma.interview.count({ where: interviewWhere }),
   ]);
 
-  // 5. KULLANICI LİSTESİ DATA (YENİ!)
+  // 5. KULLANICI LİSTESİ DATA
   const users = await prisma.user.findMany({
     take: 10,
     orderBy: { id: "desc" },
@@ -216,7 +212,6 @@ export default async function AdminPage({
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-indigo-500/30 pb-20">
-      {/* Background Decor */}
       <div className="fixed inset-0 z-0 pointer-events-none opacity-20">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-black via-transparent to-black" />
@@ -225,17 +220,13 @@ export default async function AdminPage({
         <div className="absolute top-0 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 blur-[120px]" />
         <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-blue-900/10 blur-[120px]" />
       </div>
-
       <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col gap-8 px-6 py-10">
         <AdminHeader email={session.user.email} />
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-3">
             <AdminStats counts={stats} />
           </div>
         </div>
-
-        {/* DETAYLI İSTATİSTİKLER */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-6 rounded-lg bg-green-950/20 border border-green-800/30">
             <h3 className="text-sm font-medium text-green-400 mb-2">
@@ -248,7 +239,6 @@ export default async function AdminPage({
               Admin tarafından onaylanmış
             </p>
           </div>
-
           <div className="p-6 rounded-lg bg-amber-950/20 border border-amber-800/30">
             <h3 className="text-sm font-medium text-amber-400 mb-2">
               ⚠️ Onay Bekleyenler
@@ -260,7 +250,6 @@ export default async function AdminPage({
               Admin tarafından onaylanmamış
             </p>
           </div>
-
           <div className="p-6 rounded-lg bg-indigo-950/20 border border-indigo-800/30">
             <h3 className="text-sm font-medium text-indigo-400 mb-2">
               👥 Toplam
@@ -269,10 +258,7 @@ export default async function AdminPage({
             <p className="text-xs text-slate-400 mt-1">Kayıtlı kullanıcı</p>
           </div>
         </div>
-
         <GlobalActivityChart data={Array.from(activityMap.values())} />
-
-        {/* KULLANICI LİSTESİ */}
         <DataCard
           title="👥 Kayıtlı Kullanıcılar"
           total={usersCount}
@@ -283,9 +269,7 @@ export default async function AdminPage({
         >
           <UsersTableWithModal data={users} />
         </DataCard>
-
         <AdminSearch query={q} />
-
         <div className="grid gap-8 grid-cols-1 lg:grid-cols-2">
           <DataCard
             title="Son Yüklenen CV'ler"
@@ -297,7 +281,6 @@ export default async function AdminPage({
           >
             <CVTable data={recentCVs} />
           </DataCard>
-
           <DataCard
             title="Son Analizler"
             total={analysisTotal}
@@ -309,7 +292,6 @@ export default async function AdminPage({
             <AnalysisTable data={recentAnalyses} />
           </DataCard>
         </div>
-
         <section>
           <DataCard
             title="Mülakat Oturumları"

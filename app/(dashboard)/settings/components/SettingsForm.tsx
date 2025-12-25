@@ -43,9 +43,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
   const [titleVal, setTitleVal] = useState(user.title || "");
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Sadece rakam
     const val = e.target.value.replace(/[^0-9]/g, "");
-    // Maksimum 11 hane
     if (val.length <= 11) {
       setPhoneVal(val);
     }
@@ -89,7 +87,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-3">
-      {/* Sol Panel: Profil Kartı */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -97,13 +94,10 @@ export default function SettingsForm({ user }: SettingsFormProps) {
         className="lg:col-span-1"
       >
         <div className="sticky top-6 space-y-6">
-          {/* Profile Card */}
           <div className="relative overflow-hidden bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-6 backdrop-blur-xl shadow-2xl">
-            {/* Background decoration */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl" />
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500/10 rounded-full blur-3xl" />
             <div className="relative z-10 text-center">
-              {/* Avatar */}
               <div className="relative inline-block mb-4">
                 <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-4xl font-black text-white shadow-2xl shadow-indigo-500/30 ring-4 ring-slate-900">
                   {user.name?.charAt(0).toUpperCase() || "U"}
@@ -112,7 +106,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                   <Sparkles className="w-4 h-4 text-white" />
                 </div>
               </div>
-              {/* Name & Email */}
               <h3 className="text-xl font-bold text-white mb-1">
                 {user.name || "Kullanıcı"}
               </h3>
@@ -122,8 +115,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                   {user.email}
                 </p>
               </div>
-
-              {/* Title Badge */}
               {user.title && (
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
                   <Briefcase className="w-3 h-3 text-indigo-400" />
@@ -134,8 +125,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
               )}
             </div>
           </div>
-
-          {/* Profile Completion */}
           <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 backdrop-blur-sm">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -164,8 +153,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
           </div>
         </div>
       </motion.div>
-
-      {/* Sağ Panel: Form */}
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -176,11 +163,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
           action={handleSubmit}
           className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-8 space-y-6 backdrop-blur-xl shadow-2xl relative overflow-hidden"
         >
-          {/* Background Effects */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Form Header */}
           <div className="relative z-10 pb-6 border-b border-slate-800">
             <h2 className="text-2xl font-bold text-white mb-2">
               Kişisel Bilgiler
@@ -189,9 +173,7 @@ export default function SettingsForm({ user }: SettingsFormProps) {
               Profil bilgilerinizi güncel tutun
             </p>
           </div>
-
           <div className="relative z-10 space-y-6">
-            {/* Ad Soyad */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
                 <User className="w-4 h-4 text-indigo-400" />
@@ -207,8 +189,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                 className="w-full h-12 bg-slate-950/50 border border-slate-700 rounded-xl px-4 text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
               />
             </div>
-
-            {/* Unvan */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
                 <Briefcase className="w-4 h-4 text-indigo-400" />
@@ -223,8 +203,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                 className="w-full h-12 bg-slate-950/50 border border-slate-700 rounded-xl px-4 text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
               />
             </div>
-
-            {/* Telefon */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
                 <Phone className="w-4 h-4 text-indigo-400" />
@@ -242,8 +220,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                 <p className="text-xs text-amber-400">11 haneli olmalıdır</p>
               )}
             </div>
-
-            {/* Hakkımda */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-300 flex items-center gap-2">
                 <FileText className="w-4 h-4 text-indigo-400" />
@@ -256,8 +232,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                 className="min-h-[140px] bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all resize-y"
               />
             </div>
-
-            {/* Submit Button */}
             <div className="pt-4">
               <Button
                 type="submit"
@@ -277,8 +251,6 @@ export default function SettingsForm({ user }: SettingsFormProps) {
                 )}
               </Button>
             </div>
-
-            {/* Success/Error Message */}
             <AnimatePresence>
               {message && (
                 <motion.div

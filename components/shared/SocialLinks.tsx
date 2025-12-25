@@ -12,13 +12,13 @@ interface SocialLink {
 const socialLinks: SocialLink[] = [
   {
     name: "LinkedIn",
-    href: "https://linkedin.com",
+    href: "https://www.linkedin.com/in/tunahan-bu%C3%A7ak-473812247/",
     icon: <Linkedin className="w-5 h-5" />,
     ariaLabel: "LinkedIn profilimizi ziyaret edin",
   },
   {
     name: "GitHub",
-    href: "https://github.com",
+    href: "https://github.com/tunahanbucak/career-ai",
     icon: <Github className="w-5 h-5" />,
     ariaLabel: "GitHub repomuzı inceleyin",
   },
@@ -30,7 +30,7 @@ const socialLinks: SocialLink[] = [
   },
   {
     name: "Email",
-    href: "mailto:info@careerai.app",
+    href: "mailto:tunahanbucak1@gmail.com",
     icon: <Mail className="w-5 h-5" />,
     ariaLabel: "E-posta ile iletişime geçin",
   },
@@ -41,7 +41,10 @@ interface SocialLinksProps {
   className?: string;
 }
 
-export default function SocialLinks({ variant = "footer", className = "" }: SocialLinksProps) {
+export default function SocialLinks({
+  variant = "footer",
+  className = "",
+}: SocialLinksProps) {
   return (
     <div className={`flex gap-4 ${className}`}>
       {socialLinks.map((link) => (

@@ -18,8 +18,6 @@ import { useLayout } from "@/app/context/LayoutContext";
 import { cn } from "@/lib/utils";
 import SettingsDialog from "@/components/SettingsDialog";
 
-// DashboardNavbar: Üst tarafta bulunan navigasyon çubuğu.
-// Breadcrumbs (sayfa yolu), arama çubuğu ve kullanıcı profil menüsünü içerir.
 export default function DashboardNavbar({
   user,
 }: {
@@ -40,13 +38,13 @@ export default function DashboardNavbar({
       const href = `/${paths.slice(0, index + 1).join("/")}`;
       let label = path.charAt(0).toUpperCase() + path.slice(1);
 
-      // Custom labels mapping
       if (path === "cv-analysis") label = "CV Analizi";
       if (path === "interview") label = "Mülakat";
       if (path === "me") label = "Hesabım";
       if (path === "cvs") label = "CV Geçmişi";
       if (path === "interviews") label = "Mülakat Geçmişi";
       if (path === "admin") label = "Yönetim";
+      if (path === "settings") label = "Hesap Ayarları";
 
       items.push({ href, label, icon: undefined });
     });

@@ -33,17 +33,17 @@ export function calculateLevel(currentXP: number): {
 } {
   let level = 1;
   let totalXP = 0;
-  
+
   // Mevcut seviyeyi bul
   while (totalXP + getXPForLevel(level) <= currentXP) {
     totalXP += getXPForLevel(level);
     level++;
   }
-  
+
   const xpInCurrentLevel = currentXP - totalXP;
   const xpForNextLevel = getXPForLevel(level);
   const progress = Math.floor((xpInCurrentLevel / xpForNextLevel) * 100);
-  
+
   return {
     level,
     xpInCurrentLevel,
@@ -53,14 +53,17 @@ export function calculateLevel(currentXP: number): {
 }
 
 // Kullanıcıya XP ekle ve seviye güncelle
-export async function addXP(userId: string, amount: number): Promise<{
+export async function addXP(
+  userId: string,
+  amount: number
+): Promise<{
   oldLevel: number;
   newLevel: number;
   leveledUp: boolean;
   newXP: number;
   newLevelName: string;
 }> {
-  // 1. Önce eski seviyeyi ve verileri alalım (Opsiyonel ama dönüş değerleri için gerekli)
+  // 1. Önce eski seviyeyi ve verileri alalım
   const oldUser = await prisma.user.findUnique({
     where: { id: userId },
     select: { level: true, xp: true },

@@ -9,7 +9,6 @@ export default function SecurityTab() {
           Hesap güvenliği Google/Github hesabınız tarafından sağlanmaktadır.
         </p>
       </div>
-
       <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
         <p className="text-sm">
           Giriş yapmak için OAuth sağlayıcılarını (Google, Github)

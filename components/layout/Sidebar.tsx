@@ -8,7 +8,6 @@ import {
   MessageSquare,
   Zap,
   Menu,
-  X,
   ChevronLeft,
   ChevronRight,
   Target,
@@ -16,13 +15,10 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useLayout } from "@/app/context/LayoutContext";
 import Logo from "@/components/shared/Logo";
 
-// Components
 import NavItem from "./Sidebar/NavItem";
 import UserProfile from "./Sidebar/UserProfile";
 
@@ -44,19 +40,18 @@ export default function Sidebar({
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <div className="fixed top-4 left-4 z-50 lg:hidden">
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-sidebar/80 backdrop-blur-md border-sidebar-border text-sidebar-foreground"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X /> : <Menu />}
-        </Button>
-      </div>
-
-      {/* Mobile Sidebar */}
+      {!isMobileMenuOpen && (
+        <div className="fixed top-4 left-4 z-50 lg:hidden">
+          <Button
+            variant="outline"
+            size="icon"
+            className="bg-sidebar/80 backdrop-blur-md border-sidebar-border text-sidebar-foreground"
+            onClick={() => setIsMobileMenuOpen(true)}
+          >
+            <Menu />
+          </Button>
+        </div>
+      )}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 bg-sidebar/95 p-6 lg:hidden animate-in slide-in-from-left-10 flex flex-col h-full backdrop-blur-xl">
           <div className="flex items-center gap-3 mb-10 px-2 pt-4">
@@ -68,8 +63,6 @@ export default function Sidebar({
           </div>
         </div>
       )}
-
-      {/* Desktop Sidebar */}
       <aside
         className={`hidden lg:flex fixed top-0 left-0 z-40 h-screen flex-col justify-between border-r border-sidebar-border/50 bg-sidebar/60 backdrop-blur-2xl transition-all duration-300 ease-out shadow-2xl ${
           isSidebarCollapsed ? "w-[80px]" : "w-72"
@@ -91,7 +84,6 @@ export default function Sidebar({
             />
           )}
         </button>
-
         <div className="flex flex-col h-full p-4">
           <div
             className={`flex items-center ${
@@ -108,11 +100,9 @@ export default function Sidebar({
               )}
             </Link>
           </div>
-
           <div className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-sidebar-border/50 scrollbar-track-transparent">
             <NavContent isActive={isActive} isCollapsed={isSidebarCollapsed} />
           </div>
-
           <div className="mt-4 pt-4 border-t border-sidebar-border/50">
             <UserProfile user={user} isCollapsed={isSidebarCollapsed} />
           </div>
@@ -161,7 +151,6 @@ function NavContent({
             </div>
           )}
           {isCollapsed && <div className="h-4" />}
-
           <NavItem
             href="/me/cvs"
             icon={<Target size={20} />}

@@ -32,7 +32,6 @@ export default function DashboardPreview() {
               </div>
             </div>
             <div className="col-span-12 md:col-span-10 p-6 md:p-8 relative overflow-hidden">
-              {/* Üst Kısım */}
               <div className="flex justify-between mb-8 items-center">
                 <div>
                   <div className="h-2 w-24 bg-slate-800 rounded-full mb-2" />
@@ -43,8 +42,6 @@ export default function DashboardPreview() {
                   <div className="h-8 w-8 rounded-full bg-indigo-600" />
                 </div>
               </div>
-
-              {/* Kartlar */}
               <div className="grid grid-cols-3 gap-4 mb-8">
                 {[
                   { color: "bg-indigo-500", icon: FileText },
@@ -65,13 +62,10 @@ export default function DashboardPreview() {
                   </div>
                 ))}
               </div>
-
-              {/* Grafik Alanı */}
               <div className="h-64 rounded-xl border border-slate-800 bg-slate-900/30 w-full p-6 flex items-end gap-4 relative">
                 <div className="absolute top-4 left-4 text-xs text-slate-500 font-mono">
                   Mülakat Performansı
                 </div>
-                {/* Chart Bars */}
                 {[40, 70, 50, 90, 60, 80, 45, 95, 55, 85, 65, 75].map(
                   (h, i) => (
                     <div
