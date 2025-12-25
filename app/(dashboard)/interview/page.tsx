@@ -1,10 +1,9 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import { Badge } from "@/components/ui/badge";
 import LevelUpModal from "../../../components/modals/LevelUpModal";
 import type { ChatItem } from "./components/InterviewChat";
 import InterviewHeader from "./components/InterviewHeader";
@@ -14,6 +13,7 @@ import InterviewChat from "./components/InterviewChat";
 // Kullanıcı seçtiği pozisyon için yapay zeka ile mülakat yapabilir.
 export default function InterviewPage() {
   const { data: session, status } = useSession();
+  const router = useRouter();
 
   // State Tanımları
   const [position, setPosition] = useState<string>("Frontend Developer"); // Hedef pozisyon
@@ -24,8 +24,6 @@ export default function InterviewPage() {
   const [interviewId, setInterviewId] = useState<string | null>(null); // Veritabanındaki mülakat ID'si
   const [analyzing, setAnalyzing] = useState(false); // Analiz yapılıyor mu?
   const [analysisComplete, setAnalysisComplete] = useState(false); // Analiz tamamlandı mı?
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
 
   // Level Up State
   const [levelUpInfo, setLevelUpInfo] = useState<{
@@ -35,20 +33,6 @@ export default function InterviewPage() {
   }>({ isOpen: false, newLevel: 0, levelName: "" });
   
   const { executeRecaptcha } = useGoogleReCaptcha();
-
-  // Oturum yükleniyorsa bekleme ekranı göster
-  if (status === "loading") {
-    return (
-      <div className="flex h-full items-center justify-center text-indigo-500">
-        {/* Yükleniyor spinner'ı eklenebilir */}
-      </div>
-    );
-  }
-
-  // Oturum yoksa ana sayfaya yönlendir
-  if (!session || !session.user) {
-    redirect("/");
-  }
 
   // Mülakatı Başlatma Fonksiyonu
   // İlk mesajı AI'dan almak için tetiklenir ("start: true")
@@ -190,6 +174,20 @@ export default function InterviewPage() {
     }
   }, [message, position, history, interviewId, executeRecaptcha]);
 
+  // Oturum yükleniyorsa bekleme ekranı göster
+  if (status === "loading") {
+    return (
+      <div className="flex h-full items-center justify-center text-indigo-500">
+        {/* Yükleniyor spinner'ı eklenebilir */}
+      </div>
+    );
+  }
+
+  // Oturum yoksa ana sayfaya yönlendir
+  if (!session || !session.user) {
+    redirect("/");
+  }
+
   const resetChat = () => {
     setHistory([]);
     setError(null);
@@ -236,7 +234,7 @@ export default function InterviewPage() {
       // Başarılı - mülakat detay sayfasına yönlendir
       setAnalysisComplete(true);
       setTimeout(() => {
-        window.location.href = `/me/interviews/${interviewId}`;
+        router.push(`/me/interviews/${interviewId}`);
       }, 1500);
     } catch (e: unknown) {
       const msg =
