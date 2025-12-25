@@ -4,7 +4,7 @@ import { z } from "zod";
 import { generateGeminiContent } from "@/app/utils/gemini";
 import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
-import { AnalysisData } from "@/types";
+import { AnalysisData, AnalysisDetails } from "@/types";
 import { addXP, XP_VALUES } from "@/app/utils/xp";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyRecaptcha } from "@/lib/recaptcha";
@@ -87,29 +87,75 @@ export async function POST(request: NextRequest) {
       new TextEncoder().encode(rawText)
     ).then(hash => Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join(''));
 
-    /*
     // Veritabanında aynı hash'e sahip analiz var mı?
     // Analysis model adı şemada CVAnalysis olarak geçiyor
     const existingAnalysis = await prisma.cVAnalysis.findFirst({
       where: {
         contentHash: contentHash,
-        // Sadece bu kullanıcının eski analizlerine bak
-        cv: {
-          userId: dbUser.id
-        }
+        // Sadece geçerli, tamamlanmış analizleri kabul et
+        score: { gt: 0 },
+        summary: { not: "" }
       },
       orderBy: { createdAt: "desc" }, // En son analizi getir
     });
 
     // CACHE HIT KONTROLÜ: AKTİF
-    // Sadece geçerli bir skora ve özete sahip analizleri döndür (Tutarlılık için)
-    if (existingAnalysis && (existingAnalysis.score ?? 0) > 0 && existingAnalysis.summary) {
+    if (existingAnalysis) {
       console.log(`CACHE HIT: Mevcut analiz döndürülüyor (Score: ${existingAnalysis.score})`);
-      return NextResponse.json(existingAnalysis);
-    } else if (existingAnalysis) {
-      console.log("CACHE MISS (BAD DATA): Mevcut analiz hatalı veya eksik, yeniden analiz ediliyor...");
+      
+      // Tüm detayları eksiksiz döndür
+      const cachedData: AnalysisData = {
+        summary: existingAnalysis.summary,
+        keywords: existingAnalysis.keywords,
+        suggestion: existingAnalysis.suggestion,
+        score: existingAnalysis.score || 0,
+        details: {
+          impact: existingAnalysis.impact || 0,
+          brevity: existingAnalysis.brevity || 0,
+          ats: existingAnalysis.ats || 0,
+          style: existingAnalysis.style || 0,
+        }
+      };
+
+      // Bu analiz yeni bir CV kaydı olarak da eklensin mi?
+      // Kullanıcı "yeni" bir analiz yaptığını sanıyor, bu yüzden
+      // bu sonuçlarla yeni bir CVAnalysis kaydı oluşturup oluşturmamaya karar verelim.
+      // EĞER "aynı analizi tekrar görmek" istiyorsa, sadece sonucu dönmek yeterli.
+      // ANCAK history listesinde görünmesi için yeni bir kayıt oluşturmak daha tutarlı olabilir.
+      // MALİYET DÜŞÜRMEK İÇİN: Var olan analizi kopyalayıp yeni kayıt açalım.
+      
+      await prisma.cVAnalysis.create({
+        data: {
+          cvId,
+          title: title ?? existingAnalysis.title, // Yeni başlık veya eskisi
+          summary: existingAnalysis.summary,
+          keywords: existingAnalysis.keywords,
+          suggestion: existingAnalysis.suggestion,
+          score: existingAnalysis.score,
+          impact: existingAnalysis.impact,
+          brevity: existingAnalysis.brevity,
+          ats: existingAnalysis.ats,
+          style: existingAnalysis.style,
+          contentHash, 
+        },
+      });
+
+      return NextResponse.json(
+        {
+          success: true,
+          title: title ?? existingAnalysis.title,
+          analysis: cachedData,
+          cvId,
+          levelUp: false, // Cache'den gelince level atlatmayalım (spam önleme)
+          newLevel: 0,
+          levelName: "",
+          isCached: true 
+        },
+        { status: 200 }
+      );
+    } else {
+      console.log("CACHE MISS: Yeni analiz yapılıyor...");
     }
-    */
 
     // 3. Yapay Zeka (Gemini) için prompt hazırlığı
     const systemInstruction = `
@@ -179,14 +225,13 @@ export async function POST(request: NextRequest) {
     const suggestion = parsedData.suggestion || "";
     const score = parsedData.score || 0;
     
-    // Details objesini güvenli bir şekilde oluştur
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rawDetails = (parsedData.details || {}) as any;
+    // Details objesini güvenli bir şekilde oluştur 
+    const rawDetails = (parsedData.details || {}) as AnalysisDetails;
     const details = {
-      impact: rawDetails.impact || 0,
-      brevity: rawDetails.brevity || 0,
-      ats: rawDetails.ats || 0,
-      style: rawDetails.style || 0,
+      impact: rawDetails.impact ?? 0,
+      brevity: rawDetails.brevity ?? 0,
+      ats: rawDetails.ats ?? 0,
+      style: rawDetails.style ?? 0,
     };
 
     // 6. Sonuçları Veritabanına Kaydet
