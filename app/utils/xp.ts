@@ -87,9 +87,6 @@ export async function addXP(userId: string, amount: number): Promise<{
   const newLevel = levelInfo.level;
   const newLevelName = getLevelName(newLevel);
 
-  let finalLevel = newLevel;
-  let finalLevelName = newLevelName;
-
   // 4. Eğer seviye değişmişse veritabanını tekrar güncelle (Seviye ve İsim için)
   if (newLevel !== oldLevel) {
     await prisma.user.update({
@@ -103,9 +100,9 @@ export async function addXP(userId: string, amount: number): Promise<{
 
   return {
     oldLevel,
-    newLevel: finalLevel,
-    leveledUp: finalLevel > oldLevel,
+    newLevel,
+    leveledUp: newLevel > oldLevel,
     newXP: currentTotalXP,
-    newLevelName: finalLevelName,
+    newLevelName,
   };
 }

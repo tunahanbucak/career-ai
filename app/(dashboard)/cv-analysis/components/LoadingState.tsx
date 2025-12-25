@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 import { Loader2, FileText, Brain, CheckCircle2 } from "lucide-react";
 import { useState, useEffect } from "react";
 
+const steps = [
+  { icon: FileText, label: "CV Okunuyor", color: "text-blue-400" },
+  { icon: Brain, label: "AI Analiz Yapıyor", color: "text-purple-400" },
+  { icon: CheckCircle2, label: "Sonuçlar Hazırlanıyor", color: "text-emerald-400" },
+];
+
 export default function LoadingState() {
   const [step, setStep] = useState(0);
-  
-  const steps = [
-    { icon: FileText, label: "CV Okunuyor", color: "text-blue-400" },
-    { icon: Brain, label: "AI Analiz Yapıyor", color: "text-purple-400" },
-    { icon: CheckCircle2, label: "Sonuçlar Hazırlanıyor", color: "text-emerald-400" },
-  ];
 
   useEffect(() => {
     const interval = setInterval(() => {

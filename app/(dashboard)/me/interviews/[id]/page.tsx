@@ -3,7 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ChevronLeft, User, Bot, Calendar, Award, CheckCircle, Target, Sparkles, MessageSquare, Download, GraduationCap, Users } from "lucide-react";
+import { ChevronLeft, User, Bot, Calendar, Award, CheckCircle, Target, Sparkles, MessageSquare, GraduationCap, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PrintButton } from "./components/PrintButton";

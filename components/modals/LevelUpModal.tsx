@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { motion, AnimatePresence } from "framer-motion";
-import { Award, Star, X, TrendingUp } from "lucide-react";
+import { Award, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LevelUpModalProps {

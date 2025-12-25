@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 const MODELS = [
   "gemini-2.5-flash",
   "gemini-2.5-flash-lite",
-  "gemini-3.0-flash",
+  "gemini-3-flash",
 ];
 
 /**
@@ -76,7 +76,7 @@ export async function* streamGeminiContent(
         }
       }
       return; // Başarılı olursa döngüden çık
-    } catch (error) {
+    } catch {
       console.warn(`Gemini Streaming Fallback - ${modelName} failed.`);
       // Sıradaki modele geç
     }
@@ -85,14 +85,27 @@ export async function* streamGeminiContent(
 
 /**
  * Yanıt objesinden metni çıkarmak için güvenli yardımcı fonksiyon.
+ * External API response'larını handle ettiği için unknown type kullanılır.
  */
-export function extractTextFromResponse(input: any): string | undefined {
-  if (!input) return undefined;
+export function extractTextFromResponse(input: unknown): string | undefined {
+  if (!input || typeof input !== 'object') return undefined;
+  
   try {
-    if (typeof input.text === "function") return input.text();
-    if (typeof input.response?.text === "function") return input.response.text();
-    return input.text || input.response?.text;
-  } catch (e) {
+    // Type guard ile input'u object olarak kontrol ettik
+    const obj = input as { text?: unknown; response?: { text?: unknown } };
+    
+    // text bir fonksiyon mu kontrol et
+    if (typeof obj.text === "function") return obj.text();
+    
+    // response.text bir fonksiyon mu kontrol et
+    if (typeof obj.response?.text === "function") return obj.response.text();
+    
+    // text veya response.text string mi kontrol et
+    if (typeof obj.text === "string") return obj.text;
+    if (typeof obj.response?.text === "string") return obj.response.text;
+    
+    return undefined;
+  } catch {
     return undefined;
   }
 }

@@ -29,7 +29,7 @@ export default function ProfileTab({ user }: ProfileTabProps) {
       } else {
         toast.error(result.error || "Profil güncellenirken bir hata oluştu");
       }
-    } catch (_error) {
+    } catch {
       toast.error("Bir hata oluştu");
     } finally {
       setIsLoading(false);

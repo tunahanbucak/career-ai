@@ -50,6 +50,9 @@ export default async function AdminUserHistoryPage({
         >
           <ChevronLeft size={16} /> Admin Paneline Dön
         </Link>
+        <p className="text-sm text-slate-400">
+          Bu kullanıcının tüm verileri (CV&apos;ler, analizler, mülakatlar) kalıcı olarak silinecektir.
+        </p>
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-indigo-600 flex items-center justify-center text-white">
             <User size={32} />
@@ -90,7 +93,7 @@ export default async function AdminUserHistoryPage({
         {/* CV History */}
         <div className="md:col-span-2 space-y-6">
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <FileText className="text-emerald-400" /> Yüklenen CV'ler
+            <FileText className="text-emerald-400" /> Yüklenen CV&apos;ler
           </h2>
           <div className="grid gap-4">
             {user.cvs.length === 0 ? (

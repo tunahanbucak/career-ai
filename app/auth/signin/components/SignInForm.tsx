@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { signIn } from "next-auth/react";
-import { Mail, ArrowRight, CheckCircle2, ShieldAlert } from "lucide-react";
+import { Mail, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
