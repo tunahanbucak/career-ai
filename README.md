@@ -97,7 +97,7 @@ Modern teknolojiler ve yapay zeka ile güçlendirilmiş, kullanıcıların kariy
 ### Adım 1: Projeyi Klonlayın
 
 ```bash
-git clone https://github.com/kullaniciadi/career-ai.git
+git clone https://github.com/tunahanbucak/career-ai.git
 cd career-ai
 ```
 
