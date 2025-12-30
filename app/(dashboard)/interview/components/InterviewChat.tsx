@@ -151,20 +151,26 @@ export default function InterviewChat({
           </AnimatePresence>
         )}
         {loading &&
-          history.length > 0 &&
-          history[history.length - 1]?.content === "" && (
+          (history.length === 0 ||
+            history[history.length - 1].role === "user" ||
+            (history[history.length - 1].role === "assistant" &&
+              history[history.length - 1].content === "")) && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex gap-5 justify-start"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="flex gap-5 justify-start items-end"
             >
-              <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg">
+              <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg mb-1">
                 <Bot size={20} className="text-indigo-400" />
               </div>
-              <div className="bg-slate-900/50 border border-slate-800 rounded-3xl rounded-tl-sm px-6 py-4 flex items-center gap-1.5 h-[58px]">
-                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" />
+              <div className="bg-slate-900/50 border border-slate-800 rounded-3xl rounded-tl-sm px-5 py-4 flex items-center gap-1.5 h-[54px]">
+                <span className="text-xs font-semibold text-indigo-400 mr-2 animate-pulse">
+                  Yazıyor
+                </span>
+                <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce" />
               </div>
             </motion.div>
           )}

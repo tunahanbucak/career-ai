@@ -47,6 +47,17 @@ export default function InterviewHeader({
               onChange={(e) => setPosition(e.target.value)}
               disabled={canReset}
             >
+              {[
+                "Frontend Developer",
+                "Backend Developer",
+                "Fullstack Developer",
+                "Mobile Developer",
+                "DevOps Engineer",
+                "Data Scientist",
+                "UI/UX Designer",
+              ].includes(position) ? null : (
+                <option value={position}>{position} (CV&apos;den)</option>
+              )}
               <option>Frontend Developer</option>
               <option>Backend Developer</option>
               <option>Fullstack Developer</option>
