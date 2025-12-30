@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { calculateLevel } from "@/app/utils/xp";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,8 @@ export default async function AccountPage() {
 
   const profileCompletion =
     [user.name, user.title, user.phone, user.about].filter(Boolean).length * 25;
+
+  const xpInfo = calculateLevel(user.xp);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
@@ -165,38 +168,80 @@ export default async function AccountPage() {
               </div>
             )}
           </div>
-          <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl shadow-xl">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2.5 bg-purple-500/10 rounded-xl">
-                <TrendingUp className="w-5 h-5 text-purple-400" />
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-8 backdrop-blur-xl shadow-xl overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            <div className="flex items-center gap-3 mb-6 relative z-10">
+              <div className="p-2.5 bg-amber-500/10 rounded-xl">
+                <TrendingUp className="w-5 h-5 text-amber-400" />
               </div>
-              <h3 className="text-xl font-bold text-white">Hesap Detayları</h3>
+              <h3 className="text-xl font-bold text-white">Gelişim Seviyesi</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Kullanıcı ID
+            <div className="space-y-6 relative z-10">
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className="text-sm font-bold text-amber-500 uppercase tracking-widest mb-1">
+                    MEVCUT SEVİYE
+                  </div>
+                  <div className="text-5xl font-black text-white flex items-baseline gap-2">
+                    {xpInfo.level}
+                    <span className="text-lg font-medium text-slate-500">
+                      / {xpInfo.level + 1}
+                    </span>
+                  </div>
+                  <div className="text-slate-400 font-medium mt-1">
+                    {user.levelName}
+                  </div>
                 </div>
-                <div className="font-mono text-sm text-slate-300 bg-slate-950/50 p-3 rounded-xl border border-slate-800 truncate">
-                  {user.id}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Seviye
-                </div>
-                <div className="flex items-center gap-3 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 p-3 rounded-xl">
-                  <Award className="w-5 h-5 text-amber-400" />
-                  <div>
-                    <div className="text-sm font-bold text-amber-400">
-                      Level {user.level} - {user.levelName}
-                    </div>
-                    <div className="text-xs text-slate-500">
-                      {user.xp} XP
-                    </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-slate-200">
+                    {xpInfo.xpInCurrentLevel}{" "}
+                    <span className="text-sm text-slate-500 font-normal">
+                      XP
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-500 mt-1">
+                    Sonraki seviyeye{" "}
+                    {xpInfo.xpForNextLevel - xpInfo.xpInCurrentLevel} XP kaldı
                   </div>
                 </div>
               </div>
+              <div className="h-4 w-full bg-slate-950 rounded-full overflow-hidden border border-slate-800 relative">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-all duration-1000 relative overflow-hidden"
+                  style={{ width: `${xpInfo.progress}%` }}
+                >
+                  <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-800/50">
+                <div className="space-y-1">
+                  <div className="text-xs text-slate-500 font-semibold uppercase">
+                    Toplam XP
+                  </div>
+                  <div className="text-lg font-mono text-slate-300">
+                    {user.xp}
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-xs text-slate-500 font-semibold uppercase">
+                    Sıradaki Ödül
+                  </div>
+                  <div className="text-sm font-medium text-amber-400">
+                    Yeni Mülakat Rozeti 🎖️
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gradient-to-br from-slate-900/90 to-slate-950/90 border border-slate-800 rounded-2xl p-6 backdrop-blur-xl shadow-xl flex items-center justify-between">
+            <div className="space-y-1">
+              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Kullanıcı ID
+              </div>
+              <div className="font-mono text-sm text-slate-400">{user.id}</div>
+            </div>
+            <div className="h-8 w-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-500">
+              <Shield size={14} />
             </div>
           </div>
         </div>
