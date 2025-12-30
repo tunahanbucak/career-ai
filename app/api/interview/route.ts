@@ -33,10 +33,31 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Yetkisiz." }, { status: 401 });
     }
 
+    // 1.5. Kullanıcı ve Onay Kontrolü
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Kullanıcı bulunamadı." },
+        { status: 404 }
+      );
+    }
+    if (!user.approved) {
+      return NextResponse.json(
+        {
+          error:
+            "Hesabınız henüz yönetici tarafından onaylanmadı. Mülakat yapabilmek için admin onayı beklemeniz gerekmektedir.",
+        },
+        { status: 403 }
+      );
+    }
+
     // 2. İstek Verilerini Okuma
     const { position, history, message, start, interviewId, recaptchaToken } =
       (await req.json()) as InterviewRequestBody;
-      
+
     // 2.5 reCAPTCHA Doğrulaması
     if (recaptchaToken) {
       const isValid = await verifyRecaptcha(recaptchaToken);
@@ -62,12 +83,61 @@ export async function POST(req: NextRequest) {
         ? position.trim()
         : "Genel Yazılım Geliştirici";
 
-    // 3. AI Sistem Talimatı (Prompt) Hazırlama
+    // 3. Kullanıcının En Son Analiz Edilen CV'sini Çek
+    const latestAnalysis = await prisma.cVAnalysis.findFirst({
+      where: {
+        cv: {
+          userId: user.id,
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        summary: true,
+        keywords: true,
+        cv: {
+          select: {
+            rawText: true,
+            title: true,
+          },
+        },
+      },
+    });
+
+    // 4. AI Sistem Talimatı (Prompt) Hazırlama
+    let cvContext = "";
+    if (latestAnalysis) {
+      cvContext = `
+      ADAYIN PROFİLİ (CV'den Çekildi):
+      - Özet: ${latestAnalysis.summary}
+      - Yetkinlikler: ${latestAnalysis.keywords.join(", ")}
+      - CV Başlığı: ${latestAnalysis.cv.title}
+      
+      YÖNERGE:
+      Sorularını SADECE "${role}" pozisyonu için değil, AYNI ZAMANDA adayın bu geçmiş deneyimlerine ve projelerine göre özelleştir.
+      Örneğin: Eğer CV'sinde "E-ticaret projesi" varsa, e-ticaret ile ilgili teknik sorular sor.
+      Eğer "React" biliyorsa, React ile ilgili derinlemesine sorular sor.
+      Genel geçer sorular yerine, adayın CV'sindeki detaylara odaklan.
+      `;
+    }
+
+    if (cvContext) {
+      console.log(
+        "🔍 ENJEKTE EDİLEN BAĞLAM:\n",
+        cvContext.trim().substring(0, 200) + "...\n(Devamı var)"
+      );
+    } else {
+      console.log("ℹ️ Standart rol bazlı mülakat yapılıyor.");
+    }
+
     const systemPrompt = `
       Sen profesyonel, nazik bir teknik mülakat simülatörüsün. 
       Rolün: ${role}.
       
-      TALİMATLAR:
+      ${cvContext}
+      
+      GENEL TALİMATLAR:
       - HER SEFERINDE TEK BİR SORU SOR (çok önemli!)
       - Sorular KISA ve NET olsun (maksimum 2-3 cümle)
       - Adayın yanıtına göre takip sorusu sor
@@ -80,7 +150,7 @@ export async function POST(req: NextRequest) {
       "Açıklamanız için teşekkürler. Verdiğiniz detaylar üzerine bazı derinleştirici sorularım olacak: 1. Modül Bağımlılıkları... 2. Domain Katmanında... 3. ViewModel..."
       
       İYİ ÖRNEK (KULLAN):
-      "Anladım. Peki bu modül bağımlılıklarını pratikte nasıl kontrol ediyorsunuz?"
+      "Anladım, React projenizden bahsetmişsiniz. Peki bu projede state yönetimi için hangi kütüphaneyi tercih ettiniz ve neden?"
     `;
 
     // 4. Geçmişi Metne Çevirme (Context Window için)
@@ -97,25 +167,6 @@ export async function POST(req: NextRequest) {
     const fullPrompt = isStart
       ? `${systemPrompt}\n\nGeçmiş:\n${historyText}\n\nLütfen ${role} pozisyonu için ilk teknik mülakat sorunu sor. Kısa ve net olsun.\n\nMülakatçı:`
       : `${systemPrompt}\n\nGeçmiş:\n${historyText}\n\nAday: ${message}\n\nMülakatçı:`;
-
-    // 7. Kullanıcı ve Onay Kontrolü
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    });
-
-    if (!user)
-      return NextResponse.json(
-        { error: "Kullanıcı bulunamadı." },
-        { status: 404 }
-      );
-    if (!user.approved)
-      return NextResponse.json(
-        {
-          error:
-            "Hesabınız henüz yönetici tarafından onaylanmadı. Mülakat yapabilmek için admin onayı beklemeniz gerekmektedir.",
-        },
-        { status: 403 }
-      );
 
     let createdInterviewId = interviewId;
 

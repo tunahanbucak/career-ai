@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 import ScoreGauge from "./ScoreGauge";
 import { AnalysisResult } from "@/types";
 
@@ -28,7 +29,9 @@ export default function AnalysisResultView({
 }: AnalysisResultViewProps) {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Bağlantı kopyalandı!");
+    toast.success("Bağlantı kopyalandı!", {
+      description: "Analiz raporunu artık paylaşabilirsin.",
+    });
   };
 
   const handleDownload = () => {
@@ -43,6 +46,9 @@ export default function AnalysisResultView({
     a.href = url;
     a.download = "cv-analiz-raporu.txt";
     a.click();
+    toast.success("Rapor indirildi", {
+      description: "Analiz detayları metin dosyası olarak cihazına kaydedildi.",
+    });
   };
 
   return (
@@ -52,10 +58,31 @@ export default function AnalysisResultView({
       transition={{ duration: 0.5 }}
       className="h-full flex flex-col"
     >
-      <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex-1 flex flex-col">
+      <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex-1 flex flex-col relative">
         <div className="relative p-8 pb-12 bg-gradient-to-br from-indigo-900 via-slate-900 to-slate-900 overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-8">
+          <div className="absolute top-6 right-6 flex gap-2 z-20">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-10 w-10 transition-colors"
+              onClick={handleShare}
+              title="Paylaş"
+            >
+              <Share2 size={20} />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-slate-400 hover:text-white hover:bg-white/10 rounded-full h-10 w-10 transition-colors"
+              onClick={handleDownload}
+              title="Raporu İndir"
+            >
+              <Download size={20} />
+            </Button>
+          </div>
+
+          <div className="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-8 mt-2">
             <div className="text-center sm:text-left space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold uppercase border border-indigo-500/20 backdrop-blur-sm">
                 <Award className="h-3 w-3" />
@@ -191,35 +218,94 @@ export default function AnalysisResultView({
                     </div>
                   ))}
                 </div>
-                <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
-                      <AlertTriangle size={16} className="text-amber-500" />
+                {(() => {
+                  const details = analysis.analysis?.details || {
+                    impact: 0,
+                    brevity: 0,
+                    ats: 0,
+                    style: 0,
+                  };
+                  const metrics = [
+                    {
+                      key: "impact",
+                      val: details.impact,
+                      label: "Etki Odaklılık",
+                      msg: "Başarılarını somutlaştırmak için daha fazla rakam (%, ₺) kullan.",
+                    },
+                    {
+                      key: "brevity",
+                      val: details.brevity,
+                      label: "Kısalık / Öz",
+                      msg: "Cümlelerini daha kısa, net ve vurucu hale getir.",
+                    },
+                    {
+                      key: "ats",
+                      val: details.ats,
+                      label: "ATS Uyumu",
+                      msg: "İlanlardaki anahtar kelimelere CV'nde daha çok yer ver.",
+                    },
+                    {
+                      key: "style",
+                      val: details.style,
+                      label: "Dil ve Stil",
+                      msg: "Daha profesyonel ve kurumsal bir dil kullanmalısın.",
+                    },
+                  ];
+                  const weakest = metrics.reduce((prev, curr) =>
+                    curr.val < prev.val ? curr : prev
+                  );
+                  const score = analysis.analysis?.score || 0;
+                  let formatStatus = {
+                    title: "Format: Standart",
+                    msg: "Genel düzenin kabul edilebilir seviyede.",
+                  };
+                  if (score >= 85)
+                    formatStatus = {
+                      title: "Format: Mükemmel",
+                      msg: "Tasarım ve okunabilirlik harika, aynen devam.",
+                    };
+                  else if (score >= 70)
+                    formatStatus = {
+                      title: "Format: Modern",
+                      msg: "Bölüm başlıkların net, akış gayet anlaşılır.",
+                    };
+                  else if (score < 50)
+                    formatStatus = {
+                      title: "Format: Karışık",
+                      msg: "Daha sade ve okunabilir bir şablon denemelisin.",
+                    };
+
+                  return (
+                    <div className="p-4 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-amber-500/10 flex items-center justify-center">
+                          <AlertTriangle size={16} className="text-amber-500" />
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-bold text-slate-200">
+                            Gelişim Alanı: {weakest.label}
+                          </h5>
+                          <p className="text-xs text-slate-500">
+                            {weakest.msg}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-indigo-500/10 flex items-center justify-center">
+                          <Layers size={16} className="text-indigo-500" />
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-bold text-slate-200">
+                            {formatStatus.title}
+                          </h5>
+                          <p className="text-xs text-slate-500">
+                            {formatStatus.msg}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h5 className="text-sm font-bold text-slate-200">
-                        Gelişim Alanı: Sayısal Veriler
-                      </h5>
-                      <p className="text-xs text-slate-500">
-                        Başarılarını somutlaştırmak için daha fazla rakam
-                        kullan.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                      <Layers size={16} className="text-indigo-500" />
-                    </div>
-                    <div>
-                      <h5 className="text-sm font-bold text-slate-200">
-                        Format: Modern Düzen
-                      </h5>
-                      <p className="text-xs text-slate-500">
-                        Bölüm başlıkların net ve okunabilir.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })()}
               </TabsContent>
               <TabsContent
                 value="action"
@@ -242,7 +328,12 @@ export default function AnalysisResultView({
                     className="w-full justify-between h-auto py-4 px-4 border-slate-700 bg-slate-800/30 hover:bg-slate-800 text-left group"
                     asChild
                   >
-                    <Link href="/interview">
+                    <Link
+                      href={`/interview?position=${encodeURIComponent(
+                        analysis.analysis?.keywords?.[0] ||
+                          "Yazılım Geliştirici"
+                      )}&autoStart=true`}
+                    >
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
                           <Zap size={16} className="text-emerald-500" />
@@ -266,32 +357,6 @@ export default function AnalysisResultView({
               </TabsContent>
             </div>
           </Tabs>
-        </div>
-        <div className="p-4 bg-slate-950 border-t border-slate-800 flex gap-3">
-          <Button
-            className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-500/25"
-            asChild
-          >
-            <Link href="/interview">
-              <Zap className="mr-2 h-4 w-4" /> Simülasyonu Başlat
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="aspect-square p-0 border-slate-700 hover:bg-slate-800 text-slate-400"
-            onClick={handleShare}
-            title="Paylaş"
-          >
-            <Share2 size={18} />
-          </Button>
-          <Button
-            variant="outline"
-            className="aspect-square p-0 border-slate-700 hover:bg-slate-800 text-slate-400"
-            onClick={handleDownload}
-            title="Raporu İndir"
-          >
-            <Download size={18} />
-          </Button>
         </div>
       </div>
     </motion.div>
