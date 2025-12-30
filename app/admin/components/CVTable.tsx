@@ -44,6 +44,16 @@ export default function CVTable({ data }: CVTableProps) {
                 {cv.user?.email?.split("@")[0]}
               </span>
             </td>
+            <td className="px-6 py-3.5">
+              <span className="text-xs text-slate-400">
+                {new Date(cv.uploadDate).toLocaleDateString("tr-TR", {
+                  day: "numeric",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </td>
             <td className="px-6 py-3.5 text-right">
               <Dialog>
                 <DialogTrigger asChild>
