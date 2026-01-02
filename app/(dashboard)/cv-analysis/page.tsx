@@ -132,8 +132,9 @@ export default function CvUploadPage() {
   }, [file, executeRecaptcha]);
 
   return (
-    <div className="flex flex-col xl:flex-row gap-8 min-h-[calc(100vh-100px)]">
-      <div className="w-full xl:w-1/2 space-y-8 ">
+    <div className="max-w-[1400px] mx-auto">
+      <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 min-h-[calc(100vh-100px)]">
+        <div className="w-full xl:w-1/2 space-y-6 lg:space-y-8">
         <div>
           <h2 className="text-3xl font-bold text-white mb-2">CV Analizi</h2>
           <p className="text-slate-400">
@@ -169,6 +170,7 @@ export default function CvUploadPage() {
         newLevel={levelUpInfo.newLevel}
         levelName={levelUpInfo.levelName}
       />
+      </div>
     </div>
   );
 }

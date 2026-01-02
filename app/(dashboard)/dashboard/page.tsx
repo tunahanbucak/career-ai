@@ -59,7 +59,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen w-full font-sans selection:bg-primary/30 overflow-hidden pb-20">
-      <main className="relative z-10 h-full w-full max-w-[1920px] mx-auto p-6 lg:p-10">
+      <main className="relative z-10 h-full w-full max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 xl:p-10">
         <DashboardHeader userName={dbUser.name} />
         {isNewUser && (
           <div className="mb-6">

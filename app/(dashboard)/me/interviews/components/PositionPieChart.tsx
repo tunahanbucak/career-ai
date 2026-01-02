@@ -35,14 +35,22 @@ export default function PositionPieChart({ data }: PositionPieChartProps) {
             <PieChart>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "#020617",
+                  backgroundColor: "#0f172a",
                   borderRadius: 12,
-                  border: "1px solid #1f2937",
-                  padding: "8px 10px",
+                  border: "1px solid #334155",
+                  padding: "12px 16px",
                 }}
-                formatter={(value, _name, entry) => [
-                  value,
-                  (entry.payload as { name: string })?.name ?? "",
+                labelStyle={{
+                  color: "#f1f5f9",
+                  fontWeight: "600",
+                  marginBottom: "4px",
+                }}
+                itemStyle={{
+                  color: "#e2e8f0",
+                }}
+                formatter={(value: number, name: string) => [
+                  `${value} mülakat`,
+                  name,
                 ]}
               />
               <Pie

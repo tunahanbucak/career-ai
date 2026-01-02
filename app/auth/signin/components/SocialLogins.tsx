@@ -1,8 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Github, Users } from "lucide-react";
-import { motion } from "framer-motion";
+import { Github } from "lucide-react";
 
 const GoogleIcon = () => (
   <svg
@@ -40,17 +39,6 @@ export default function SocialLogins() {
         <p className="text-slate-400">
           Kariyer yolculuğuna devam etmek için giriş yap.
         </p>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20"
-        >
-          <Users className="w-4 h-4 text-indigo-400" />
-          <span className="text-sm text-indigo-300 font-medium">
-            2,000+ profesyonel kullanıyor
-          </span>
-        </motion.div>
       </div>
       <div className="space-y-4 mb-8">
         <button

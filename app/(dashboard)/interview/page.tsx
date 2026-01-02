@@ -287,7 +287,8 @@ export default function InterviewPage() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] gap-4 relative">
+    <div className="max-w-[1400px] mx-auto">
+      <div className="flex flex-col h-[calc(100vh-100px)] gap-3 sm:gap-4 relative">
       {isAutoStarting && (
         <div className="absolute inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center text-center rounded-3xl animate-in fade-in duration-500">
           <div className="w-20 h-20 mb-6 relative">
@@ -345,6 +346,7 @@ export default function InterviewPage() {
         newLevel={levelUpInfo.newLevel}
         levelName={levelUpInfo.levelName}
       />
+      </div>
     </div>
   );
 }

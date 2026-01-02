@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Hesabınız henüz yönetici tarafından onaylanmadı. CV yükleyebilmek için admin onayı beklemen iz gerekmektedir.",
+            "Hesabınız henüz yönetici tarafından onaylanmadı. CV yükleyebilmek için admin onayı beklemeniz gerekmektedir.",
         },
         { status: 403 }
       );

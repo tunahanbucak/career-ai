@@ -91,7 +91,7 @@ function StatCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border backdrop-blur-md p-5 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg",
+        "group relative overflow-hidden rounded-xl border backdrop-blur-md p-5 transition-all duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer",
         border,
         bg,
         glow
