@@ -1,4 +1,5 @@
 import { AdminInterview } from "@/types";
+import { DeleteInterviewButton } from "./AdminActions";
 
 interface InterviewTableProps {
   data: AdminInterview[];
@@ -14,6 +15,7 @@ export default function InterviewTable({ data }: InterviewTableProps) {
           <th className="px-6 py-3 font-semibold text-center">Etkileşim</th>
           <th className="px-6 py-3 font-semibold text-center">Durum</th>
           <th className="px-6 py-3 font-semibold text-right">Tarih</th>
+          <th className="px-6 py-3 font-semibold text-right w-10"></th>
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-800/50">
@@ -50,6 +52,9 @@ export default function InterviewTable({ data }: InterviewTableProps) {
             </td>
             <td className="px-6 py-3.5 text-right text-xs text-slate-500 tabular-nums font-mono">
               {new Date(i.date).toLocaleString("tr-TR")}
+            </td>
+            <td className="px-6 py-3.5 text-right w-10">
+              <DeleteInterviewButton id={i.id} />
             </td>
           </tr>
         ))}

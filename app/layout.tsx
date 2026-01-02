@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "sonner";
 import { Providers } from "@/components/providers/Providers";
+import { ToasterProvider } from "@/components/providers/ToasterProvider";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -46,8 +46,7 @@ export default function RootLayout({
         {/* Global State ve Session yönetimini sağlayan kapsayıcılar */}
         <Providers>
           {children}
-          {/* Bildirim (Toast) bileşeni - Tüm uygulamada kullanılabilir */}
-          <Toaster position="top-center" theme="dark" richColors />
+          <ToasterProvider />
         </Providers>
       </body>
     </html>

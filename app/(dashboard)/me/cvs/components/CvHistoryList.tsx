@@ -2,8 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FileText, Calendar, Search, ArrowUpRight, Clock } from "lucide-react";
+import { FileText, Calendar, Search, ArrowUpRight, Clock, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface AnalysisData {
   summary: string;
@@ -29,10 +40,43 @@ const item = {
 
 export default function CvHistoryList({ cvs }: CvHistoryListProps) {
   const [term, setTerm] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [cvToDelete, setCvToDelete] = useState<string | null>(null);
 
   const filtered = cvs.filter((c) =>
     (c.title?.toLowerCase() || "").includes(term.toLowerCase())
   );
+
+  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCvToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!cvToDelete) return;
+
+    setDeletingId(cvToDelete);
+    setDeleteDialogOpen(false);
+    
+    try {
+      const { deleteCV } = await import("@/app/actions/delete");
+      const result = await deleteCV(cvToDelete);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("CV başarıyla silindi.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Bir hata oluştu.");
+    } finally {
+      setDeletingId(null);
+      setCvToDelete(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -69,6 +113,7 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                 key={cv.id}
                 variants={item}
                 exit={{ opacity: 0, scale: 0.95 }}
+                className={deletingId === cv.id ? "opacity-50 pointer-events-none" : ""}
               >
                 <Link href={`/me/cvs/${cv.id}`} className="group block h-full">
                   <div className="relative h-full bg-slate-900/40 backdrop-blur-md rounded-3xl border border-slate-800/60 p-6 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-900/80 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col justify-between overflow-hidden">
@@ -93,8 +138,21 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                           </div>
                         </div>
                       </div>
-                      <div className="h-8 w-8 rounded-full flex items-center justify-center text-slate-600 group-hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100">
-                        <ArrowUpRight className="h-5 w-5" />
+                      <div className="flex items-center gap-2">
+                         <button
+                            onClick={(e) => handleDeleteClick(e, cv.id)}
+                            className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-rose-500/20 hover:text-rose-400 transition-all z-20"
+                            title="Sil"
+                          >
+                            {deletingId === cv.id ? (
+                                <div className="h-4 w-4 border-2 border-rose-400 border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                                <Trash2 className="h-4 w-4" />
+                            )}
+                          </button>
+                          <div className="h-8 w-8 rounded-full flex items-center justify-center text-slate-600 group-hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100">
+                            <ArrowUpRight className="h-5 w-5" />
+                          </div>
                       </div>
                     </div>
                     {cv.analysis && (
@@ -138,6 +196,26 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
           </AnimatePresence>
         </div>
       )}
+      
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>CV'yi Sil</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bu CV analizini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-rose-600 hover:bg-rose-700"
+            >
+              Sil
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

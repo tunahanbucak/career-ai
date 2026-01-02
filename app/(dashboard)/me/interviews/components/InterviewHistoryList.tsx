@@ -2,9 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MessageSquare, Search, ArrowRight, Clock } from "lucide-react";
+import { MessageSquare, Search, ArrowRight, Clock, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const container = {
   hidden: { opacity: 0 },
@@ -38,12 +49,43 @@ export default function InterviewHistoryList({
   interviews,
 }: InterviewHistoryListProps) {
   const [term, setTerm] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [interviewToDelete, setInterviewToDelete] = useState<string | null>(null);
 
   const filtered = interviews.filter((item) =>
     (item.position.toLowerCase() || "").includes(term.toLowerCase())
   );
 
+  const handleDeleteClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setInterviewToDelete(id);
+    setDeleteDialogOpen(true);
+  };
 
+  const confirmDelete = async () => {
+    if (!interviewToDelete) return;
+
+    setDeletingId(interviewToDelete);
+    setDeleteDialogOpen(false);
+    
+    try {
+      const { deleteInterview } = await import("@/app/actions/delete");
+      const result = await deleteInterview(interviewToDelete);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Mülakat başarıyla silindi.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Bir hata oluştu.");
+    } finally {
+      setDeletingId(null);
+      setInterviewToDelete(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -82,7 +124,12 @@ export default function InterviewHistoryList({
           <AnimatePresence mode="popLayout">
             {filtered.map((it) => {
               return (
-                <motion.div key={it.id} variants={item} layout>
+                <motion.div 
+                    key={it.id} 
+                    variants={item} 
+                    layout
+                    className={deletingId === it.id ? "opacity-50 pointer-events-none" : ""}
+                >
                   <Link
                     href={`/me/interviews/${it.id}`}
                     className="group block h-full"
@@ -93,19 +140,32 @@ export default function InterviewHistoryList({
                         <div className="h-12 w-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform duration-300">
                           <MessageSquare size={24} />
                         </div>
-                        <Badge
-                          variant="outline"
-                          className={`
-                                    border font-normal
-                                    ${
-                                      it.isCompleted
-                                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                        : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                                    }
-                                `}
-                        >
-                          {it.isCompleted ? "Analiz Edildi" : "Yarım Kaldı"}
-                        </Badge>
+                        <div className="flex flex-col items-end gap-2">
+                            <Badge
+                            variant="outline"
+                            className={`
+                                        border font-normal
+                                        ${
+                                        it.isCompleted
+                                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                            : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                        }
+                                    `}
+                            >
+                            {it.isCompleted ? "Analiz Edildi" : "Yarım Kaldı"}
+                            </Badge>
+                             <button
+                                onClick={(e) => handleDeleteClick(e, it.id)}
+                                className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-rose-500/20 hover:text-rose-400 transition-all z-20"
+                                title="Sil"
+                              >
+                                {deletingId === it.id ? (
+                                    <div className="h-4 w-4 border-2 border-rose-400 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                    <Trash2 className="h-4 w-4" />
+                                )}
+                              </button>
+                        </div>
                       </div>
                       <div className="flex-1">
                         <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors line-clamp-1">
@@ -153,6 +213,26 @@ export default function InterviewHistoryList({
           </AnimatePresence>
         </motion.div>
       )}
+      
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mülakatı Sil</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bu mülakat oturumunu silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>İptal</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-rose-600 hover:bg-rose-700"
+            >
+              Sil
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { DeleteCVButton } from "./AdminActions";
 
 interface CVTableProps {
   data: AdminCV[];
@@ -79,6 +80,7 @@ export default function CVTable({ data }: CVTableProps) {
                   </div>
                 </DialogContent>
               </Dialog>
+              <DeleteCVButton id={cv.id} />
             </td>
           </tr>
         ))}
