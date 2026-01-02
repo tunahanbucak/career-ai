@@ -59,7 +59,7 @@ export function DeleteCVButton({ id }: DeleteButtonProps) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>CV'yi Sil</AlertDialogTitle>
+          <AlertDialogTitle>CV&apos;yi Sil</AlertDialogTitle>
           <AlertDialogDescription>
             Bu kaydı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
           </AlertDialogDescription>

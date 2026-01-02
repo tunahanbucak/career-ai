@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FileText, Calendar, Search, ArrowUpRight, Clock, Trash2 } from "lucide-react";
+import {
+  FileText,
+  Calendar,
+  Search,
+  ArrowUpRight,
+  Clock,
+  Trash2,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   AlertDialog,
@@ -60,7 +67,7 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
 
     setDeletingId(cvToDelete);
     setDeleteDialogOpen(false);
-    
+
     try {
       const { deleteCV } = await import("@/app/actions/delete");
       const result = await deleteCV(cvToDelete);
@@ -113,7 +120,9 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                 key={cv.id}
                 variants={item}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className={deletingId === cv.id ? "opacity-50 pointer-events-none" : ""}
+                className={
+                  deletingId === cv.id ? "opacity-50 pointer-events-none" : ""
+                }
               >
                 <Link href={`/me/cvs/${cv.id}`} className="group block h-full">
                   <div className="relative h-full bg-slate-900/40 backdrop-blur-md rounded-3xl border border-slate-800/60 p-6 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-900/80 hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/10 flex flex-col justify-between overflow-hidden">
@@ -139,20 +148,20 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                         <button
-                            onClick={(e) => handleDeleteClick(e, cv.id)}
-                            className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-rose-500/20 hover:text-rose-400 transition-all z-20"
-                            title="Sil"
-                          >
-                            {deletingId === cv.id ? (
-                                <div className="h-4 w-4 border-2 border-rose-400 border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                                <Trash2 className="h-4 w-4" />
-                            )}
-                          </button>
-                          <div className="h-8 w-8 rounded-full flex items-center justify-center text-slate-600 group-hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100">
-                            <ArrowUpRight className="h-5 w-5" />
-                          </div>
+                        <button
+                          onClick={(e) => handleDeleteClick(e, cv.id)}
+                          className="h-8 w-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-rose-500/20 hover:text-rose-400 transition-all z-20"
+                          title="Sil"
+                        >
+                          {deletingId === cv.id ? (
+                            <div className="h-4 w-4 border-2 border-rose-400 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </button>
+                        <div className="h-8 w-8 rounded-full flex items-center justify-center text-slate-600 group-hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100">
+                          <ArrowUpRight className="h-5 w-5" />
+                        </div>
                       </div>
                     </div>
                     {cv.analysis && (
@@ -196,13 +205,14 @@ export default function CvHistoryList({ cvs }: CvHistoryListProps) {
           </AnimatePresence>
         </div>
       )}
-      
+
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>CV'yi Sil</AlertDialogTitle>
+            <AlertDialogTitle>CV&apos;yi Sil</AlertDialogTitle>
             <AlertDialogDescription>
-              Bu CV analizini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
+              Bu CV analizini silmek istediğinize emin misiniz? Bu işlem geri
+              alınamaz.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
