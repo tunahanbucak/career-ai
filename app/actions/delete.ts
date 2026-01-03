@@ -19,7 +19,7 @@ export async function deleteCV(cvId: string) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?.email) {
-      return { error: "Unauthorized" };
+      return { error: "Oturum açmanız gerekiyor" };
     }
 
     const cv = await prisma.cV.findUnique({
@@ -28,7 +28,7 @@ export async function deleteCV(cvId: string) {
     });
 
     if (!cv) {
-      return { error: "CV not found" };
+      return { error: "CV bulunamadı" };
     }
 
     // Check ownership or admin status
@@ -36,7 +36,7 @@ export async function deleteCV(cvId: string) {
     const isUserAdmin = isAdmin(session.user.email);
 
     if (!isOwner && !isUserAdmin) {
-      return { error: "Forbidden: You do not have permission to delete this CV" };
+      return { error: "Yetkisiz işlem: Bu CV'yi silme yetkiniz yok." };
     }
 
     await prisma.cV.delete({

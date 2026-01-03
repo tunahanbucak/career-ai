@@ -1,4 +1,5 @@
 import { AdminCVAnalysis } from "@/types";
+import DownloadActionButton from "./DownloadActionButton";
 
 interface AnalysisTableProps {
   data: AdminCVAnalysis[];
@@ -12,6 +13,7 @@ export default function AnalysisTable({ data }: AnalysisTableProps) {
           <th className="px-6 py-3 font-semibold">İçerik</th>
           <th className="px-6 py-3 font-semibold">User</th>
           <th className="px-6 py-3 font-semibold text-right">Zaman</th>
+          <th className="px-6 py-3 font-semibold text-right w-10"></th>
         </tr>
       </thead>
       <tbody className="divide-y divide-slate-800/50">
@@ -43,6 +45,9 @@ export default function AnalysisTable({ data }: AnalysisTableProps) {
             </td>
             <td className="px-6 py-3.5 text-right text-xs text-slate-500 tabular-nums font-mono">
               {new Date(a.createdAt).toLocaleDateString("tr-TR")}
+            </td>
+            <td className="px-6 py-3.5 text-right w-10">
+              <DownloadActionButton type="analysis" data={a} />
             </td>
           </tr>
         ))}

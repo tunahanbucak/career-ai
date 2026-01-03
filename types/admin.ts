@@ -15,6 +15,13 @@ export interface AdminCVAnalysis {
   title: string | null;
   createdAt: Date;
   keywords: string[];
+  summary: string;
+  suggestion: string;
+  score: number;
+  impact: number;
+  brevity: number;
+  ats: number;
+  style: number;
   cv: {
     title: string;
     user: AdminUserEmail;
@@ -28,6 +35,9 @@ export interface AdminInterview {
   user: AdminUserEmail;
   messages: {
     id: string;
+    content: string;
+    role: "ASSISTANT" | "USER";
+    createdAt: Date;
   }[];
 }
 

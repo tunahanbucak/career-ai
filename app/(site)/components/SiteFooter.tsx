@@ -23,51 +23,6 @@ export default function SiteFooter() {
             </div>
           </div>
           <div className="lg:col-span-2">
-            <h3 className="text-white font-semibold text-sm mb-4">Ürün</h3>
-            <ul className="space-y-3">
-              <li>
-                <Link
-                  href="/#ozellikler"
-                  className="text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                >
-                  Özellikler
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/#nasil-calisir"
-                  className="text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                >
-                  Nasıl Çalışır
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard"
-                  className="text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                >
-                  Dashboard
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/me/cv-analyses"
-                  className="text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                >
-                  CV Analizi
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/me/interviews"
-                  className="text-slate-400 hover:text-indigo-400 transition-colors text-sm"
-                >
-                  Mülakat Simülasyonu
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <div className="lg:col-span-2">
             <h3 className="text-white font-semibold text-sm mb-4">Kaynaklar</h3>
             <ul className="space-y-3">
               <li>

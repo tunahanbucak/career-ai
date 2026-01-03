@@ -205,7 +205,7 @@ export default async function AdminPage({
       take: pageSize,
       include: {
         user: { select: { email: true } },
-        messages: { select: { id: true } },
+        messages: { select: { id: true, content: true, role: true, createdAt: true } },
       },
     }),
   ])) as [AdminCV[], AdminCVAnalysis[], AdminInterview[]];

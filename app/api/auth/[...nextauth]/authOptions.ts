@@ -175,6 +175,8 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       // Token'daki güncel verileri session'a aktar
       if (session.user) {
+        // @ts-expect-error: NextAuth session tipinde id tanimli olmadigi icin bu hata bastiriliyor
+        session.user.id = token.sub;
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.image = token.picture;

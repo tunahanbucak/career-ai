@@ -1,5 +1,6 @@
 import { AdminInterview } from "@/types";
 import { DeleteInterviewButton } from "./AdminActions";
+import DownloadActionButton from "./DownloadActionButton";
 
 interface InterviewTableProps {
   data: AdminInterview[];
@@ -54,7 +55,10 @@ export default function InterviewTable({ data }: InterviewTableProps) {
               {new Date(i.date).toLocaleString("tr-TR")}
             </td>
             <td className="px-6 py-3.5 text-right w-10">
-              <DeleteInterviewButton id={i.id} />
+              <div className="flex items-center justify-end gap-1">
+                <DownloadActionButton type="interview" data={i} />
+                <DeleteInterviewButton id={i.id} />
+              </div>
             </td>
           </tr>
         ))}

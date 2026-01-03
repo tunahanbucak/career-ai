@@ -55,8 +55,16 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. İstek Verilerini Okuma
-    const { position, history, message, start, interviewId, recaptchaToken } =
-      (await req.json()) as InterviewRequestBody;
+    const body = await req.json();
+    const {
+      position,
+      history,
+      message,
+      start,
+      interviewId,
+      recaptchaToken,
+      useCv,
+    } = body as InterviewRequestBody & { useCv?: boolean };
 
     // 2.5 reCAPTCHA Doğrulaması
     if (recaptchaToken) {
@@ -83,29 +91,32 @@ export async function POST(req: NextRequest) {
         ? position.trim()
         : "Genel Yazılım Geliştirici";
 
-    // 3. Kullanıcının En Son Analiz Edilen CV'sini Çek
-    const latestAnalysis = await prisma.cVAnalysis.findFirst({
-      where: {
-        cv: {
-          userId: user.id,
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      select: {
-        summary: true,
-        keywords: true,
-        cv: {
-          select: {
-            rawText: true,
-            title: true,
+    // 3. Kullanıcının En Son Analiz Edilen CV'sini Çek (Sadece useCv varsa!)
+    console.log("DEBUG: useCv flag received:", useCv);
+
+    let latestAnalysis = null;
+    if (useCv) {
+      latestAnalysis = await prisma.cVAnalysis.findFirst({
+        where: {
+          cv: {
+            userId: user.id,
           },
         },
-      },
-    });
-
-    // 4. AI Sistem Talimatı (Prompt) Hazırlama
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          summary: true,
+          keywords: true,
+          cv: {
+            select: {
+              rawText: true,
+              title: true,
+            },
+          },
+        },
+      });
+    } // 4. AI Sistem Talimatı (Prompt) Hazırlama
     let cvContext = "";
     if (latestAnalysis) {
       cvContext = `

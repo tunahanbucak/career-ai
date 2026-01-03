@@ -12,6 +12,7 @@ type StatCardProps = {
   gradient: string;
   borderColor: string;
   delay: number;
+  isActive?: boolean;
 };
 
 function StatCard({
@@ -22,6 +23,7 @@ function StatCard({
   gradient,
   borderColor,
   delay,
+  isActive = true,
 }: StatCardProps) {
   return (
     <motion.div
@@ -61,9 +63,9 @@ function StatCard({
             </span>
           )}
         </div>
-        <div className="mt-3 flex items-center gap-1 text-emerald-400 text-xs font-medium">
-          <TrendingUp className="w-3 h-3" />
-          <span>Aktif</span>
+        <div className={`mt-3 flex items-center gap-1 text-xs font-medium ${isActive ? 'text-emerald-400' : 'text-slate-500'}`}>
+          <TrendingUp className={`w-3 h-3 ${isActive ? '' : 'rotate-90'}`} />
+          <span>{isActive ? 'Aktif' : 'Stabil'}</span>
         </div>
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -75,12 +77,16 @@ type Props = {
   totalAnalyses: number;
   totalInterviews: number;
   activityScore: number;
+  recentCvCount?: number;
+  recentInterviewCount?: number;
 };
 
 export default function StatsGrid({
   totalAnalyses,
   totalInterviews,
   activityScore,
+  recentCvCount = 0,
+  recentInterviewCount = 0,
 }: Props) {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -91,6 +97,7 @@ export default function StatsGrid({
         gradient="bg-blue-500/10"
         borderColor="border-blue-500/20"
         delay={0.1}
+        isActive={recentCvCount > 0}
       />
       <StatCard
         title="Mülakat Pratiği"
@@ -99,6 +106,7 @@ export default function StatsGrid({
         gradient="bg-emerald-500/10"
         borderColor="border-emerald-500/20"
         delay={0.2}
+        isActive={recentInterviewCount > 0}
       />
       <StatCard
         title="Aktivite Skoru"
@@ -108,6 +116,7 @@ export default function StatsGrid({
         gradient="bg-amber-500/10"
         borderColor="border-amber-500/20"
         delay={0.3}
+        isActive={activityScore > 50}
       />
     </div>
   );

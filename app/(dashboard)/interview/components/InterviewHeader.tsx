@@ -55,16 +55,26 @@ export default function InterviewHeader({
                 "DevOps Engineer",
                 "Data Scientist",
                 "UI/UX Designer",
+                "Endüstri Mühendisi",
+                "Elektrik-Elektronik Mühendisi",
+                "Makine Mühendisi",
+                "İnşaat Mühendisi",
+                "Yazılım Mühendisi",
               ].includes(position) ? null : (
                 <option value={position}>{position} (CV&apos;den)</option>
               )}
               <option>Frontend Developer</option>
               <option>Backend Developer</option>
               <option>Fullstack Developer</option>
-              <option>Data Scientist</option>
               <option>Mobile Developer</option>
               <option>DevOps Engineer</option>
+              <option>Data Scientist</option>
               <option>UI/UX Designer</option>
+              <option>Endüstri Mühendisi</option>
+              <option>Elektrik-Elektronik Mühendisi</option>
+              <option>Makine Mühendisi</option>
+              <option>İnşaat Mühendisi</option>
+              <option>Yazılım Mühendisi</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
               <ChevronDown className="h-4 w-4 text-slate-500" />

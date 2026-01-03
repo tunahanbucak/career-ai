@@ -251,13 +251,15 @@ export default function AnalysisResultView({
                       msg: "Daha profesyonel ve kurumsal bir dil kullanmalısın.",
                     },
                   ];
-                  const weakest = metrics.reduce((prev, curr) =>
-                    curr.val < prev.val ? curr : prev
-                  );
+                  const minVal = Math.min(...metrics.map(m => m.val));
+                  const weakestCandidates = metrics.filter(m => m.val === minVal);
+                  const selectedIndex = (analysis.analysis?.score || 0) % weakestCandidates.length;
+                  const weakest = weakestCandidates[selectedIndex];
+
                   const score = analysis.analysis?.score || 0;
                   let formatStatus = {
-                    title: "Format: Standart",
-                    msg: "Genel düzenin kabul edilebilir seviyede.",
+                    title: "Format: Kurumsal",
+                    msg: "Yapısal olarak profesyonel standartlara uygun.",
                   };
                   if (score >= 85)
                     formatStatus = {
@@ -271,7 +273,7 @@ export default function AnalysisResultView({
                     };
                   else if (score < 50)
                     formatStatus = {
-                      title: "Format: Karışık",
+                      title: "Format: Geliştirilmeli",
                       msg: "Daha sade ve okunabilir bir şablon denemelisin.",
                     };
 

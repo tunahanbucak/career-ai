@@ -88,7 +88,7 @@ export default function InterviewChat({
               pozisyonu için teknik mülakat simülasyonu başlatılacak.
             </p>
             <Button
-              onClick={onStart}
+              onClick={() => onStart()}
               disabled={loading}
               size="lg"
               className="h-14 px-10 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-lg font-semibold shadow-[0_0_30px_rgba(79,70,229,0.3)] transition-all hover:scale-105"

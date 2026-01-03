@@ -8,23 +8,23 @@ import Logo from "@/components/shared/Logo";
 const testimonials = [
   {
     quote:
-      "CareerAI sayesinde mülakatlara olan güvenim 10 kat arttı. Eksiklerimi nokta atışı tespit etmesi inanılmazdı. Hayalimdeki işe kabul edildim.",
-    author: "Ahmet Yılmaz",
-    role: "Yazılım Mühendisi @ TechCorp",
-    initial: "A",
+      "CareerAI sayesinde mülakat stresimi yendim. Simülasyonlar o kadar gerçekçi ki, gerçek mülakatta hiç zorlanmadım.",
+    author: "Berkant G.",
+    role: "Yazılım Mühendisi @ Global Teknoloji Şirketi",
+    initial: "B",
   },
   {
     quote:
-      "CV'mi yükledim ve 2 dakika içinde detaylı analiz aldım. ATS uyumluluğumu artırdım ve daha fazla geri dönüş almaya başladım.",
-    author: "Zeynep Demir",
-    role: "Ürün Yöneticisi @ StartupXYZ",
-    initial: "Z",
+      "CV analiz özelliği sayesinde gözden kaçırdığım kritik hataları fark ettim. Başvuru dönüşlerim %40 arttı.",
+    author: "Selin Y.",
+    role: "UX Tasarımcı @ E-Ticaret Devi",
+    initial: "S",
   },
   {
     quote:
-      "Mülakat simülasyonu gerçek mülakatlara çok benziyordu. AI koçumun geri bildirimleri sayesinde kendimi çok daha iyi ifade ediyorum.",
-    author: "Mehmet Kaya",
-    role: "Veri Analisti @ DataCo",
+      "Yeni mezun biri olarak mülakatlarda ne sorulacağını bilmiyordum. Bu uygulama kariyer yolculuğumda en büyük yardımcım oldu.",
+    author: "Mert C.",
+    role: "Junior Developer @ Finans Teknoloji A.Ş.",
     initial: "M",
   },
 ];

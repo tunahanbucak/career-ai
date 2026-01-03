@@ -21,7 +21,7 @@ const features = [
   {
     icon: <MessageSquare className="w-6 h-6 text-purple-400" />,
     title: "AI Mülakat Simülasyonu",
-    desc: "Gerçek mülakat senaryolarıyla pratik yap. Sesli yanıtlarını analiz eden AI koçun ile heyecanını yen.",
+    desc: "Gerçek mülakat senaryolarıyla pratik yap. Yazılı yanıtlarını analiz eden AI koçun ile teknik mülakatlara hazırlan.",
     gradient: "from-purple-500/20 to-pink-500/20",
     border: "group-hover:border-purple-500/50",
   },
