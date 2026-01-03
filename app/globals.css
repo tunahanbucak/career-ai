@@ -212,6 +212,16 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+/* Global Cursor Pointer for Interactive Elements */
+button,
+[role="button"],
+[type="button"],
+[type="submit"],
+[type="reset"],
+a {
+  cursor: pointer;
+}
+
 /* Skip to Main Content Link for Screen Readers */
 .skip-to-main {
   position: absolute;

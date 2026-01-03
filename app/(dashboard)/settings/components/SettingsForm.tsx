@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { updateProfile } from "@/app/actions/profile";
 import { Textarea } from "@/components/ui/textarea";
+import DeleteAccountSection from "./DeleteAccountSection";
 
 interface SettingsFormProps {
   user: {
@@ -282,6 +283,14 @@ export default function SettingsForm({ user }: SettingsFormProps) {
             </AnimatePresence>
           </div>
         </form>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="lg:col-span-3 border-t border-slate-800 pt-8"
+      >
+        <DeleteAccountSection />
       </motion.div>
     </div>
   );

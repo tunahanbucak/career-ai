@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Calendar } from "lucide-react";
+import { Sparkles, Calendar, FileText } from "lucide-react";
 import Link from "next/link";
 
 interface DashboardHeaderProps {
@@ -72,15 +72,18 @@ export default function DashboardHeader({ userName }: DashboardHeaderProps) {
             className="group px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/50 hover:scale-105"
           >
             <span className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+              <FileText className="w-4 h-4 group-hover:rotate-12 transition-transform" />
               Yeni CV Analizi
             </span>
           </Link>
           <Link
             href="/interview"
-            className="px-6 py-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/50 text-slate-200 hover:text-white font-semibold transition-all backdrop-blur-sm"
+            className="group px-6 py-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/50 text-white font-semibold transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/50 hover:scale-105"
           >
-            Mülakat Başlat
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+              Mülakat Başlat
+            </span>
           </Link>
         </motion.div>
       </motion.div>

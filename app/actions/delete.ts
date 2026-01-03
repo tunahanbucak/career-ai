@@ -5,7 +5,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// Helper to check if user is admin
 const isAdmin = (email: string | null | undefined) => {
   if (!email) return false;
   const adminEmails = (process.env.ADMIN_EMAILS || "")
@@ -31,7 +30,6 @@ export async function deleteCV(cvId: string) {
       return { error: "CV bulunamadı" };
     }
 
-    // Check ownership or admin status
     const isOwner = cv.userId === session.user.id;
     const isUserAdmin = isAdmin(session.user.email);
 
@@ -68,13 +66,12 @@ export async function deleteInterview(interviewId: string) {
       return { error: "Interview not found" };
     }
 
-    // Check ownership or admin status
     const isOwner = interview.userId === session.user.id;
     const isUserAdmin = isAdmin(session.user.email);
 
     if (!isOwner && !isUserAdmin) {
       return {
-        error: "Forbidden: You do not have permission to delete this interview",
+        error: "Yetkisiz işlem: Bu mülakatı silme yetkiniz yok.",
       };
     }
 
@@ -88,5 +85,23 @@ export async function deleteInterview(interviewId: string) {
   } catch (error) {
     console.error("Error deleting interview:", error);
     return { error: "Failed to delete interview" };
+  }
+}
+
+export async function deleteUser() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user?.email) {
+      return { error: "Unauthorized" };
+    }
+
+    await prisma.user.delete({
+      where: { id: session.user.id },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return { error: "Failed to delete account" };
   }
 }
