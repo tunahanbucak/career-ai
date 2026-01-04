@@ -60,25 +60,25 @@ export default function AnalysisDetails({ analysis }: AnalysisDetailsProps) {
                 <h3 className="text-lg font-bold text-white">Güçlü Yönler</h3>
               </div>
               <ul className="space-y-2 text-sm text-slate-300">
-                {(analysis.brevity ?? 0) >= 80 && (
+                {(analysis.brevity ?? 0) >= 70 && (
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                     <span>Özlü ve anlaşılır ifadeler</span>
                   </li>
                 )}
-                {(analysis.ats ?? 0) >= 80 && (
+                {(analysis.ats ?? 0) >= 70 && (
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                     <span>ATS sistemleriyle uyumlu</span>
                   </li>
                 )}
-                {(analysis.style ?? 0) >= 80 && (
+                {(analysis.style ?? 0) >= 70 && (
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                     <span>Profesyonel dil kullanımı</span>
                   </li>
                 )}
-                {(analysis.impact ?? 0) >= 80 && (
+                {(analysis.impact ?? 0) >= 70 && (
                   <li className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
                     <span>Etkili başarı vurguları</span>
@@ -120,6 +120,21 @@ export default function AnalysisDetails({ analysis }: AnalysisDetailsProps) {
                     <span>Dil ve stil iyileştirilebilir</span>
                   </li>
                 )}
+                {(analysis.brevity ?? 0) >= 70 &&
+                  (analysis.impact ?? 0) >= 70 &&
+                  (analysis.ats ?? 0) >= 70 &&
+                  (analysis.style ?? 0) >= 70 && (
+                    <>
+                      <li className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                        <span>Sektörel terim çeşitliliğini artırabilirsin</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
+                        <span>Liderlik ve inisiyatif örnekleri ekle</span>
+                      </li>
+                    </>
+                  )}
               </ul>
             </div>
           </div>
