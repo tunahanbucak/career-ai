@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
                         <td style="padding: 40px 40px 30px 40px;">
                           <h2 style="color: #1f2937; font-size: 20px; font-weight: 700; margin-bottom: 20px;">Tekrar Hoş Geldiniz!</h2>
                           <p style="color: #4b5563; font-size: 16px; line-height: 1.6; margin-bottom: 30px;">
-                            Hesabınıza güvenli bir şekilde giriş yapmak için aşağıdaki butonu kullanabilirsiniz. Bu bağlantı 24 saat boyunca geçerlidir.
+                            Hesabınıza güvenli bir şekilde giriş yapmak için aşağıdaki butonu kullanabilirsiniz. Bu bağlantı 5 dakika boyunca geçerlidir.
                           </p>
                           <table border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
@@ -108,6 +108,7 @@ export const authOptions: NextAuthOptions = {
           throw new Error(`Email(s) (${failed.join(", ")}) could not be sent`);
         }
       },
+      maxAge: 5 * 60,
     }),
   ],
 
