@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation"; 
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,7 @@ interface SettingsFormProps {
 
 export default function SettingsForm({ user }: SettingsFormProps) {
   const { update } = useSession();
+  const router = useRouter(); // Router hook
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{
     type: "success" | "error";
@@ -75,7 +77,8 @@ export default function SettingsForm({ user }: SettingsFormProps) {
       const result = await updateProfile(null, formData);
       if (result.success) {
         setMessage({ type: "success", text: result.message });
-        await update(); // Session'ı güncelle
+        await update(); // Session'ı güncelle (JWT'yi yeniler)
+        router.refresh(); // Server componentleri (Sidebar, Header) yeniler
       } else {
         setMessage({ type: "error", text: result.message });
       }

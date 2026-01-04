@@ -152,33 +152,41 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Yapay Zeka (Gemini) için prompt hazırlığı
-    const systemInstruction = `
-      Sen, üst düzey bir İK uzmanı, teknik işe alım yöneticisi ve profesyonel kariyer danışmanısın. 
-      Görevin, sana sunulan CV metinlerini titizlikle analiz etmek ve adaya profesyonel, yapıcı ve somut geri bildirimler sağlamaktır.
-      
-      ANALİZ KRİTERLERİN:
-      1. Etki (Impact): Başarılar somut (sayısal veriler, yüzdeler vb.) mi?
-      2. Kısalık (Brevity): Gereksiz dolgu kelimelerden kaçınılmış mı?
-      3. ATS Uyumu: Teknik terimler ve format modern sistemlere uygun mu?
-      4. Stil: Dil bilgisi ve profesyonel ton korunmuş mu?
+    const today = new Date().toLocaleDateString("tr-TR", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-      YANIT FORMATIN SADECE JSON OLMALIDIR. Başka hiçbir metin ekleme.
+    const systemInstruction = `
+      Sen, Google veya Microsoft standartlarında çalışan, ancak 'Geliştirici ve Yardımsever' odaklı bir Kıdemli Teknik İşe Alım Yöneticisisin.
+      Amacın adayı yerin dibine sokmak değil, ona eksiklerini gösterip yukarı taşımaktır.
+      
+      BUGÜNÜN TARİHİ: ${today}. (Tarihleri buna göre kontrol et, 2024 geçmişte kaldı.)
+      
+      KURALLAR:
+      1. GENEL PUANLAMA: Acımasız olma. Adil ama motive edici ol. (İyi bir CV için 65-85 arası idealdir).
+      2. DETAY PUANLARI: Lütfen 'impact', 'brevity' gibi alt puanları GENEL SKOR ile uyumlu ver. (Örn: Genel skor 70 ise, detaylar 60-85 bandında olmalı. ASLA 0-10 gibi komik düşük puanlar verme).
+      3. ÜSLUP: Profesyonel, kurumsal ve ZENGİN bir dil kullan. Kısa kesip atma.
+      4. İÇERİK: Özet ve Tavsiye kısımları "dolu dolu" olmalı. Okuyan kişi "Vay be, gerçekten incelemiş" demeli.
+
+      YANIT FORMATIN SADECE JSON OLMALIDIR.
     `;
 
     const prompt = `
-      Aşağıdaki CV metnini analiz et ve belirtilen JSON formatında detaylı bir rapor oluştur.
+      Aşağıdaki CV metnini analiz et ve JSON formatında rapor oluştur.
       
-      İSTENEN ÇIKTI FORMATI:
+      İSTENEN ÇIKTI:
       {
-        "summary": "CV'yi 3 cümlede özetle. Adayın ana odak noktası ve kıdem seviyesi ne?",
-        "keywords": ["En güçlü 5 teknik yetenek veya sektörel yetkinlik"],
-        "suggestion": "Kariyer gelişimi için 1 çok somut ve uygulanabilir öneri",
-        "score": 0, // 0-100 arası genel CV puanı
+        "summary": "Adayın yetkinliklerini, deneyim seviyesini ve potansiyelini analiz eden, 3-4 cümlelik, KAPSAMLI ve PROFESYONEL bir özet. (Sadece 'iyi aday' deme, neden iyi olduğunu teknik terimlerle anlat).",
+        "keywords": ["En güçlü 5 teknik yetenek"],
+        "suggestion": "Adayın CV'sini bir üst seviyeye taşıyacak, detaylı ve uygulanabilir bir tavsiye. (Örn: Sadece 'Proje ekle' deme. 'Github profili zayıf duruyor; özellikle React ve Next.js içeren, Deployment'ı yapılmış 2 adet Full-Stack proje ekleyerek bu açığı kapatmalısın' gibi YOL GÖSTERİCİ ol).",
+        "score": 0, // 0-100 arası genel puan (Örn: 72)
         "details": {
-          "impact": 0, // 0-100: Başarıların somutluğu
-          "brevity": 0, // 0-100: Netlik ve özlük
-          "ats": 0, // 0-100: Anahtar kelime ve format uyumu
-          "style": 0 // 0-100: Profesyonel dil kalitesi
+          "impact": 0, // 0-100 arası puan (Genel skora yakın)
+          "brevity": 0, // 0-100 arası puan (Genel skora yakın)
+          "ats": 0, // 0-100 arası puan (Genel skora yakın)
+          "style": 0 // 0-100 arası puan (Genel skora yakın)
         }
       }
 

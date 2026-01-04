@@ -151,23 +151,27 @@ export const authOptions: NextAuthOptions = {
         return { ...token, ...user, title: (user as User).title };
       }
 
-      // HER TOKEN REFRESH: name yoksa DB'den al veya oluştur
-      if (token.email && (!token.name || token.name === null)) {
+      // HER TOKEN REFRESH: DB'den güncel veriyi çek
+      if (token.email) {
         const dbUser = await prisma.user.findUnique({
           where: { email: token.email as string },
         });
 
-        if (dbUser && !dbUser.name) {
-          // DB'de de name yoksa email'den oluştur
-          const generatedName = (token.email as string).split("@")[0];
-          await prisma.user.update({
-            where: { email: token.email as string },
-            data: { name: generatedName },
-          });
-          token.name = generatedName;
-        } else if (dbUser?.name) {
-          // DB'de name varsa token'a koy
-          token.name = dbUser.name;
+        if (dbUser) {
+          // Eğer DB'de isim varsa onu kullan, yoksa email'den üret ve kaydet
+          if (dbUser.name) {
+            token.name = dbUser.name;
+          } else {
+            const generatedName = (token.email as string).split("@")[0];
+            await prisma.user.update({
+              where: { email: token.email as string },
+              data: { name: generatedName },
+            });
+            token.name = generatedName;
+          }
+          
+          token.title = dbUser.title;
+          token.picture = dbUser.image;
         }
       }
 

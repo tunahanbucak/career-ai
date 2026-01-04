@@ -35,7 +35,6 @@ export default function DashboardHeader({ userName }: DashboardHeaderProps) {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
       >
-        {" "}
         <div>
           <div className="flex items-center gap-3 mb-2">
             <motion.div
@@ -65,25 +64,22 @@ export default function DashboardHeader({ userName }: DashboardHeaderProps) {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          className="flex flex-wrap gap-3"
+          className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto sm:items-center"
         >
           <Link
             href="/cv-analysis"
-            className="group px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold transition-all shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/50 hover:scale-105"
+            className="group w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-medium transition-all shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:scale-105"
           >
-            <span className="flex items-center gap-2">
-              <FileText className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-              Yeni CV Analizi
-            </span>
+            <FileText className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+            Yeni CV Analizi
           </Link>
+
           <Link
             href="/interview"
-            className="group px-6 py-3 rounded-xl bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/50 text-white font-semibold transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/50 hover:scale-105"
+            className="group w-full sm:w-auto inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700 hover:border-indigo-500/50 text-white text-sm font-medium transition-all shadow-md shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-105"
           >
-            <span className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-              Mülakat Başlat
-            </span>
+            <Sparkles className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+            Mülakat Başlat
           </Link>
         </motion.div>
       </motion.div>
