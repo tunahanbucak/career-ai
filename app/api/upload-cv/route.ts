@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-require-imports */
-
 import { NextRequest, NextResponse } from "next/server";
 import mammoth from "mammoth"; // DOCX için
 import { getServerSession } from "next-auth";
@@ -9,7 +7,7 @@ import { addXP, XP_VALUES } from "@/app/utils/xp";
 
 // Node.js runtime kullandaki fonksiyonu kullanacağız.
 // Bu, require ile import edilen objenin içindeki fonksiyonu bulmanın en güvenilir yoludur.
-const pdfParse = require("pdf-parse");
+import pdfParse from "pdf-parse";
 
 export const runtime = "nodejs";
 

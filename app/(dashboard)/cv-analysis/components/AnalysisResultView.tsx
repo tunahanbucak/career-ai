@@ -91,8 +91,10 @@ export default function AnalysisResultView({
               <h3 className="text-3xl font-black text-white tracking-tight">
                 {analysis.analysis?.score && analysis.analysis.score >= 85
                   ? "Mükemmel!"
-                  : analysis.analysis?.score && analysis.analysis.score >= 70
+                  : analysis.analysis?.score && analysis.analysis.score >= 75
                   ? "Çok İyi"
+                  : analysis.analysis?.score && analysis.analysis.score >= 65
+                  ? "İyi"
                   : "Geliştirilmeli"}
               </h3>
               <p className="text-indigo-200/80 font-medium max-w-xs">
@@ -251,9 +253,12 @@ export default function AnalysisResultView({
                       msg: "Daha profesyonel ve kurumsal bir dil kullanmalısın.",
                     },
                   ];
-                  const minVal = Math.min(...metrics.map(m => m.val));
-                  const weakestCandidates = metrics.filter(m => m.val === minVal);
-                  const selectedIndex = (analysis.analysis?.score || 0) % weakestCandidates.length;
+                  const minVal = Math.min(...metrics.map((m) => m.val));
+                  const weakestCandidates = metrics.filter(
+                    (m) => m.val === minVal
+                  );
+                  const selectedIndex =
+                    (analysis.analysis?.score || 0) % weakestCandidates.length;
                   const weakest = weakestCandidates[selectedIndex];
 
                   const score = analysis.analysis?.score || 0;
